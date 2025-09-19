@@ -1,0 +1,705 @@
+---
+title: "PGPR screening analysis"
+author: "Rodrigo Taketani"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+```
+
+# Analysis of the Functional screening datadata
+
+
+## Import data
+
+```{r}
+
+# Get metadata
+
+sample_data <- readxl::read_excel("./sample.xlsx") # description of the pot experiment metadata
+
+AgMicrobiome_RR <- readxl::read_excel("./AgMicrobiome-RR.xlsx", sheet = "Soils") # Data from the source soils
+
+sample_metadata <- merge(sample_data, AgMicrobiome_RR, by = "Sample name", all.x = TRUE) 
+
+# Make a df with isolate data and metadata
+
+merged_table2 <- read.delim("./isolate_data.tsv") # Import data of the isolates
+
+Huge_table <- merge(merged_table2, sample_metadata, by = "Plate", all.x = TRUE)
+
+# Make a DF with the number of positives per sample
+
+#remove samples that were not tested 
+
+combined_df <- Huge_table[!is.na(Huge_table$TSA),]
+combined_df <- Huge_table[Huge_table$TSA %in% c("Yes", "No"), ]
+
+
+# Check if an isolate is detected in any of the media tested to normalise
+
+columns_to_move <- c("Plate", "Ca3.PO4.2.solubilization",  "K.solubilization", "Siderophore.production", "N.hydrolization", "ACC.deaminase" , "Salt", "Drought", "Zinc.solubilization", "TSA")
+
+# Create a new column 'recovered' with 'Yes' if any of the columns_to_move have 'Yes' in the row
+combined_df$recovered <- apply(combined_df[, columns_to_move], 1, function(x) {
+  if ("Yes" %in% x) {
+    "Yes"
+  } else {
+    "No"
+  }
+})
+
+# Create new columns indicating if the isolate has nutrient aquisition characteristics or stress relief.
+
+columns_stress <- c("ACC.deaminase" , "Salt", "Drought")
+
+combined_df$stress <- apply(combined_df[, columns_stress], 1, function(x) {
+  if ("Yes" %in% x) {
+    "Yes"
+  } else {
+    "No"
+  }
+})
+
+columns_nutrient <- c("Ca3.PO4.2.solubilization",  "K.solubilization", "Siderophore.production", "N.hydrolization", "Zinc.solubilization")
+
+combined_df$nutrient <- apply(combined_df[, columns_nutrient], 1, function(x) {
+  if ("Yes" %in% x) {
+    "Yes"
+  } else {
+    "No"
+  }
+})
+
+fun_vec <- columns_to_move[-10]
+
+#Count the number of functions per isolate
+combined_df$n_functions <- rowSums(combined_df[fun_vec] == "Yes")
+
+
+```
+
+Prepare a table with the number of positives per sample
+
+```{r}
+positive_counts <- data.frame(Plate = unique(combined_df$Plate))
+
+
+# Loop through each column and count "yes" for each sample
+
+columns_to_move2 <- c("Plate", "Ca3.PO4.2.solubilization",  "K.solubilization", "Siderophore.production", "N.hydrolization", "ACC.deaminase" , "Salt", "Drought", "Zinc.solubilization", "TSA", "recovered", "nutrient", "stress")
+
+for (col in columns_to_move2) {
+  positive_counts[col] <- sapply(unique(combined_df$Plate), function(plate) {
+    sum(combined_df[combined_df$Plate == plate, col] == "Yes", na.rm = TRUE)
+  })
+}
+
+positive_counts[1] <- unique(combined_df$Plate)
+
+posit_counts_table <- merge(positive_counts, sample_metadata, by = "Plate", all.x = TRUE)
+
+posit_counts_table_backup <- posit_counts_table
+
+posit_norm_table <- posit_counts_table
+
+
+
+# Ensure that the 'recovered' column is numeric
+posit_norm_table$recovered <- as.numeric(posit_norm_table$recovered)
+
+# Loop through each column in the vector and normalize the values by the 'recovered' column
+posit_norm_table[, columns_to_move[2:10]] <- lapply(posit_norm_table[, columns_to_move[2:10]], function(col) {
+  col / posit_norm_table$recovered
+})
+
+posit_norm_table$recovered <- NULL
+
+```
+
+## Aesthetic defaults
+
+We will set a labels, colors, and shapes to represent the different treatments on the plots. This consistency will help with the readability of the plots. 
+
+```{r}
+# Aestetic parameters
+
+colorvec <- c("AN" = "#005F73",
+              "BE"  = "#0A9396",
+              "BO" = "#94D2BD",
+              "BU" = "#E9D8A6",
+              "HE" = "#EE9B00",
+              "SH" = "#CA6702",
+              "YO" = "#BB3E03",
+              "CL" = "#251605",
+              "CY" = "#c57b57",
+              "SC" = "#f1ab86",
+              "SL" = "#f7dba7",
+              "Barley" = "#0e181b", 
+              "Oats" = "#1f363d", 
+              "Wheat" = "#40798c", 
+              "Beans" = "#70a9a1", 
+              "OilseedRape" = "#9ec1a3", 
+              "OSR" = "#9ec1a3", 
+              "Sugarbeet" = "#cfe0c3", 
+              "Bulksoil" = "#E9D8A6",
+              "Bulk" = "#E9D8A6",
+              "CL" = "#251605",
+              "CY" = "#c57b57",
+              "SC" = "#f1ab86",
+              "SL" = "#f7dba7",
+              "Clay loam" = "#251605",
+              "Clay" = "#c57b57",
+              "Silty clay loam" = "#f1ab86",
+              "Sandy loam" = "#f7dba7",
+              "CL.BO" = "#2c2c54",
+              "SL.AN" = "#474787",
+              "CL.YO" = "#227093",
+              "CY.YO" = "#218c74",
+              "SC.HE" = "#b33939",
+              "CY.BU" = "#cd6133",
+              "SL.BE" = "#cc8e35",
+              "SC.SH" = "#ccae62",
+              "SL.SH" = "#84817a"
+              )
+
+shapesvec <- c("Barley" = 3, "Beans" = 15, 
+               "Bulksoil" = 16, "Oats" = 17, 
+               "OilseedRape" = 18, "Sugarbeet" = 25, 
+               "Wheat" = 0,
+               "AN" = 3, "BE" = 15, 
+               "BO" = 16, "BU" = 17, 
+               "HE" = 18, "SH" = 25, 
+               "YO" = 0)
+
+labelsvec <- c("AN" = "Angus",
+              "BE"  = "Bedfordshire",
+              "BO" = "Borders",
+              "BU" = "Buckinghamshire",
+              "HE" = "Hertfordshire",
+              "SH" = "Shropshire",
+              "YO" = "Yorkshire",
+              "Barley" = "Barley",
+              "Beans" = "Beans", 
+              "Bulksoil" = "Bulk soil",
+              "Bulk" = "Bulk soil",
+              "Oats" = "Oats", 
+              "OilseedRape" = "Oilseed Rape", 
+              "OSR" = "Oilseed Rape",
+              "Sugarbeet" = "Sugarbeet", 
+              "Wheat" = "Wheat",
+              "CL" = "Clay loam",
+              "CY" = "Clay",
+              "SC" = "Silt clay loam",
+              "SL" = "Sandy loam",
+              "Clay loam" = "Clay loam",
+              "Clay" = "Clay",
+              "Silty clay loam" = "Silt clay loam",
+              "Sandy loam" = "Sandy loam",
+              "CL.BO" = "Borders",
+              "CL.YO" = "Yorkshire-CL",
+              "CY.BU" = "Buckinghamshire",
+              "CY.YO" = "Yorkshire-CY",
+              "SC.HE" = "Hertfordshire",
+              "SC.SH" = "Shropshire-SC",
+              "SL.AN" = "Angus",
+              "SL.BE" = "Bedfordshire",
+              "SL.SH" = "Shropshire-SL"
+              )
+
+crop_order = c("Barley", "Oats", "Wheat", "Beans", "OSR", "Sugarbeet", "Bulk")
+
+local_order = c("CL.BO", "SL.AN", "CL.YO", "CY.YO", "SC.HE", "CY.BU", "SL.BE", "SC.SH", "SL.SH")
+
+funct_labs <- c("Ca3.PO4.2.solubilization" = expression("Ca"[3]*"(PO"[4]*")"[2]*" solubilization"),
+                 "K.solubilization" = "Potassium solubilization",
+                 "Siderophore.production" = "Siderophores production",
+                 "Zinc.solubilization" = "ZnO solubilization",
+                 "N.hydrolization" = "Casein hydrolysis",
+                  "ACC.deaminase" = "ACC deaminase",
+                  "Salt" = "600mM NaCl resist.",
+                  "Drought"= "Drought resist.")
+
+# for convinience, let's rename some of the columns
+
+library(dplyr)
+
+# Renaming a specific column by specifying the old and new column names
+posit_counts_table <- posit_counts_table %>% rename(soil = `Textural class`)
+posit_counts_table <- posit_counts_table %>% rename(Location = `Soil Id`)
+
+posit_norm_table <- posit_norm_table %>% rename(soil = `Textural class`)
+posit_norm_table <- posit_norm_table %>% rename(Location = `Soil Id`)
+
+posit_counts_table$Location <- gsub("-", ".", posit_counts_table$Location)
+posit_norm_table$Location <- gsub("-", ".", posit_norm_table$Location)
+
+
+
+
+```
+
+# Data analysis. 
+
+## number of positives
+
+```{r}
+### Make a plot with total positive isolates
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+
+columns_to_plot <- c("Ca3.PO4.2.solubilization",  "K.solubilization", "Siderophore.production", "N.hydrolization", "ACC.deaminase" , "Salt", "Drought", "Zinc.solubilization")
+
+sum_df <- posit_counts_table %>%
+  summarise(across(all_of(columns_to_plot), sum))
+
+# Convert the summary data frame to a format suitable for ggplot
+sum_df <- pivot_longer(sum_df, everything(), names_to = "Column", values_to = "Sum")
+
+# Create the barplot
+ggplot(sum_df, aes(x = Column, y = Sum)) +
+  geom_bar(stat = "identity", fill = "#56B4E9") +
+  geom_text(aes(label = Sum), vjust = -0.5, size = 3.5) +
+  labs(x = "Function", y = "Total count")+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# separate by cluster
+
+sum_df <- posit_counts_table %>%
+  group_by(soil) %>%
+  summarise(across(all_of(columns_to_plot), sum))
+
+# Convert the summary data frame to a long format for ggplot
+sum_df_long <- pivot_longer(sum_df, -soil, names_to = "Column", values_to = "Sum")
+
+# Create the stacked barplot
+ggplot(sum_df_long, aes(x = Column, y = Sum, fill = soil)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Function", y = "Total count") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotating x-axis labels for readability
+  scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec)  # Set color palette for segments
+
+# separate by Crop
+
+sum_df <- posit_counts_table %>%
+  group_by(Crop) %>%
+  summarise(across(all_of(columns_to_plot), sum))
+
+# Convert the summary data frame to a long format for ggplot
+sum_df_long <- pivot_longer(sum_df, -Crop, names_to = "Column", values_to = "Sum")
+
+# Create the stacked barplot
+ggplot(sum_df_long, aes(x = Column, y = Sum, fill = Crop)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Function", y = "Total count") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotating x-axis labels for readability
+  scale_fill_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) 
+                         # Set color palette for segments
+
+# separate by Site
+sum_df <- posit_counts_table %>%
+  group_by(Location) %>%
+  summarise(across(all_of(columns_to_plot), sum))
+
+# Convert the summary data frame to a long format for ggplot
+sum_df_long <- pivot_longer(sum_df, -Location, names_to = "Column", values_to = "Sum")
+
+# Create the stacked barplot
+ggplot(sum_df_long, aes(x = Column, y = Sum, fill = Location)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Function", y = "Total count") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotating x-axis labels for readability
+  scale_fill_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) 
+
+```
+
+```{r, fig.height = 11, fig.width = 11, fig.align = "center"}
+
+library(tidyverse)
+library(ggplot2)
+library(multcompView)
+library(ggpubr)
+
+posit_counts_table <- posit_norm_table
+
+# Quick Shapiro-Wilk test to check for normality
+
+results <- lapply(columns_to_plot, function(col) {
+  shapiro.test(posit_counts_table[[col]])$p.value
+})
+
+# Assign column names to results
+names(results) <- columns_to_plot
+
+# Print results
+results
+
+
+#Compare by Texture Cluster
+cluster_list <- list()
+
+for (col in columns_to_plot) {
+  # Analysis of variance
+  my_formula <- as.formula(paste0("posit_counts_table$\"", col, "\" ~ soil"))
+  anova_result <- aov(formula = my_formula, data = posit_counts_table)
+  anova_summary <- summary(anova_result)
+  p_value <- anova_summary[[1]][["Pr(>F)"]][1]  # Extract p-value
+  p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+  
+  # Tukey's test
+  tukey_result <- TukeyHSD(anova_result)
+  
+  # Compact letter display
+  cld_result <- multcompLetters4(anova_result, tukey_result)
+  
+  # Create a summary table
+  dt <- posit_counts_table %>%
+    group_by(soil) %>%
+    summarise(w = mean(.data[[col]]), sd = sd(.data[[col]]), max = max(.data[[col]])) %>%
+    arrange(desc(w))
+  
+  # Extracting the compact letter display and adding it to the table
+  cld <- as.data.frame.list(cld_result$soil)
+  dt$cld <- cld$Letters
+  
+  # Create a bar plot
+  p <- ggplot(posit_counts_table, aes(x = soil, y = .data[[col]], fill = soil)) +
+    geom_boxplot(show.legend = FALSE, outlier.shape = NA) +
+    geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) +  # Add jitter
+    labs(title = funct_labs[[col]], x = "Sample", y = "Count of Positives") +
+    scale_fill_manual(values = colorvec, name = NULL, labels = labelsvec) +
+    scale_x_discrete(labels = labelsvec) +
+    labs(x = element_blank(), y = "Frequency of isolates per sample") +
+    geom_text(data = dt, aes(label = cld, y = max * 1.05), color = "darkgray", vjust = -0.5, size = 4) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    annotate("text", x = 2.5, y = max(dt$max) * 1.2, label = p_value_text, size = 4) +
+    coord_cartesian(ylim = c(0, max(dt$max) * 1.25))
+  
+  cluster_list[[col]] <- p
+}
+
+# Arrange the plots
+gridExtra::grid.arrange(grobs = cluster_list)
+cluster_list_box_soils <- cluster_list
+
+
+cluster_list <- list()
+
+for (col in columns_to_plot) {
+  # Analysis of variance
+  my_formula <- as.formula(paste0("posit_counts_table$\"", col, "\" ~ Crop"))
+  anova_result <- aov(formula = my_formula, data = posit_counts_table)
+  anova_summary <- summary(anova_result)
+  p_value <- anova_summary[[1]][["Pr(>F)"]][1]  # Extract p-value
+  p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+  
+  # Tukey's test
+  tukey_result <- TukeyHSD(anova_result)
+  
+  # Compact letter display
+  cld_result <- multcompLetters4(anova_result, tukey_result)
+  
+  # Create a summary table
+  dt <- posit_counts_table %>%
+    group_by(Crop) %>%
+    summarise(w = mean(.data[[col]]), sd = sd(.data[[col]]), max = max(.data[[col]])) %>%
+    arrange(desc(w))
+  
+  # Extracting the compact letter display and adding it to the table
+  cld <- as.data.frame.list(cld_result$Crop)
+  dt$cld <- cld$Letters
+  
+  # Create a bar plot
+  p <- ggplot(posit_counts_table, aes(x = Crop, y = .data[[col]], fill = Crop)) +
+    geom_boxplot(show.legend = FALSE, outlier.shape = NA) +
+    geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) +  # Add jitter
+    labs(title = funct_labs[[col]], x = "Sample", y = "Count of Positives") +
+    scale_fill_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
+    scale_x_discrete(labels = labelsvec, limits = crop_order) +
+    labs(x = element_blank(), y = "Frequency of isolates per sample") +
+    geom_text(data = dt, aes(label = cld, y = max * 1.05), color = "darkgray", vjust = -0.5, size = 4) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    annotate("text", x = 4, y = max(dt$max) * 1.2, label = p_value_text, size = 4) +
+    coord_cartesian(ylim = c(0, max(dt$max) * 1.25))
+  
+  cluster_list[[col]] <- p
+}
+
+# Arrange the plots
+gridExtra::grid.arrange(grobs = cluster_list)
+cluster_list_box_crops <- cluster_list
+
+
+cluster_list <- list()
+
+for (col in columns_to_plot) {
+  # Analysis of variance
+  my_formula <- as.formula(paste0("posit_counts_table$\"", col, "\" ~ Location"))
+  anova_result <- aov(formula = my_formula, data = posit_counts_table)
+  anova_summary <- summary(anova_result)
+  p_value <- anova_summary[[1]][["Pr(>F)"]][1]  # Extract p-value
+  p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+  
+  # Tukey's test
+  tukey_result <- TukeyHSD(anova_result)
+  
+  # Compact letter display
+  cld_result <- multcompLetters4(anova_result, tukey_result)
+  
+  # Create a summary table
+  dt <- posit_counts_table %>%
+    group_by(Location) %>%
+    summarise(w = mean(.data[[col]]), sd = sd(.data[[col]]), max = max(.data[[col]])) %>%
+    arrange(desc(w))
+  
+  # Extracting the compact letter display and adding it to the table
+  cld <- as.data.frame.list(cld_result$Location)
+  dt$cld <- cld$Letters
+  
+  # Create a bar plot
+  p <- ggplot(posit_counts_table, aes(x = Location, y = .data[[col]], fill = Location)) +
+    geom_boxplot(show.legend = FALSE, outlier.shape = NA) +
+    geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) +  # Add jitter
+    labs(title = funct_labs[[col]], x = "Sample", y = "Count of Positives") +
+    scale_fill_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+    scale_x_discrete(labels = labelsvec, limits = local_order) +
+    labs(x = element_blank(), y = "Frequency of isolates per sample") +
+    geom_text(data = dt, aes(label = cld, y = max * 1.05), color = "darkgray", vjust = -0.5, size = 4) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    annotate("text", x = 5, y = max(dt$max) * 1.2, label = p_value_text, size = 4) +
+    coord_cartesian(ylim = c(0, max(dt$max) * 1.25))
+  
+  cluster_list[[col]] <- p
+}
+
+# Arrange the plots
+gridExtra::grid.arrange(grobs = cluster_list)
+
+cluster_list_box_locations <- cluster_list
+
+
+
+```
+
+```{r, fig.height = 4, fig.width = 4, fig.align = "center"}
+
+## PCoA 
+
+library(vegan)
+your_data <- posit_counts_table[,2:9]
+row.names(your_data) <- posit_counts_table$Plate
+
+
+# Replace 'your_data' with your actual data frame
+bray_curtis_matrix <- vegdist(your_data, method = "bray")
+bray_curtis_matrix_fun <- bray_curtis_matrix
+
+save(posit_counts_table, posit_norm_table, combined_df, Huge_table, file = "../Comparisons/functional.RData") # save for future comparisons
+library(vegan)
+library(ggplot2)
+library(RColorBrewer)
+library(scales)
+
+# Run NMDS using Bray-Curtis dissimilarity
+nmds_result <- metaMDS(bray_curtis_matrix, k = 2, trymax = 100)
+
+nmds_result$stress
+
+# Extract NMDS coordinates
+nmds_df <- data.frame(
+  NMDS1 = nmds_result$points[, 1],
+  NMDS2 = nmds_result$points[, 2]
+)
+nmds_df$Site <- posit_counts_table$Location
+nmds_df$Crop <- posit_counts_table$Crop
+nmds_df$Cluster <- posit_counts_table$soil
+
+# Plot NMDS results
+p <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site, shape = Crop)) +
+  geom_point(size = 3) +
+  scale_shape_manual(values = shapesvec) +
+  labs(x = "NMDS1", y = "NMDS2") +
+  ggtitle("NMDS Plot of Bray-Curtis Dissimilarity") +
+  theme_classic() +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  theme(legend.direction = "horizontal") +
+  guides(color = guide_legend(ncol = 2),
+         shape = guide_legend(ncol = 2))+
+  theme(legend.position = 'bottom',
+        legend.direction = "vertical")+
+  guides(color=guide_legend(ncol=2))
+
+print(p)
+
+q <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Cluster)) +
+  geom_point(size = 2.5) +
+  labs(x = "NMDS1", y = "NMDS2") +
+  #ggtitle("NMDS colored by soil type") +
+  cowplot::theme_cowplot()+
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec)+
+  theme(legend.position = 'bottom',
+        legend.direction = "vertical",
+        axis.title = element_blank())+
+  guides(color=guide_legend(ncol=2))
+
+
+print(q)
+
+r <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Crop)) +
+  geom_point(size = 2.5) +
+  labs(x = "NMDS1", y = "NMDS2") +
+  #ggtitle("NMDS colored by Crop") +
+  cowplot::theme_cowplot()+
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order)+
+  theme(legend.position = 'bottom',
+        legend.direction = "vertical",
+        axis.title = element_blank()) +
+  guides(color=guide_legend(ncol=2))
+
+
+print(r)
+
+
+s <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site)) +
+  geom_point(size = 2.5) +
+  labs(x = "NMDS1", y = "NMDS2") +
+  #ggtitle("NMDS colored by location") +
+  cowplot::theme_cowplot()+
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  theme(legend.position = 'bottom',
+        legend.direction = "vertical",
+        axis.title = element_blank()) +
+  guides(color=guide_legend(ncol=2))
+
+
+print(s)
+```
+
+```{r, fig.height = 5, fig.width = 11, fig.align = "center"}
+# Calculate the size of the first plot to match the combined size of the other two
+library(patchwork)
+
+s + r + q + plot_annotation(tag_levels = 'A')
+
+nmds_func <- (r +s +  q)
+
+```
+
+```{r, fig.height = 11, fig.width = 11, fig.align = "center"}
+## repeat the plots q and r adding the centroids of the groups
+
+library(dplyr)
+library(ggplot2)
+
+pcoa_result <- cmdscale(bray_curtis_matrix)
+
+pcoa_df <- data.frame(
+  PC1 = pcoa_result[, 1],
+  PC2 = pcoa_result[, 2]
+)
+pcoa_df$Site <- posit_counts_table$Location
+pcoa_df$Crop <- posit_counts_table$Crop
+pcoa_df$Cluster <- posit_counts_table$soil
+
+
+```
+
+
+# PERMANOVA
+
+
+```{r}
+library(pairwiseAdonis)
+
+permanova_soil <- vegan::adonis2(bray_curtis_matrix ~ pcoa_df$Cluster)
+permanova_crop <- vegan::adonis2(bray_curtis_matrix ~ pcoa_df$Crop)
+permanova_local <- vegan::adonis2(bray_curtis_matrix ~ pcoa_df$Site)
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+
+
+```
+# Pairwise PERMANOVA
+
+```{r}
+library(pairwiseAdonis)
+
+pairwise.adonis(bray_curtis_matrix, pcoa_df$Cluster)
+pairwise.adonis(bray_curtis_matrix, pcoa_df$Crop)
+pairwise.adonis(bray_curtis_matrix, pcoa_df$Site)
+```
+
+# PERMDIST
+
+```{r}
+# Perform PERMDIST
+#soil 
+soil_type_permdist <- vegan::betadisper(bray_curtis_matrix, pcoa_df$Cluster, type = "centroid")
+anova(soil_type_permdist)
+
+#location
+loc_type_permdist <- vegan::betadisper(bray_curtis_matrix, pcoa_df$Site, type = "centroid")
+anova(loc_type_permdist)
+
+#crop
+crop_type_permdist <- vegan::betadisper(bray_curtis_matrix, pcoa_df$Crop, type = "centroid")
+anova(crop_type_permdist)
+
+
+pairwise.adonis(bray_curtis_matrix, pcoa_df$Cluster)
+pairwise.adonis(bray_curtis_matrix, pcoa_df$Crop)
+pairwise.adonis(bray_curtis_matrix, pcoa_df$Site)
+
+
+
+```
+Because the PERMDIST test indicated that the dispersal of the samples is significant as were the PERMANOVA tests we cannot affirm that the are due to Soil type, location or crop because PERMANOVA assumes that distances are homogeneous. 
+
+# ANOSIM
+
+Because the PERMANOVA results are not reliable we will use the non-parametric ANOSIM test. 
+
+```{r}
+# Soil type
+vegan::anosim(bray_curtis_matrix, pcoa_df$Cluster, distance = "bray", permutations = 999)
+
+# Location
+vegan::anosim(bray_curtis_matrix, pcoa_df$Site, distance = "bray", permutations = 999)
+# Crop
+vegan::anosim(bray_curtis_matrix, pcoa_df$Crop, distance = "bray", permutations = 999)
+
+```
+
+
+```{r}
+
+save(nmds_func, cluster_list_box_locations, cluster_list_box_soils, cluster_list_box_crops, file = "../Comparisons/funct_figs.RData")
+
+```
+
+
+```{r}
+installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
+``` 
+

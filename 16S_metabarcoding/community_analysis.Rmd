@@ -1,0 +1,1430 @@
+---
+title: "AgMicrobiome 16S metabarcoding"
+output: github_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+```
+# Importing data
+
+first we import the normalized data from [Payton's Github page](https://github.com/paytonyau/agmicrobiomebase/tree/main/publications-scripts/How-to-paper/case_00_02_RData)
+
+```{r}
+load("../16S_metabarcoding/norm.RData")
+library(phyloseq)
+physeq.norm
+
+tree <- ape::read.tree("../16S_metabarcoding/tree.nwk")
+
+physeq.norm = merge_phyloseq(physeq.norm, tree)
+physeq.norm
+
+
+library(phyloseq)
+current_sample_names <- sample_names(physeq.norm)
+
+# Replace 'WH' with 'SW'
+new_sample_names <- gsub("WH", "SW", current_sample_names)
+new_sample_names <- gsub(".RE", "", new_sample_names)
+new_sample_names <- gsub(".FB.", ".BE.", new_sample_names)
+new_sample_names <- gsub("1", "01", new_sample_names)
+new_sample_names <- gsub("2", "02", new_sample_names)
+new_sample_names <- gsub("3", "03", new_sample_names)
+new_sample_names <- gsub("4", "04", new_sample_names)
+new_sample_names <- gsub("5", "05", new_sample_names)
+# Update the sample names in the phyloseq object
+sample_names(physeq.norm) <- new_sample_names
+
+# add more metadata
+
+
+old_sample_dta <- as.data.frame(sample_data(physeq.norm))
+old_sample_dta$id <- rownames(old_sample_dta)
+
+AgMicrobiome_RR <- readxl::read_excel("../R_functional_tool/AgMicrobiome-RR.xlsx", sheet = "Soils") # Data from the source soils
+
+AgMicrobiome_RR$`Soil Id` <- gsub("-", ".", AgMicrobiome_RR$`Soil Id`)
+colnames(AgMicrobiome_RR)[colnames(AgMicrobiome_RR) == 'Soil Id'] <- 'Soil.Location'
+
+sample_metadata_iso <- merge(as.data.frame(as.matrix(old_sample_dta)), AgMicrobiome_RR, by = "Soil.Location", all.x = TRUE) 
+
+sample_metadata_iso <- sample_data(sample_metadata_iso)
+sample_names(sample_metadata_iso) <- sample_metadata_iso$id
+
+setdiff(sample_names(physeq.norm), sample_names(sample_metadata_iso))
+
+sample_data(physeq.norm) <- sample_metadata_iso
+
+
+```
+# Aesthetic defaults
+
+We will set a labels, colors, and shapes to represent the different treatments on the plots. This consistency will help with the readability of the plots. 
+
+```{r}
+# Aestetic parameters
+
+colorvec <- c("AN" = "#005F73",
+              "BE"  = "#0A9396",
+              "BO" = "#94D2BD",
+              "BU" = "#E9D8A6",
+              "HE" = "#EE9B00",
+              "SH" = "#CA6702",
+              "YO" = "#BB3E03",
+              "CL" = "#251605",
+              "CY" = "#c57b57",
+              "SC" = "#f1ab86",
+              "SL" = "#f7dba7",
+              "Barley" = "#0e181b", 
+              "Oats" = "#1f363d", 
+              "Wheat" = "#40798c", 
+              "Beans" = "#70a9a1", 
+              "OilseedRape" = "#9ec1a3", 
+              "OSR" = "#9ec1a3", 
+              "Sugarbeet" = "#cfe0c3", 
+              "Bulksoil" = "#E9D8A6",
+              "Bulk" = "#E9D8A6",
+              "CL" = "#251605",
+              "CY" = "#c57b57",
+              "SC" = "#f1ab86",
+              "SL" = "#f7dba7",
+              "Clay loam" = "#251605",
+              "Clay" = "#c57b57",
+              "Silty clay loam" = "#f1ab86",
+              "Sandy loam" = "#f7dba7",
+              "CL.BO" = "#2c2c54",
+              "SL.AN" = "#474787",
+              "CL.YO" = "#227093",
+              "CY.YO" = "#218c74",
+              "SC.HE" = "#b33939",
+              "CY.BU" = "#cd6133",
+              "SL.BE" = "#cc8e35",
+              "SC.SH" = "#ccae62",
+              "SL.SH" = "#84817a"
+              )
+
+shapesvec <- c("Barley" = 3, "Beans" = 15, 
+               "Bulksoil" = 16, "Oats" = 17, 
+               "OilseedRape" = 18, "Sugarbeet" = 25, 
+               "Wheat" = 0,
+               "AN" = 3, "BE" = 15, 
+               "BO" = 16, "BU" = 17, 
+               "HE" = 18, "SH" = 25, 
+               "YO" = 0)
+
+labelsvec <- c("AN" = "Angus",
+              "BE"  = "Bedfordshire",
+              "BO" = "Borders",
+              "BU" = "Buckinghamshire",
+              "HE" = "Hertfordshire",
+              "SH" = "Shropshire",
+              "YO" = "Yorkshire",
+              "Barley" = "Barley",
+              "Beans" = "Beans", 
+              "Bulksoil" = "Bulk soil",
+              "Bulk" = "Bulk soil",
+              "Oats" = "Oats", 
+              "OilseedRape" = "Oilseed Rape", 
+              "OSR" = "Oilseed Rape",
+              "Sugarbeet" = "Sugarbeet", 
+              "Wheat" = "Wheat",
+              "CL" = "Clay loam",
+              "CY" = "Clay",
+              "SC" = "Silt clay loam",
+              "SL" = "Sandy loam",
+              "Clay loam" = "Clay loam",
+              "Clay" = "Clay",
+              "Silty clay loam" = "Silt clay loam",
+              "Sandy loam" = "Sandy loam",
+              "CL.BO" = "Borders",
+              "CL.YO" = "Yorkshire-CL",
+              "CY.BU" = "Buckinghamshire",
+              "CY.YO" = "Yorkshire-CY",
+              "SC.HE" = "Hertfordshire",
+              "SC.SH" = "Shropshire-SC",
+              "SL.AN" = "Angus",
+              "SL.BE" = "Bedfordshire",
+              "SL.SH" = "Shropshire-SL"
+              )
+
+crop_order = c("Barley", "Oats", "Wheat", "Beans", "OilseedRape", "Sugarbeet", "Bulksoil")
+
+local_order = c("CL.BO", "SL.AN", "CL.YO", "CY.YO", "SC.HE", "CY.BU", "SL.BE", "SC.SH", "SL.SH")
+```
+
+Here I will adjust the ASVs names to something that is understandable by humans:
+
+```{r}
+
+
+# Extract the OTU table, taxonomy table, and sample data
+otu_table_matrix <- as(otu_table(physeq.norm), "matrix")
+tax_table_matrix <- as(tax_table(physeq.norm), "matrix")
+sample_data_df <- as(sample_data(physeq.norm), "data.frame")
+
+# Get the original OTU IDs
+original_otus <- row.names(otu_table_matrix)
+
+# Generate new ASV IDs
+num_otus <- length(original_otus)
+new_asv_ids <- sprintf("ASV_%06d", seq(1, num_otus))
+
+# Create a named vector to map original OTU IDs to new ASV IDs
+otu_to_asv <- setNames(new_asv_ids, original_otus)
+
+# Rename the OTUs in the OTU table
+rownames(otu_table_matrix) <- new_asv_ids
+
+# Rename the OTUs in the taxonomy table
+rownames(tax_table_matrix) <- new_asv_ids
+
+#Rename OTUs on tree
+tree2 <- phy_tree(physeq.norm)
+current_tips <- tree2$tip.label
+tree2$tip.label <- unname(otu_to_asv[current_tips])
+
+
+
+# Create new OTU table and taxonomy table objects
+new_otu_table <- otu_table(otu_table_matrix, taxa_are_rows = TRUE)
+new_tax_table <- tax_table(tax_table_matrix)
+
+# Create a new phyloseq object
+new_physeq <- phyloseq(new_otu_table, new_tax_table, sample_data(sample_data_df))
+new_physeq <- merge_phyloseq(new_physeq, tree2)
+# Print the new phyloseq object to verify the changes
+physeq.norm <- new_physeq
+
+# remove ASVs that are not present in more than 50% of the samples
+
+filter_by_presence<-function(physeq,sampling_group,threshold){
+  
+  if(class(physeq)=="phyloseq"){
+    
+    if(!taxa_are_rows(physeq)){
+      
+      phyloseq::otu_table(physeq)<-t(phyloseq::otu_table(physeq))
+      
+    }
+    
+    sampling_group<-sample_data(physeq)[[sampling_group]]    
+    
+  }
+  
+  groups<-as.character(unique(sampling_group))
+  
+  cols_per_group<-sapply(groups,function(x) which(sampling_group==x),simplify=FALSE)
+  
+  ncols_per_group<-lengths(cols_per_group)
+  
+  # x is the row of OTU, y is the farm id
+  
+  if(class(physeq)=="phyloseq"){
+    
+    matrix<-t(apply(otu_table(physeq),1,function(x) sapply(cols_per_group,function(y) 100-(sum(x[y]==0)/length(y)*100 ))))
+    
+  } else{
+    
+    matrix<-t(apply(physeq,1,function(x) sapply(cols_per_group,function(y) 100-(sum(x[y]==0)/length(y)*100 ))))
+    
+  }
+  
+  n_groups_over_threshold       <- apply(matrix,1,function(x) length(which(x>threshold)))
+  
+  keep<-names(which(n_groups_over_threshold!=0))
+  
+  if(class(physeq)=="phyloseq"){
+    
+    physeq<-prune_taxa(keep,physeq)
+    
+  } else {
+    
+    physeq<-physeq[which(n_groups_over_threshold!=0),]
+    
+  }
+  
+  return(physeq)
+  
+}
+
+physeq.norm <- filter_by_presence(physeq.norm, "Group", 50)
+
+
+
+```
+
+
+Then, we will create a rarefied phyloseq object to use in the analysis that are affected by uneven sampling such as diversity analysis. 
+
+```{r}
+set.seed(2024)
+physeq.norm.raref <- rarefy_even_depth(physeq.norm)
+
+
+```
+
+# Alpha-diversity measurements
+
+Here we will evaluate the differences in alpha diversity indexes of the samples. We will calculate Sobs, Pielou's Evenness, and Shannon's H'.
+
+```{r}
+# Calculate the Sobs, Pielou's Evenness, and Shannon's H'
+library(picante)
+library(vegan)
+
+
+community_matrix <- as(t(otu_table(physeq.norm.raref)), "matrix")
+
+# Calculate Observed Species (Sobs)
+Sobs <- specnumber(community_matrix)
+
+# Calculate Shannon Diversity Index
+shannon_index <- vegan::diversity(community_matrix, index = "shannon")
+
+# Calculate Pielou's Evenness
+pielou_evenness <- shannon_index / log(Sobs)
+
+
+# Create a data frame with the results
+diversity_table <- data.frame(
+  Sample = rownames(community_matrix),
+  Sobs = Sobs,
+  Shannon = shannon_index,
+  Pielou = pielou_evenness
+)
+
+# Print the diversity table
+print(diversity_table)
+
+```
+
+Below we will plot and compare the diversity indexes by location, crop and soil type. first will test the normality of the data using Shapiro-Wilk
+
+```{r}
+
+shapiro_test_shannon <- shapiro.test(diversity_table$Shannon)
+print(shapiro_test_shannon)
+
+shapiro_test_Pielou <- shapiro.test(diversity_table$Pielou)
+print(shapiro_test_Pielou)
+
+shapiro_test_sobs <- shapiro.test(diversity_table$Sobs)
+print(shapiro_test_sobs)
+
+```
+
+Normality was rejected, so, we will test differences using Kuskal-Wallis.
+
+First we prepare the data.
+
+```{r}
+library(tibble)
+library(dplyr)
+# Extract the sample data
+sample_data_df <- data.frame(sample_data(physeq.norm.raref))
+sample_data_df <- sample_data_df %>% rownames_to_column("Sample")
+
+# Merge the diversity index with the sample data based on sample names
+
+merged_sample_data_unc <- merge(sample_data_df, diversity_table, by = "Sample")
+
+```
+Below we will plot and compare the diversity indexes by location, crop and soil type. first will test the normality of the data using Shapiro-Wilk
+
+```{r}
+#Shannon
+shapiro_test_shannon_crop <- by(merged_sample_data_unc$Shannon, merged_sample_data_unc$Type, shapiro.test) #shapiro.test(diversity_table$Shannon)
+print(shapiro_test_shannon_crop)
+
+shapiro_test_shannon_location <- by(merged_sample_data_unc$Shannon, merged_sample_data_unc$Soil.Type, shapiro.test) #shapiro.test(diversity_table$Shannon)
+print(shapiro_test_shannon_location)
+
+shapiro_test_shannon_soil <- by(merged_sample_data_unc$Shannon, merged_sample_data_unc$Soil, shapiro.test) #shapiro.test(diversity_table$Shannon)
+print(shapiro_test_shannon_soil)
+
+#Sobs
+shapiro_test_sobs_crop <- by(merged_sample_data_unc$Sobs, merged_sample_data_unc$Type, shapiro.test) #shapiro.test(diversity_table$Sobs)
+print(shapiro_test_sobs_crop)
+shapiro_test_sobs_location <- by(merged_sample_data_unc$Sobs, merged_sample_data_unc$Soil.Type, shapiro.test) #shapiro.test(diversity_table$Sobs)
+print(shapiro_test_sobs_location)
+shapiro_test_sobs_soil <- by(merged_sample_data_unc$Sobs, merged_sample_data_unc$Soil, shapiro.test) #shapiro.test(diversity_table$Sobs)
+print(shapiro_test_sobs_soil)
+
+#Pielou
+shapiro_test_Pielou_crop <- by(merged_sample_data_unc$Pielou, merged_sample_data_unc$Type, shapiro.test) #shapiro.test(diversity_table$Pielou)
+print(shapiro_test_Pielou_crop)
+
+shapiro_test_Pielou_location <- by(merged_sample_data_unc$Pielou, merged_sample_data_unc$Soil.Type, shapiro.test) #shapiro.test(diversity_table$Pielou)
+print(shapiro_test_Pielou_location)
+
+shapiro_test_Pielou_soil <- by(merged_sample_data_unc$Pielou, merged_sample_data_unc$Soil, shapiro.test) #shapiro.test(diversity_table$Pielou)
+print(shapiro_test_Pielou_soil)
+
+```
+
+Normality was rejected, so, we will test differences using Kruskal-Wallis.
+## Shannon H'
+Then let's start looking at the Shannon results.
+
+```{r}
+
+# Here I deficne a fuction to get letters from pairwise test 
+# Define the function
+generate_significant_letters <- function(p_values_matrix) {
+  
+  # Load necessary library for generating letters
+  library(multcompView)
+  
+  # Get the location names
+  
+  location_names <- rownames(p_values_matrix)
+  
+  # Add a first row with NAs and the name of the first column
+  first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
+  #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+  p_values_matrix <- rbind(first_row, p_values_matrix)
+  rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+  # Add a last column with NAs and the name of the last row
+  p_values_matrix <- cbind(p_values_matrix, NA)
+  colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+  
+  # Fill the diagonal with 1s to avoid issues with self-comparisons
+  #diag(p_values_matrix) <- 1
+  
+  # Generate letters for the significant differences
+  significant_letters <- multcompLetters(p_values_matrix)$Letters
+  
+  # Return the significant letters
+  return(significant_letters)
+}
+```
+
+### Location:
+
+```{r}
+
+#Location
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Shannon ~ Soil.Location, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Shannon, merged_sample_data_unc$Soil.Location, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+library(ggplot2)
+sha_loc_plot <- ggplot(merged_sample_data_unc, aes(x = Soil.Location, y = Shannon, fill = Soil.Location)) +
+                        geom_boxplot() +
+                        labs(x = "Location", y = "Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Soil.Location, y = max(merged_sample_data_unc$Shannon) + 0.2, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = local_order) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 4, y = max(merged_sample_data_unc$Shannon) * 1.2, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(4, max(merged_sample_data_unc$Shannon) * 1.25))
+
+
+sha_loc_plot
+
+```
+
+### Crop:
+
+```{r}
+#Crop
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Shannon ~ Type, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Shannon, merged_sample_data_unc$Type, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+sha_crop_plot <- ggplot(merged_sample_data_unc, aes(x = Type, y = Shannon, fill = Type)) +
+                        geom_boxplot() +
+                        labs(x = "Crop", y = "Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Type, y = max(merged_sample_data_unc$Shannon) + 0.2, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = crop_order) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 4, y = max(merged_sample_data_unc$Shannon) * 1.2, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(4, max(merged_sample_data_unc$Shannon) * 1.25))
+  
+  
+
+
+sha_crop_plot
+```
+
+
+### Soil type:
+
+```{r}
+#Soil type
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Shannon ~ Soil, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Shannon, merged_sample_data_unc$Soil, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+sha_Soil_plot <- ggplot(merged_sample_data_unc, aes(x = Soil, y = Shannon, fill = Soil)) +
+                        geom_boxplot() +
+                        labs(x = "Soil type", y = "Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Soil, y = max(merged_sample_data_unc$Shannon) + 0.2, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 2.5, y = max(merged_sample_data_unc$Shannon) * 1.2, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(4, max(merged_sample_data_unc$Shannon) * 1.25))
+
+
+sha_Soil_plot
+```
+
+## Sobs
+
+Now we will do the same with Sobs
+
+###Location:
+
+```{r}
+
+#Location
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Sobs ~ Soil.Location, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Sobs, merged_sample_data_unc$Soil.Location, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+sobs_loc_plot <- ggplot(merged_sample_data_unc, aes(x = Soil.Location, y = Sobs, fill = Soil.Location)) +
+                        geom_boxplot() +
+                        labs(x = "Location", y = "Sobs") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Soil.Location, y = max(merged_sample_data_unc$Sobs) + 0.5, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = local_order) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 5, y = max(merged_sample_data_unc$Sobs) * 1.2, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(4, max(merged_sample_data_unc$Sobs) * 1.25))
+
+
+sobs_loc_plot
+
+```
+
+### Crop:
+
+```{r}
+#Location
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Sobs ~ Type, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Sobs, merged_sample_data_unc$Type, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+sobs_crop_plot <- ggplot(merged_sample_data_unc, aes(x = Type, y = Sobs, fill = Type)) +
+                        geom_boxplot() +
+                        labs(x = "Crop", y = "Sobs") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Type, y = max(merged_sample_data_unc$Sobs) + 0.5, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = crop_order) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 4, y = max(merged_sample_data_unc$Sobs) * 1.2, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(4, max(merged_sample_data_unc$Sobs) * 1.25))
+  
+  
+
+
+sobs_crop_plot
+```
+
+
+### Soil type:
+
+```{r}
+#Soil type
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Sobs ~ Soil, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Sobs, merged_sample_data_unc$Soil, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+sobs_Soil_plot <- ggplot(merged_sample_data_unc, aes(x = Soil, y = Sobs, fill = Soil)) +
+                        geom_boxplot() +
+                        labs(x = "Soil type", y = "Sobs") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Soil, y = max(merged_sample_data_unc$Sobs) + 0.5, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 2.5, y = max(merged_sample_data_unc$Sobs) * 1.2, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(4, max(merged_sample_data_unc$Sobs) * 1.25))
+
+
+sobs_Soil_plot
+```
+
+## Pielou
+
+Now we will do the same with Pielou
+
+### Location:
+
+```{r}
+
+#Location
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Pielou ~ Soil.Location, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Pielou, merged_sample_data_unc$Soil.Location, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+Pielou_loc_plot <- ggplot(merged_sample_data_unc, aes(x = Soil.Location, y = Pielou, fill = Soil.Location)) +
+                        geom_boxplot() +
+                        labs(x = "Location", y = "Pielou") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Soil.Location, y = max(merged_sample_data_unc$Pielou) + 0.01, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = local_order) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 5, y = max(merged_sample_data_unc$Pielou) + 0.035, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(0.8, max(merged_sample_data_unc$Pielou) + 0.04))
+
+
+Pielou_loc_plot
+
+```
+
+### Crop:
+
+```{r}
+#Location
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Pielou ~ Type, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Pielou, merged_sample_data_unc$Type, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+Pielou_crop_plot <- ggplot(merged_sample_data_unc, aes(x = Type, y = Pielou, fill = Type)) +
+                        geom_boxplot() +
+                        labs(x = "Crop", y = "Pielou") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Type, y = max(merged_sample_data_unc$Pielou) + 0.01, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = crop_order) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 4, y = max(merged_sample_data_unc$Pielou) + 0.035, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(0.8, max(merged_sample_data_unc$Pielou) + 0.04))
+  
+  
+
+
+Pielou_crop_plot
+```
+
+
+### Soil type:
+
+```{r}
+#Soil type
+
+# Perform the Kruskal-Wallis test
+kruskal_test <- kruskal.test(Pielou ~ Soil, data = merged_sample_data_unc)
+
+# Print the result of the Kruskal-Wallis test
+print(kruskal_test)
+
+# Extract the p-value
+p_value <- kruskal_test$p.value
+
+# Format the p-value for display
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+# Perform pairwise comparisons using Wilcox on rank-sum test
+pairwise_comparisons <- pairwise.wilcox.test(merged_sample_data_unc$Pielou, merged_sample_data_unc$Soil, p.adjust.method = "BH")
+
+# Print the pairwise comparison results
+print(pairwise_comparisons)
+
+p_values_matrix <- pairwise_comparisons$p.value
+
+# Generate letters for significant differences using the custom function
+significant_letters <- generate_significant_letters(p_values_matrix)
+
+
+# Create a data frame for the letters to use in plotting
+letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
+
+# Create a boxplot with letters
+Pielou_Soil_plot <- ggplot(merged_sample_data_unc, aes(x = Soil, y = Pielou, fill = Soil)) +
+                        geom_boxplot() +
+                        labs(x = "Soil type", y = "Pielou") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        geom_text(data = letters_df, aes(x = Soil, y = max(merged_sample_data_unc$Pielou) + 0.01, 
+                                                         label = Letters), 
+                                  vjust = -0.5, color = "darkgray", size = 4) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec) +
+                        theme(legend.position = "none")+
+                        annotate("text", x = 2.5, y = max(merged_sample_data_unc$Pielou) + 0.035, label = p_value_text, size = 4) +
+                        coord_cartesian(ylim = c(0.8, max(merged_sample_data_unc$Pielou) + 0.04))
+
+
+Pielou_Soil_plot
+```
+
+## Join plots
+
+```{r, fig.height = 11, fig.width = 9, fig.align = "center"}
+
+library(patchwork)
+combined_plot <- (sha_crop_plot + sha_loc_plot +  sha_Soil_plot) / (sobs_crop_plot + sobs_loc_plot +  sobs_Soil_plot) / (Pielou_crop_plot + Pielou_loc_plot + Pielou_Soil_plot)
+
+# Add labels to the combined plot
+combined_plot <- combined_plot + plot_annotation(tag_levels = 'A')
+combined_plot
+
+alpha_combined_plot_uncult <- (sha_crop_plot + sha_loc_plot +  sha_Soil_plot)
+
+
+```
+
+# Taxonomic evaluation of the samples
+
+Let's make plots using with the taxonomic assignment of the ASVs. The goal of the plots is to show the differences due to location, soil type, and crop. 
+
+```{r}
+classGlommed = tax_glom(physeq.norm.raref, "Class")
+phylGlommed = tax_glom(physeq.norm.raref, "Phylum")
+
+plot_bar(phylGlommed, fill ="Phylum") + 
+  cowplot::theme_cowplot()+
+  #scale_fill_manual(values = tax_color)+ 
+  ylab('Normalized and Rarefied Abundance')+
+  theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+top20class.phy  <- prune_taxa(names(sort(taxa_sums(classGlommed), decreasing = TRUE))[1:20], classGlommed)
+library(RColorBrewer)
+tax_color <- colorRampPalette(c("#001219", "#005f73", "#0a9396", "#94d2bd", "#e9d8a6", "#ee9b00", "#ca6702", "#bb3e03", "#ae2012", "#9b2226"))(21)
+
+plot_bar(top20class.phy, fill ="Class") + 
+  cowplot::theme_cowplot()+
+  scale_fill_manual(values = tax_color)+ 
+  ylab('Relative Abundance')+
+  theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+```
+
+Now we will get the overall abundance of all samples from different locations, crops and soil types.
+
+## Location
+
+```{r}
+# Location
+
+classGlommed.locat <- merge_samples(classGlommed, "Soil.Location")
+
+classGlommed.locat <- transform_sample_counts(classGlommed.locat, function(x) x / sum(x)) # convert to relative abundances
+
+
+top10class.classGlommed.locat  <- prune_taxa(names(sort(taxa_sums(classGlommed.locat), decreasing = TRUE))[1:20], classGlommed.locat)
+
+
+tax_plot_locat <- plot_bar(top10class.classGlommed.locat, fill ="Class") + 
+                            cowplot::theme_cowplot()+
+                            scale_fill_manual(values = tax_color)+ 
+                            ylab('Relative Abundance')+
+                            theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+                            scale_x_discrete(labels = labelsvec, limits = local_order) #, limits = crop_order) +
+
+tax_plot_locat
+
+```
+
+## Crop
+
+```{r}
+# Location
+
+classGlommed.crop <- merge_samples(classGlommed, "Type")
+
+classGlommed.crop <- transform_sample_counts(classGlommed.crop, function(x) x / sum(x)) # convert to relative abundances
+
+
+top10class.classGlommed.crop  <- prune_taxa(names(sort(taxa_sums(classGlommed.crop), decreasing = TRUE))[1:20], classGlommed.crop)
+
+
+tax_plot_crop <- plot_bar(top10class.classGlommed.crop, fill ="Class") + 
+                            cowplot::theme_cowplot()+
+                            scale_fill_manual(values = tax_color)+ 
+                            ylab('Relative Abundance')+
+                            theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+                            scale_x_discrete(labels = labelsvec, limits = crop_order) 
+
+tax_plot_crop
+
+```
+
+
+## Soil type
+
+```{r}
+# Location
+
+classGlommed.soil <- merge_samples(classGlommed, "Soil")
+
+classGlommed.soil <- transform_sample_counts(classGlommed.soil, function(x) x / sum(x)) # convert to relative abundances
+
+
+top10class.classGlommed.soil  <- prune_taxa(names(sort(taxa_sums(classGlommed.soil), decreasing = TRUE))[1:20], classGlommed.soil)
+
+
+tax_plot_soil <- plot_bar(top10class.classGlommed.soil, fill ="Class") + 
+                            cowplot::theme_cowplot()+
+                            scale_fill_manual(values = tax_color)+ 
+                            ylab('Relative Abundance') + 
+                            theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+                            scale_x_discrete(labels = labelsvec) #, limits = crop_order) 
+
+tax_plot_soil
+```
+
+Because the top 20 classes are not the same between comparisons and to keep the colors consistent we will create a single color vector associated with plots
+
+```{r}
+
+# Load the necessary library
+library(phyloseq)
+
+# Extract the taxonomy table
+taxonomy1 <- tax_table(top10class.classGlommed.soil)
+taxonomy2 <- tax_table(top10class.classGlommed.locat)
+taxonomy3 <- tax_table(top10class.classGlommed.crop)
+
+# Extract unique classes
+# Assuming "Class" is the taxonomic rank of interest
+classes1 <- unique(taxonomy1[, "Class"])
+classes2 <- unique(taxonomy2[, "Class"])
+classes3 <- unique(taxonomy3[, "Class"])
+
+# Convert to character vectors
+classes1 <- as.character(classes1)
+classes2 <- as.character(classes2)
+classes3 <- as.character(classes3)
+
+# Combine the class lists and identify non-redundant classes
+combined_classes <- unique(c(classes1, classes2, classes3))
+
+# Sort the combined classes alphabetically
+combined_classes <- sort(combined_classes)
+
+# Print the non-redundant classes
+combined_classes
+
+# Crete a palette with the number of colors needed. Based on [this palette] (https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226)
+
+library(RColorBrewer)
+colors_new <- colorRampPalette(c("#001219", "#005f73", "#0a9396", "#94d2bd", "#e9d8a6", "#ee9b00", "#ca6702", "#bb3e03", "#ae2012", "#9b2226"))(21)
+
+# Create the named vector
+tax_color <- setNames(colors_new, combined_classes)
+
+# save this files to use in the comparisons with other dataset
+save(physeq.norm.raref, otu_to_asv, tax_color, file = "../Comparisons/metabarcode.RData")
+
+# Print the resulting named vector
+print(tax_color)
+
+# Now we reprint the plots
+tax_plot_soil <- plot_bar(top10class.classGlommed.soil, fill ="Class") + 
+                            cowplot::theme_cowplot()+
+                            scale_fill_manual(values = tax_color)+ 
+                            ylab('Relative Abundance') + 
+                            theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+                            scale_x_discrete(labels = labelsvec) #, limits = crop_order) 
+tax_plot_crop <- plot_bar(top10class.classGlommed.crop, fill ="Class") + 
+                            cowplot::theme_cowplot()+
+                            scale_fill_manual(values = tax_color)+ 
+                            ylab('Relative Abundance')+
+                            theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+                            scale_x_discrete(labels = labelsvec, limits = crop_order) 
+tax_plot_locat <- plot_bar(top10class.classGlommed.locat, fill ="Class") + 
+                            cowplot::theme_cowplot()+
+                            scale_fill_manual(values = tax_color)+ 
+                            ylab('Relative Abundance')+
+                            theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+                            scale_x_discrete(labels = labelsvec, limits = local_order) #, limits = crop_order) +
+
+```
+
+
+
+```{r, fig.height = 4, fig.width = 9, fig.align = "center"}
+
+library(patchwork)
+taxa_plot_comb <- (tax_plot_crop + tax_plot_locat + tax_plot_soil) + plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1, guides = "collect") &
+  theme(legend.position = "bottom", legend.box="vertical", 
+        legend.margin=margin(),
+        plot.margin = unit(c(2,2,2,2), "mm"),
+        text = element_text(size = 10),   # Set global text size (for all text elements)
+      legend.text = element_text(size = 8),  # Adjust legend text size
+      axis.title = element_text(size = 9),   # Adjust axis title text size
+      axis.text = element_text(size = 8))
+
+taxa_plot_comb
+
+taxa_plot_comb_uncult <- (tax_plot_crop + tax_plot_locat + tax_plot_soil) & theme(legend.position = "none")
+
+```
+```{r} 
+library(tidyverse)
+library(multcompView)
+library(dplyr)
+
+# Taxa aggregation and data formatting
+ps_class <- tax_glom(physeq.norm.raref, "Class")
+ps_class_rel <- transform_sample_counts(ps_class, function(x) x / sum(x))
+df <- psmelt(ps_class_rel)
+
+# Filter to top 20 classes
+top_classes <- df %>%
+  group_by(Class) %>%
+  summarise(mean_abund = mean(Abundance, na.rm = TRUE)) %>%
+  slice_max(order_by = mean_abund, n = 20) %>%
+  pull(Class)
+
+df_top <- df %>%
+  filter(Class %in% top_classes)
+
+# Function to return formatted string: "mean ± sd^group"
+format_cell <- function(mean, sd, letter) {
+  sprintf("%.3f ± %.3f⁽%s⁾", mean, sd, letter)
+}
+
+## Crop
+
+run_anova_tukey_wide <- function(df, class_name, factor_var = "Type", labelsvec = NULL) {
+  df_sub <- df %>% filter(Class == class_name)
+  
+  # Ensure factor
+  df_sub[[factor_var]] <- factor(df_sub[[factor_var]])
+  
+  model <- aov(as.formula(paste("Abundance ~", factor_var)), data = df_sub)
+  tukey <- TukeyHSD(model, factor_var)
+  letters <- multcompLetters(tukey[[factor_var]][,"p adj"])$Letters
+  
+  summary_df <- df_sub %>%
+    group_by(.data[[factor_var]]) %>%
+    summarise(
+      mean = mean(Abundance),
+      sd = sd(Abundance),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      Class = class_name,
+      group = letters[as.character(.data[[factor_var]])],
+      Label = if (!is.null(labelsvec)) labelsvec[as.character(.data[[factor_var]])] else as.character(.data[[factor_var]]),
+      cell = format_cell(mean, sd, group)
+    ) %>%
+    dplyr::select(Class, Label, cell)
+  
+  return(summary_df)
+}
+
+# Run for all classes and pivot
+anova_wide <- map_dfr(top_classes, ~run_anova_tukey_wide(df_top, .x, factor_var = "Type", labelsvec = labelsvec)) %>%
+  pivot_wider(names_from = Label, values_from = cell)
+
+# Clean up
+anova_wide <- anova_wide %>%
+  arrange(Class)
+
+# Display
+knitr::kable(
+  anova_wide,
+  caption = "Mean ± SD (with Tukey group letters) of Class abundance per Crop",
+  align = "l"
+) 
+
+## Soil 
+run_anova_tukey_wide <- function(df, class_name, factor_var = "Soil", labelsvec = NULL) {
+  df_sub <- df %>% filter(Class == class_name)
+  
+  # Ensure factor
+  df_sub[[factor_var]] <- factor(df_sub[[factor_var]])
+  
+  model <- aov(as.formula(paste("Abundance ~", factor_var)), data = df_sub)
+  tukey <- TukeyHSD(model, factor_var)
+  letters <- multcompLetters(tukey[[factor_var]][,"p adj"])$Letters
+  
+  summary_df <- df_sub %>%
+    group_by(.data[[factor_var]]) %>%
+    summarise(
+      mean = mean(Abundance),
+      sd = sd(Abundance),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      Class = class_name,
+      group = letters[as.character(.data[[factor_var]])],
+      Label = if (!is.null(labelsvec)) labelsvec[as.character(.data[[factor_var]])] else as.character(.data[[factor_var]]),
+      cell = format_cell(mean, sd, group)
+    ) %>%
+    dplyr::select(Class, Label, cell)
+  
+  return(summary_df)
+}
+
+# Run for all classes and pivot
+anova_wide <- map_dfr(top_classes, ~run_anova_tukey_wide(df_top, .x, factor_var = "Soil", labelsvec = labelsvec)) %>%
+  pivot_wider(names_from = Label, values_from = cell)
+
+# Clean up
+anova_wide <- anova_wide %>%
+  arrange(Class)
+
+# Display
+knitr::kable(
+  anova_wide,
+  caption = "Mean ± SD (with Tukey group letters) of Class abundance per Soil type",
+  align = "l"
+)
+
+## Location 
+run_anova_tukey_wide <- function(df, class_name, factor_var = "Soil.Location", labelsvec = NULL) {
+  df_sub <- df %>% filter(Class == class_name)
+  
+  # Ensure factor
+  df_sub[[factor_var]] <- factor(df_sub[[factor_var]])
+  
+  model <- aov(as.formula(paste("Abundance ~", factor_var)), data = df_sub)
+  tukey <- TukeyHSD(model, factor_var)
+  letters <- multcompLetters(tukey[[factor_var]][,"p adj"])$Letters
+  
+  summary_df <- df_sub %>%
+    group_by(.data[[factor_var]]) %>%
+    summarise(
+      mean = mean(Abundance),
+      sd = sd(Abundance),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      Class = class_name,
+      group = letters[as.character(.data[[factor_var]])],
+      Label = if (!is.null(labelsvec)) labelsvec[as.character(.data[[factor_var]])] else as.character(.data[[factor_var]]),
+      cell = format_cell(mean, sd, group)
+    ) %>%
+    dplyr::select(Class, Label, cell)
+  
+  return(summary_df)
+}
+
+# Run for all classes and pivot
+anova_wide <- map_dfr(top_classes, ~run_anova_tukey_wide(df_top, .x, factor_var = "Soil.Location", labelsvec = labelsvec)) %>%
+  pivot_wider(names_from = Label, values_from = cell)
+
+# Clean up
+anova_wide <- anova_wide %>%
+  arrange(Class)
+
+# Display
+knitr::kable(
+  anova_wide,
+  caption = "Mean ± SD (with Tukey group letters) of Class abundance per Location",
+  align = "l"
+) 
+
+```
+
+# Beta-Diversity analysis
+
+
+
+```{r}
+
+NMDS <- ordinate(physeq = physeq.norm.raref, 
+                 method = "NMDS", 
+                 distance = "bray")
+
+NMDS$stress
+
+NMDS_plot_all <- plot_ordination(physeq = physeq.norm, 
+                                   ordination = NMDS, 
+                                   color = "Soil.Location", 
+                                   shape = "Type")+
+            geom_point(size = 3) +
+            scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+            scale_shape_manual(values = shapesvec, name = NULL, labels = labelsvec, limits = crop_order) +
+            cowplot::theme_cowplot()
+            
+NMDS_plot_all
+
+```
+
+Now we will repeat the plots highlighting the differences between crops, locations and soil types with colors.
+
+```{r}
+library(scales)
+# location
+
+NMDS_plot_loc <- plot_ordination(physeq = physeq.norm, 
+                                   ordination = NMDS, 
+                                   color = "Soil.Location" 
+                                   )+
+            geom_point(size = 2.5) +
+            scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+            #scale_shape_manual(values = shapesvec, ) +
+            cowplot::theme_cowplot()+
+             scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+             scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+            theme(legend.position = "bottom", legend.box="vertical",
+        axis.title = element_blank()) +
+            guides(color = guide_legend(ncol=2)) 
+            
+NMDS_plot_loc
+
+NMDS_plot_crop <- plot_ordination(physeq = physeq.norm, 
+                                   ordination = NMDS, 
+                                   color = "Type" 
+                                   )+
+            geom_point(size = 2.5) +
+            scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
+            #scale_shape_manual(values = shapesvec, ) +
+            cowplot::theme_cowplot()+
+            scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+            scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+            theme(legend.position = "bottom", legend.box="vertical",
+        axis.title = element_blank()) +
+            guides(color = guide_legend(ncol=2)) 
+            
+NMDS_plot_crop
+
+NMDS_plot_soil <- plot_ordination(physeq = physeq.norm, 
+                                   ordination = NMDS, 
+                                   color = "Soil" 
+                                   )+
+            geom_point(size = 2.5) +
+            scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+            #scale_shape_manual(values = shapesvec, ) +
+            cowplot::theme_cowplot()+
+             scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+             scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+            theme(legend.position = "bottom", legend.box="vertical",
+        axis.title = element_blank()) +
+            guides(color = guide_legend(ncol=2)) 
+            
+NMDS_plot_soil
+
+```
+
+
+Now, we will collect the plot in a single figure.
+
+
+```{r, fig.height = 5, fig.width = 11, fig.align = "center"}
+nmds_plot_comb <- (NMDS_plot_crop + NMDS_plot_loc +  NMDS_plot_soil) + plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1) 
+
+nmds_plot_comb
+
+nmds_plot_comb_uncult <- (NMDS_plot_crop + NMDS_plot_loc +  NMDS_plot_soil) & theme(legend.position = "none")
+
+```
+
+
+# PERMANOVA
+
+Let's perform PERMANOVA to test if the differences in the community composition are due to the soil type, location or crop.
+
+```{r}
+
+ps_tr <- microbiome::transform(physeq.norm.raref, "clr")
+
+ps_dist_matrix <- phyloseq::distance(physeq.norm.raref, method ="bray")
+
+permanova_soil <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(ps_tr)$Soil)
+permanova_crop <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(ps_tr)$Type)
+permanova_local <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(ps_tr)$Soil.Location)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+```
+
+# Pairwise PERMANOVA
+
+```{r}
+library(pairwiseAdonis)
+
+pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil)
+pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Type)
+pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Location)
+```
+
+# PERMDIST
+
+Because the PERMANOVA results are not reliable we will use the PERMDIST test to test if the distances are homogeneous.
+
+```{r}
+# Perform PERMDIST
+#soil 
+soil_type_permdist <- vegan::betadisper(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil, type = "centroid")
+anova(soil_type_permdist)
+
+#location
+loc_type_permdist <- vegan::betadisper(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Location, type = "centroid")
+anova(loc_type_permdist)
+
+#crop
+crop_type_permdist <- vegan::betadisper(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Type, type = "centroid")
+anova(crop_type_permdist)
+```
+
+Because the PERMDIST test indicated that the dispersal of the samples is significant as were the PERMANOVA tests we cannot affirm that the are due to Soil type, location or crop because PERMANOVA assumes that distances are homogeneous. 
+
+# ANOSIM
+
+Because the PERMANOVA results are not reliable we will use the non-parametric ANOSIM test. 
+
+```{r}
+# Soil type
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil, distance = "bray", permutations = 999)
+
+# Location
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Location, distance = "bray", permutations = 999)
+# Crop
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Type, distance = "bray", permutations = 999)
+
+```
+
+```{r}
+
+save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
+
+```
+
+```{r}
+installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
+``` 
