@@ -16,3 +16,5 @@ Code for the main figures found in the paper. [here](./Comparisons/concat_figs.m
 ## License
 This repository is licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).  
 See the [LICENSE](./LICENSE.txt) file for details.
+
+[![DOI](https://zenodo.org/badge/1057889884.svg)](https://zenodo.org/badge/latestdoi/1057889884)
