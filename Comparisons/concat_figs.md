@@ -1,7 +1,7 @@
 Paper figures
 ================
 Rodrigo Taketani
-2025-09-16
+2025-09-22
 
 # Paper figures
 
@@ -27,7 +27,77 @@ load("funct_figs.RData")
 library(ggplot2)
 library(scales)
 
-nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func + plot_annotation(tag_levels = 'A') &
+# Make Permanova values plot
+
+df_unc <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.03, 0.428, 0.181),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_unc$Color) +
+  labs(
+    title = "Unculturable",
+    y = expression(R^2),   # <- superscript 2
+    x = NULL
+  ) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+df_cult <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.0519, 0.1177, 0.0566),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_cult$Color) +
+  labs(
+    title = "Culturable",
+    y = expression(R^2),   # <- superscript 2
+    x = NULL
+  ) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+df_func <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.2217, 0.0668, 0.0202),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_func <- ggplot(df_func, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_func$Color) +
+  labs(
+    title = "Functions",
+    y = expression(R^2),   # <- superscript 2
+    x = NULL
+  ) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+perm_bars <- bar_unc + bar_cult + bar_func 
+
+nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func / perm_bars + plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = 14, face = "bold", hjust = 1, vjust = -1), 
     plot.tag.position = c(0, 1),
     plot.margin = margin(20, 20, 20, 20))
@@ -36,15 +106,99 @@ nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func + plot_annotation(ta
     ## Warning in plot_theme(plot): The `labels` theme element is not defined in the element hierarchy.
     ## The `labels` theme element is not defined in the element hierarchy.
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-2-1.png)<!-- --> \##
-Alpha diversity
+![](concat_figs_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+Also adding a ANOSIM barplot
+
+``` r
+ library(patchwork)
+library(ggplot2)
+library(scales)
+
+# Make Permanova values plot
+
+df_unc <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.02727, 0.936, 0.4326),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_unc$Color) +
+  labs(
+    title = "Unculturable",
+    y = "R",   # <- superscript 2
+    x = NULL
+  ) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+df_cult <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.0669, 0.2176, 0.1734),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_cult$Color) +
+  labs(
+    title = "Culturable",
+    y = "R",   # <- superscript 2
+    x = NULL
+  ) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+df_func <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.2437, 0.03378, 0.0087),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_func <- ggplot(df_func, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_func$Color) +
+  labs(
+    title = "Functions",
+    y = "R",   # <- superscript 2
+    x = NULL
+  ) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+ANOSIM_bars <- bar_unc + bar_cult + bar_func + plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 14, face = "bold"))
+
+ANOSIM_bars
+```
+
+![](concat_figs_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+## Alpha diversity
 
 ``` r
 alpha_combined_plot_uncult / alpha_shannon_isolates + plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = 14, face = "bold"))
 ```
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](concat_figs_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ## Functions
 
@@ -86,4 +240,4 @@ layout
     ## `label` cannot be a <ggplot2::element_blank> object.
     ## `label` cannot be a <ggplot2::element_blank> object.
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](concat_figs_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
