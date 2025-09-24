@@ -1,7 +1,7 @@
 Paper figures
 ================
 Rodrigo Taketani
-2025-09-22
+2025-09-24
 
 # Paper figures
 
@@ -27,11 +27,12 @@ load("funct_figs.RData")
 library(ggplot2)
 library(scales)
 
-# Make Permanova values plot
+# Make ANOSIM values plot
+
 
 df_unc <- data.frame(
   Factor = c("Crop", "Location", "Soil type"),
-  R2 = c(0.03, 0.428, 0.181),
+  R2 = c(0.02727, 0.936, 0.4326),
   Color = c("#40798c", "#b33939", "#c57b57")
 )
 
@@ -40,10 +41,11 @@ bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
   geom_bar(stat = "identity", color = "black") +
   scale_fill_manual(values = df_unc$Color) +
   labs(
-    title = "Unculturable",
-    y = expression(R^2),   # <- superscript 2
+    title = "16S Total Community",
+    y = "ANOSIM R",   # <- superscript 2
     x = NULL
   ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
   cowplot::theme_cowplot()+
   theme(
     legend.position = "none",
@@ -53,7 +55,7 @@ bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
 
 df_cult <- data.frame(
   Factor = c("Crop", "Location", "Soil type"),
-  R2 = c(0.0519, 0.1177, 0.0566),
+  R2 = c(0.0669, 0.2176, 0.1734),
   Color = c("#40798c", "#b33939", "#c57b57")
 )
 
@@ -62,10 +64,11 @@ bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
   geom_bar(stat = "identity", color = "black") +
   scale_fill_manual(values = df_cult$Color) +
   labs(
-    title = "Culturable",
-    y = expression(R^2),   # <- superscript 2
+    title = "16S Culturable",
+    y = "ANOSIM R",   # <- superscript 2
     x = NULL
   ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
   cowplot::theme_cowplot()+
   theme(
     legend.position = "none",
@@ -75,7 +78,7 @@ bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
 
 df_func <- data.frame(
   Factor = c("Crop", "Location", "Soil type"),
-  R2 = c(0.2217, 0.0668, 0.0202),
+  R2 = c(0.2437, 0.03378, 0.0087),
   Color = c("#40798c", "#b33939", "#c57b57")
 )
 
@@ -84,10 +87,11 @@ bar_func <- ggplot(df_func, aes(x = Factor, y = R2, fill = Factor)) +
   geom_bar(stat = "identity", color = "black") +
   scale_fill_manual(values = df_func$Color) +
   labs(
-    title = "Functions",
-    y = expression(R^2),   # <- superscript 2
+    title = "PGP Functions",
+    y = "ANOSIM R",   # <- superscript 2
     x = NULL
   ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
   cowplot::theme_cowplot()+
   theme(
     legend.position = "none",
@@ -95,9 +99,10 @@ bar_func <- ggplot(df_func, aes(x = Factor, y = R2, fill = Factor)) +
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-perm_bars <- bar_unc + bar_cult + bar_func 
+ANOSIM_bars <- bar_unc + bar_cult + bar_func 
 
-nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func / perm_bars + plot_annotation(tag_levels = 'A') &
+
+nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func / ANOSIM_bars + plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = 14, face = "bold", hjust = 1, vjust = -1), 
     plot.tag.position = c(0, 1),
     plot.margin = margin(20, 20, 20, 20))
@@ -119,7 +124,7 @@ library(scales)
 
 df_unc <- data.frame(
   Factor = c("Crop", "Location", "Soil type"),
-  R2 = c(0.02727, 0.936, 0.4326),
+  R2 = c(0.03, 0.428, 0.181),
   Color = c("#40798c", "#b33939", "#c57b57")
 )
 
@@ -128,10 +133,11 @@ bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
   geom_bar(stat = "identity", color = "black") +
   scale_fill_manual(values = df_unc$Color) +
   labs(
-    title = "Unculturable",
-    y = "R",   # <- superscript 2
+    title = "16S Total Community",
+    y = expression("PERMANOVA " ~R^2),   # <- superscript 2
     x = NULL
   ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
   cowplot::theme_cowplot()+
   theme(
     legend.position = "none",
@@ -141,7 +147,7 @@ bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
 
 df_cult <- data.frame(
   Factor = c("Crop", "Location", "Soil type"),
-  R2 = c(0.0669, 0.2176, 0.1734),
+  R2 = c(0.0519, 0.1177, 0.0566),
   Color = c("#40798c", "#b33939", "#c57b57")
 )
 
@@ -150,10 +156,11 @@ bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
   geom_bar(stat = "identity", color = "black") +
   scale_fill_manual(values = df_cult$Color) +
   labs(
-    title = "Culturable",
-    y = "R",   # <- superscript 2
+    title = "16S Culturable",
+    y = expression("PERMANOVA " ~R^2),   # <- superscript 2
     x = NULL
   ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
   cowplot::theme_cowplot()+
   theme(
     legend.position = "none",
@@ -163,7 +170,7 @@ bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
 
 df_func <- data.frame(
   Factor = c("Crop", "Location", "Soil type"),
-  R2 = c(0.2437, 0.03378, 0.0087),
+  R2 = c(0.2217, 0.0668, 0.0202),
   Color = c("#40798c", "#b33939", "#c57b57")
 )
 
@@ -172,10 +179,11 @@ bar_func <- ggplot(df_func, aes(x = Factor, y = R2, fill = Factor)) +
   geom_bar(stat = "identity", color = "black") +
   scale_fill_manual(values = df_func$Color) +
   labs(
-    title = "Functions",
-    y = "R",   # <- superscript 2
+    title = "PGP Functions",
+    y = expression("PERMANOVA " ~R^2),   # <- superscript 2
     x = NULL
   ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
   cowplot::theme_cowplot()+
   theme(
     legend.position = "none",
@@ -183,10 +191,10 @@ bar_func <- ggplot(df_func, aes(x = Factor, y = R2, fill = Factor)) +
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-ANOSIM_bars <- bar_unc + bar_cult + bar_func + plot_annotation(tag_levels = 'A') &
+perm_bars <- bar_unc + bar_cult + bar_func + plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = 14, face = "bold"))
 
-ANOSIM_bars
+perm_bars
 ```
 
 ![](concat_figs_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
