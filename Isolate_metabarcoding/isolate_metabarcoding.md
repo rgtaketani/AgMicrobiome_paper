@@ -1,7 +1,7 @@
 Isolates Metabarcoding
 ================
 Rodrigo Taketani
-2025-09-16
+2025-11-28
 
 # Importing data
 
@@ -423,10 +423,6 @@ library(picante)
     ## Loading required package: vegan
 
     ## Loading required package: permute
-
-    ## Loading required package: lattice
-
-    ## This is vegan 2.6-8
 
     ## Loading required package: nlme
 
@@ -2554,9 +2550,9 @@ library(tidyverse)
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ forcats   1.0.0     ✔ readr     2.1.5
-    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.1
-    ## ✔ purrr     1.0.4     ✔ tidyr     1.3.1
+    ## ✔ forcats   1.0.1     ✔ readr     2.1.5
+    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.2
+    ## ✔ purrr     1.1.0     ✔ tidyr     1.3.1
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ nlme::collapse() masks dplyr::collapse()
     ## ✖ dplyr::filter()  masks stats::filter()
@@ -2775,42 +2771,42 @@ NMDS <- ordinate(physeq = physeq.norm.raref,
     ## Square root transformation
     ## Wisconsin double standardization
     ## Run 0 stress 0.3118237 
-    ## Run 1 stress 0.3119003 
-    ## ... Procrustes: rmse 0.017449  max resid 0.1990651 
-    ## Run 2 stress 0.3115248 
+    ## Run 1 stress 0.313976 
+    ## Run 2 stress 0.3122341 
+    ## ... Procrustes: rmse 0.01594606  max resid 0.1621917 
+    ## Run 3 stress 0.3183052 
+    ## Run 4 stress 0.3128313 
+    ## Run 5 stress 0.3123139 
+    ## ... Procrustes: rmse 0.01916841  max resid 0.1654285 
+    ## Run 6 stress 0.3120067 
+    ## ... Procrustes: rmse 0.01458911  max resid 0.1676868 
+    ## Run 7 stress 0.312609 
+    ## Run 8 stress 0.315365 
+    ## Run 9 stress 0.3358457 
+    ## Run 10 stress 0.312527 
+    ## Run 11 stress 0.3120499 
+    ## ... Procrustes: rmse 0.01296947  max resid 0.1657576 
+    ## Run 12 stress 0.3135471 
+    ## Run 13 stress 0.3139265 
+    ## Run 14 stress 0.3116225 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.01482942  max resid 0.1682883 
-    ## Run 3 stress 0.3122564 
-    ## Run 4 stress 0.3125065 
-    ## Run 5 stress 0.3123616 
-    ## Run 6 stress 0.3117233 
-    ## ... Procrustes: rmse 0.01174395  max resid 0.1155786 
-    ## Run 7 stress 0.3283057 
-    ## Run 8 stress 0.3132779 
-    ## Run 9 stress 0.3122633 
-    ## Run 10 stress 0.314256 
-    ## Run 11 stress 0.3125583 
-    ## Run 12 stress 0.3120315 
-    ## Run 13 stress 0.3141519 
-    ## Run 14 stress 0.311795 
-    ## ... Procrustes: rmse 0.01316751  max resid 0.1134747 
-    ## Run 15 stress 0.3117775 
-    ## ... Procrustes: rmse 0.01091214  max resid 0.0891933 
-    ## Run 16 stress 0.3126234 
-    ## Run 17 stress 0.3126158 
-    ## Run 18 stress 0.3119146 
-    ## ... Procrustes: rmse 0.0172568  max resid 0.1628323 
-    ## Run 19 stress 0.3172425 
-    ## Run 20 stress 0.3120922 
+    ## ... Procrustes: rmse 0.0177464  max resid 0.1914029 
+    ## Run 15 stress 0.3368767 
+    ## Run 16 stress 0.3126265 
+    ## Run 17 stress 0.313338 
+    ## Run 18 stress 0.3123648 
+    ## Run 19 stress 0.3163615 
+    ## Run 20 stress 0.3119246 
+    ## ... Procrustes: rmse 0.01922854  max resid 0.1897319 
     ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##      7: no. of iterations >= maxit
-    ##     13: stress ratio > sratmax
+    ##      9: no. of iterations >= maxit
+    ##     11: stress ratio > sratmax
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.3115248
+    ## [1] 0.3116225
 
 ``` r
 iso_bac_phylo_norm <- bac_phylo_norm
@@ -3014,14 +3010,14 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Textural.class)
 
     ##                           pairs Df SumsOfSqs  F.Model         R2 p.value
     ## 1             Clay loam vs Clay  1  1.866854 4.875022 0.04243762   0.001
-    ## 2       Clay loam vs Sandy loam  1  1.096888 3.181155 0.02253243   0.001
+    ## 2       Clay loam vs Sandy loam  1  1.096888 3.181155 0.02253243   0.003
     ## 3  Clay loam vs Silty clay loam  1  1.217085 3.168675 0.02799957   0.001
     ## 4            Clay vs Sandy loam  1  3.057977 8.754101 0.05965149   0.001
     ## 5       Clay vs Silty clay loam  1  1.779650 4.566030 0.03985500   0.001
     ## 6 Sandy loam vs Silty clay loam  1  1.728770 4.935940 0.03453253   0.001
     ##   p.adjusted sig
     ## 1      0.006   *
-    ## 2      0.006   *
+    ## 2      0.018   .
     ## 3      0.006   *
     ## 4      0.006   *
     ## 5      0.006   *
@@ -3032,27 +3028,27 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Crop)
 ```
 
     ##                  pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
-    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.016      0.336    
-    ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.002      0.042   .
-    ## 3       Barley vs Oats  1 0.9597603 2.867802 0.03935623   0.004      0.084    
-    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.019      0.399    
+    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.018      0.378    
+    ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.001      0.021   .
+    ## 3       Barley vs Oats  1 0.9597603 2.867802 0.03935623   0.002      0.042   .
+    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.028      0.588    
     ## 5  Barley vs Sugarbeet  1 1.0274182 2.836481 0.03894314   0.001      0.021   .
     ## 6      Barley vs Wheat  1 1.2123773 3.297626 0.04498953   0.001      0.021   .
-    ## 7        Beans vs Bulk  1 0.7246194 1.874812 0.02608441   0.007      0.147    
-    ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.003      0.063    
-    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.241      1.000    
-    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.005      0.105    
-    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.017      0.357    
+    ## 7        Beans vs Bulk  1 0.7246194 1.874812 0.02608441   0.009      0.189    
+    ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.004      0.084    
+    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.208      1.000    
+    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.012      0.252    
+    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.011      0.231    
     ## 12        Bulk vs Oats  1 0.9958593 2.856177 0.03920295   0.001      0.021   .
-    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.061      1.000    
-    ## 14   Bulk vs Sugarbeet  1 1.0417453 2.769002 0.03805195   0.001      0.021   .
-    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.139      1.000    
-    ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.026      0.546    
+    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.064      1.000    
+    ## 14   Bulk vs Sugarbeet  1 1.0417453 2.769002 0.03805195   0.002      0.042   .
+    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.131      1.000    
+    ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.022      0.462    
     ## 17   Oats vs Sugarbeet  1 1.1792089 3.268379 0.04460831   0.001      0.021   .
-    ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.002      0.042   .
-    ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.003      0.063    
-    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.026      0.546    
-    ## 21  Sugarbeet vs Wheat  1 0.8971419 2.278298 0.03152119   0.002      0.042   .
+    ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.001      0.021   .
+    ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.002      0.042   .
+    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.029      0.609    
+    ## 21  Sugarbeet vs Wheat  1 0.8971419 2.278298 0.03152119   0.001      0.021   .
 
 ``` r
 pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
@@ -3060,36 +3056,36 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
 
     ##             pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
     ## 1  CL.BO vs CY.YO  1 1.1667592 3.175788 0.05554427   0.001      0.036   .
-    ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.002      0.072    
+    ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.001      0.036   .
     ## 3  CL.BO vs CY.BU  1 1.5347727 4.169977 0.07168607   0.001      0.036   .
-    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.013      0.468    
-    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.039      1.000    
-    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.380      1.000    
+    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.019      0.684    
+    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.040      1.000    
+    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.394      1.000    
     ## 7  CL.BO vs SC.HE  1 1.7967801 5.118486 0.08658013   0.001      0.036   .
-    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.032      1.000    
+    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.044      1.000    
     ## 9  CY.YO vs CL.YO  1 1.4085635 3.719082 0.06443419   0.001      0.036   .
-    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.003      0.108    
+    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.005      0.180    
     ## 11 CY.YO vs SL.AN  1 1.4106260 4.073532 0.07014438   0.001      0.036   .
-    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.013      0.468    
+    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.010      0.360    
     ## 13 CY.YO vs SL.SH  1 1.0940152 2.971160 0.05215201   0.001      0.036   .
     ## 14 CY.YO vs SC.HE  1 2.3438077 6.433468 0.10645539   0.001      0.036   .
     ## 15 CY.YO vs SL.BE  1 1.9278954 6.036639 0.10054925   0.001      0.036   .
     ## 16 CL.YO vs CY.BU  1 1.4205168 3.744109 0.06483967   0.001      0.036   .
     ## 17 CL.YO vs SL.AN  1 1.8628885 5.409701 0.09105754   0.001      0.036   .
     ## 18 CL.YO vs SC.SH  1 1.1195847 3.014159 0.05286686   0.001      0.036   .
-    ## 19 CL.YO vs SL.SH  1 0.8168638 2.230153 0.03966116   0.007      0.252    
+    ## 19 CL.YO vs SL.SH  1 0.8168638 2.230153 0.03966116   0.003      0.108    
     ## 20 CL.YO vs SC.HE  1 2.1798480 6.015285 0.10022921   0.001      0.036   .
     ## 21 CL.YO vs SL.BE  1 1.8418358 5.802232 0.09702367   0.001      0.036   .
     ## 22 CY.BU vs SL.AN  1 2.2559378 6.502168 0.10747001   0.001      0.036   .
-    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.001      0.036   .
+    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.002      0.072    
     ## 24 CY.BU vs SL.SH  1 1.3368964 3.624279 0.06289499   0.001      0.036   .
     ## 25 CY.BU vs SC.HE  1 2.5964509 7.114037 0.11640594   0.001      0.036   .
     ## 26 CY.BU vs SL.BE  1 2.6298133 8.217482 0.13207673   0.001      0.036   .
     ## 27 SL.AN vs SC.SH  1 1.2334569 3.638592 0.06312771   0.001      0.036   .
     ## 28 SL.AN vs SL.SH  1 1.0502440 3.146020 0.05505230   0.001      0.036   .
     ## 29 SL.AN vs SC.HE  1 2.2220943 6.734926 0.11089050   0.001      0.036   .
-    ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.001      0.036   .
-    ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.034      1.000    
+    ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.003      0.108    
+    ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.043      1.000    
     ## 32 SC.SH vs SC.HE  1 2.2214194 6.222167 0.10332021   0.001      0.036   .
     ## 33 SC.SH vs SL.BE  1 1.2358263 3.960120 0.06832491   0.001      0.036   .
     ## 34 SL.SH vs SC.HE  1 1.9896123 5.654609 0.09478914   0.001      0.036   .
@@ -3509,8 +3505,798 @@ taxa_plot_comb
 
 <img src="isolate_metabarcoding_files/figure-gfm/unnamed-chunk-33-1.png" style="display: block; margin: auto;" />
 
+# Analysis required by reviewers
+
+From here on we will include analysis required by reviewers.
+
+## Alpha diversity with Faith’s PD
+
 ``` r
-save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, file = "../Comparisons/isolate_metabarcode_figs.RData")
+library(picante)
+library(phyloseq)
+library(vegan)
+
+community_matrix <- as(t(otu_table(physeq.norm.raref)), "matrix")
+
+# Calculate Faith PD
+phy_tree_obj <- phy_tree(physeq.norm.raref)
+faith_pd_raw <- pd(community_matrix, phy_tree_obj, include.root = TRUE)
+
+# Create a simple vector of PD values
+FaithPD <- faith_pd_raw$PD
+
+# Create a Faith PD table
+faith_pd_table <- data.frame(
+  Sample = rownames(faith_pd_raw),
+  FaithPD = FaithPD
+)
+
+#print(faith_pd_table)
+# Merge with sample data
+
+library(dplyr)
+library(tibble)
+
+sample_data_df <- data.frame(sample_data(physeq.norm.raref)) %>% 
+  rownames_to_column("Sample")
+
+merged_pd_data <- merge(sample_data_df, faith_pd_table, by = "Sample")
+
+#head(merged_pd_data)
+
+# Run Shapiro-Wilk test for normality
+
+# Normality by crop
+shapiro_faith_crop <- by(merged_pd_data$FaithPD, merged_pd_data$Crop, shapiro.test)
+print(shapiro_faith_crop) # Normality met
+```
+
+    ## merged_pd_data$Crop: Barley
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.99159, p-value = 0.9933
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Crop: Beans
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95796, p-value = 0.1858
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Crop: Bulk
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.97942, p-value = 0.726
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Crop: Oats
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95934, p-value = 0.2052
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Crop: OSR
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96395, p-value = 0.2838
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Crop: Sugarbeet
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.979, p-value = 0.7116
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Crop: Wheat
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.9734, p-value = 0.5255
+
+``` r
+# Normality by location
+shapiro_faith_location <- by(merged_pd_data$FaithPD, merged_pd_data$Soil.Id, shapiro.test)
+print(shapiro_faith_location)
+```
+
+    ## merged_pd_data$Soil.Id: CL.BO
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96168, p-value = 0.3818
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: CL.YO
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.88495, p-value = 0.005173
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: CY.BU
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.97146, p-value = 0.6201
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: CY.YO
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96293, p-value = 0.4083
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: SC.HE
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95116, p-value = 0.2118
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: SC.SH
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98667, p-value = 0.9695
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: SL.AN
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.91109, p-value = 0.021
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: SL.BE
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96785, p-value = 0.5243
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Soil.Id: SL.SH
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.97621, p-value = 0.752
+
+``` r
+# Normality by soil type
+shapiro_faith_soil <- by(merged_pd_data$FaithPD, merged_pd_data$Textural.class, shapiro.test)
+print(shapiro_faith_soil)
+```
+
+    ## merged_pd_data$Textural.class: Clay
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98091, p-value = 0.5154
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Textural.class: Clay loam
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95633, p-value = 0.04116
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Textural.class: Sandy loam
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.97622, p-value = 0.122
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data$Textural.class: Silty clay loam
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98051, p-value = 0.4976
+
+``` r
+# Since normality is  met we will use ANOVA
+# 
+# LOcation
+
+anova_faith_loc <- aov(FaithPD ~ Soil.Id, data = merged_pd_data)
+summary(anova_faith_loc)
+```
+
+    ##              Df Sum Sq Mean Sq F value Pr(>F)  
+    ## Soil.Id       8  11.87  1.4835   1.844 0.0698 .
+    ## Residuals   243 195.53  0.8047                 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+tukey_loc <- TukeyHSD(anova_faith_loc)
+print(tukey_loc)
+```
+
+    ##   Tukey multiple comparisons of means
+    ##     95% family-wise confidence level
+    ## 
+    ## Fit: aov(formula = FaithPD ~ Soil.Id, data = merged_pd_data)
+    ## 
+    ## $Soil.Id
+    ##                    diff         lwr         upr     p adj
+    ## CL.YO-CL.BO  0.41967190 -0.33071158  1.17005537 0.7144272
+    ## CY.BU-CL.BO  0.69594686 -0.05443661  1.44633034 0.0930815
+    ## CY.YO-CL.BO  0.21567614 -0.53470734  0.96605961 0.9928352
+    ## SC.HE-CL.BO  0.14276825 -0.60761523  0.89315172 0.9996190
+    ## SC.SH-CL.BO  0.23707162 -0.51331185  0.98745510 0.9866276
+    ## SL.AN-CL.BO  0.11747633 -0.63290715  0.86785980 0.9999120
+    ## SL.BE-CL.BO -0.07956147 -0.82994495  0.67082200 0.9999957
+    ## SL.SH-CL.BO  0.27213237 -0.47825111  1.02251584 0.9682936
+    ## CY.BU-CL.YO  0.27627497 -0.47410851  1.02665844 0.9652828
+    ## CY.YO-CL.YO -0.20399576 -0.95437923  0.54638772 0.9950888
+    ## SC.HE-CL.YO -0.27690365 -1.02728712  0.47347983 0.9648082
+    ## SC.SH-CL.YO -0.18260027 -0.93298375  0.56778320 0.9977284
+    ## SL.AN-CL.YO -0.30219557 -1.05257904  0.44818791 0.9415624
+    ## SL.BE-CL.YO -0.49923337 -1.24961684  0.25115011 0.4878132
+    ## SL.SH-CL.YO -0.14753953 -0.89792300  0.60284394 0.9995140
+    ## CY.YO-CY.BU -0.48027072 -1.23065420  0.27011275 0.5425908
+    ## SC.HE-CY.BU -0.55317861 -1.30356209  0.19720486 0.3417859
+    ## SC.SH-CY.BU -0.45887524 -1.20925871  0.29150824 0.6047031
+    ## SL.AN-CY.BU -0.57847053 -1.32885401  0.17191294 0.2817010
+    ## SL.BE-CY.BU -0.77550834 -1.52589181 -0.02512486 0.0367406
+    ## SL.SH-CY.BU -0.42381450 -1.17419797  0.32656898 0.7032975
+    ## SC.HE-CY.YO -0.07290789 -0.82329136  0.67747558 0.9999978
+    ## SC.SH-CY.YO  0.02139548 -0.72898799  0.77177896 1.0000000
+    ## SL.AN-CY.YO -0.09819981 -0.84858328  0.65218366 0.9999777
+    ## SL.BE-CY.YO -0.29523761 -1.04562109  0.45514586 0.9487997
+    ## SL.SH-CY.YO  0.05645623 -0.69392725  0.80683970 0.9999997
+    ## SC.SH-SC.HE  0.09430337 -0.65608010  0.84468685 0.9999837
+    ## SL.AN-SC.HE -0.02529192 -0.77567539  0.72509155 1.0000000
+    ## SL.BE-SC.HE -0.22232972 -0.97271320  0.52805375 0.9912228
+    ## SL.SH-SC.HE  0.12936412 -0.62101936  0.87974759 0.9998176
+    ## SL.AN-SC.SH -0.11959530 -0.86997877  0.63078818 0.9998992
+    ## SL.BE-SC.SH -0.31663310 -1.06701657  0.43375038 0.9243613
+    ## SL.SH-SC.SH  0.03506074 -0.71532273  0.78544422 1.0000000
+    ## SL.BE-SL.AN -0.19703780 -0.94742128  0.55334567 0.9961323
+    ## SL.SH-SL.AN  0.15465604 -0.59572744  0.90503951 0.9993129
+    ## SL.SH-SL.BE  0.35169384 -0.39868964  1.10207731 0.8696678
+
+``` r
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_loc, tukey_loc)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Soil.Id)
+cld$Soil.Id <- rownames(cld)
+ 
+library(ggplot2)
+
+faith_loc_plot <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD, fill = Soil.Id)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Location", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Soil.Id,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec, limits = local_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 4,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+faith_loc_plot2 <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Crop), width = 0.2) +
+  labs(x = "Location", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Soil.Id,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 3)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec, limits = local_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 4,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+
+# Soil type
+
+anova_faith_soil <- aov(FaithPD ~ Textural.class, data = merged_pd_data)
+summary(anova_faith_soil)
+```
+
+    ##                 Df Sum Sq Mean Sq F value Pr(>F)
+    ## Textural.class   3   4.31  1.4361   1.754  0.157
+    ## Residuals      248 203.09  0.8189
+
+``` r
+tukey_soil <- TukeyHSD(anova_faith_soil)
+print(tukey_soil)
+```
+
+    ##   Tukey multiple comparisons of means
+    ##     95% family-wise confidence level
+    ## 
+    ## Fit: aov(formula = FaithPD ~ Textural.class, data = merged_pd_data)
+    ## 
+    ## $Textural.class
+    ##                                   diff        lwr        upr     p adj
+    ## Clay loam-Clay             -0.24597555 -0.6883176 0.19636654 0.4766937
+    ## Sandy loam-Clay            -0.35246243 -0.7562637 0.05133881 0.1109479
+    ## Silty clay loam-Clay       -0.26589156 -0.7082337 0.17645053 0.4065457
+    ## Sandy loam-Clay loam       -0.10648687 -0.5102881 0.29731437 0.9038426
+    ## Silty clay loam-Clay loam  -0.01991601 -0.4622581 0.42242608 0.9994339
+    ## Silty clay loam-Sandy loam  0.08657086 -0.3172304 0.49037210 0.9452531
+
+``` r
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_soil, tukey_soil)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Textural.class)
+cld$Textural.class <- rownames(cld)
+ 
+
+faith_soil_plot <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD, fill = Textural.class)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Soil type", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Textural.class,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 2.5,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+faith_soil_plot2 <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Soil.Id), width = 0.2) +
+  labs(x = "Soil type", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Textural.class,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 2.5,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+# Crop
+anova_faith_crop <- aov(FaithPD ~ Crop, data = merged_pd_data)
+summary(anova_faith_crop)
+```
+
+    ##              Df Sum Sq Mean Sq F value   Pr(>F)    
+    ## Crop          6  30.88   5.147   7.144 4.94e-07 ***
+    ## Residuals   245 176.52   0.720                     
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+tukey_crop <- TukeyHSD(anova_faith_crop)
+print(tukey_crop)
+```
+
+    ##   Tukey multiple comparisons of means
+    ##     95% family-wise confidence level
+    ## 
+    ## Fit: aov(formula = FaithPD ~ Crop, data = merged_pd_data)
+    ## 
+    ## $Crop
+    ##                         diff         lwr         upr     p adj
+    ## Beans-Barley      0.33514622 -0.25964995  0.92994239 0.6332665
+    ## Bulk-Barley       0.16163496 -0.43316121  0.75643114 0.9840170
+    ## Oats-Barley      -0.34638308 -0.94117925  0.24841309 0.5956773
+    ## OSR-Barley        0.28824507 -0.30655110  0.88304125 0.7790828
+    ## Sugarbeet-Barley  0.63938382  0.04458765  1.23418000 0.0260656
+    ## Wheat-Barley      0.77250241  0.17770624  1.36729858 0.0027251
+    ## Bulk-Beans       -0.17351126 -0.76830743  0.42128492 0.9770152
+    ## Oats-Beans       -0.68152930 -1.27632547 -0.08673313 0.0133921
+    ## OSR-Beans        -0.04690115 -0.64169732  0.54789503 0.9999860
+    ## Sugarbeet-Beans   0.30423760 -0.29055857  0.89903378 0.7321847
+    ## Wheat-Beans       0.43735619 -0.15743998  1.03215236 0.3068861
+    ## Oats-Bulk        -0.50801804 -1.10281422  0.08677813 0.1500534
+    ## OSR-Bulk          0.12661011 -0.46818606  0.72140628 0.9956689
+    ## Sugarbeet-Bulk    0.47774886 -0.11704731  1.07254503 0.2081214
+    ## Wheat-Bulk        0.61086745  0.01607127  1.20566362 0.0397941
+    ## OSR-Oats          0.63462815  0.03983198  1.22942433 0.0280153
+    ## Sugarbeet-Oats    0.98576690  0.39097073  1.58056308 0.0000315
+    ## Wheat-Oats        1.11888549  0.52408932  1.71368166 0.0000012
+    ## Sugarbeet-OSR     0.35113875 -0.24365742  0.94593492 0.5796538
+    ## Wheat-OSR         0.48425734 -0.11053884  1.07905351 0.1944835
+    ## Wheat-Sugarbeet   0.13311859 -0.46167759  0.72791476 0.9943047
+
+``` r
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_crop, tukey_crop)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Crop)
+cld$Crop <- rownames(cld)
+ 
+
+faith_crop_plot <- ggplot(merged_pd_data, aes(x = Crop, y = FaithPD, fill = Crop)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Crop", y = "Faith’s PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Crop,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec, limits = crop_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", 
+           x = 4, 
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+# coloring jitter
+
+faith_crop_plot2 <- ggplot(merged_pd_data, aes(x = Crop, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Soil.Id), width = 0.2) +
+  labs(x = "Crop", y = "Faith’s PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Crop,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec, limits = crop_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", 
+           x = 4, 
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+
+library(patchwork)
+
+faith_combined_plot <- (faith_crop_plot + faith_loc_plot + faith_soil_plot) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+faith_combined_plot
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/FaithPD-1.png" style="display: block; margin: auto;" />
+
+``` r
+faith_combined_plot2 <- (faith_crop_plot2 + faith_loc_plot2 + faith_soil_plot2) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+faith_combined_plot2
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/FaithPD2-1.png" style="display: block; margin: auto;" />
+
+## Now we will run NMDS using w-nifrac
+
+``` r
+## === Weighted UniFrac NMDS =======================================
+
+NMDS <- ordinate(
+  physeq = physeq.norm.raref, 
+  method = "NMDS", 
+  distance = "unifrac",
+  weighted = TRUE
+)
+```
+
+    ## Run 0 stress 0.2000125 
+    ## Run 1 stress 0.2024325 
+    ## Run 2 stress 0.2039124 
+    ## Run 3 stress 0.2111399 
+    ## Run 4 stress 0.2027339 
+    ## Run 5 stress 0.2030466 
+    ## Run 6 stress 0.2024599 
+    ## Run 7 stress 0.2130167 
+    ## Run 8 stress 0.1996424 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.01043728  max resid 0.1268076 
+    ## Run 9 stress 0.2005816 
+    ## Run 10 stress 0.2024695 
+    ## Run 11 stress 0.2007924 
+    ## Run 12 stress 0.203126 
+    ## Run 13 stress 0.2021945 
+    ## Run 14 stress 0.2005607 
+    ## Run 15 stress 0.1997016 
+    ## ... Procrustes: rmse 0.004703332  max resid 0.07371999 
+    ## Run 16 stress 0.207795 
+    ## Run 17 stress 0.2062813 
+    ## Run 18 stress 0.2025049 
+    ## Run 19 stress 0.2029784 
+    ## Run 20 stress 0.1997614 
+    ## ... Procrustes: rmse 0.003365729  max resid 0.05083799 
+    ## *** Best solution was not repeated -- monoMDS stopping criteria:
+    ##      3: no. of iterations >= maxit
+    ##     17: stress ratio > sratmax
+
+``` r
+NMDS$stress
+```
+
+    ## [1] 0.1996424
+
+``` r
+NMDS_plot_all <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Soil.Id", 
+  shape = "Crop"
+) +
+  geom_point(size = 3) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  scale_shape_manual(values = shapesvec, name = NULL, labels = labelsvec, limits = crop_order) +
+  cowplot::theme_cowplot()
+
+NMDS_plot_all
+```
+
+    ## Warning: Removed 72 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](isolate_metabarcoding_files/figure-gfm/wUNifrac%20NMDS-1.png)<!-- -->
+
+``` r
+library(scales)
+
+## === Location =====================================================
+
+NMDS_plot_loc <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Soil.Id"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+
+
+
+## === Crop =========================================================
+
+NMDS_plot_crop <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Crop"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+
+
+
+## === Textural.class =========================================================
+
+NMDS_plot_soil <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Textural.class"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+
+
+
+## === Combine Plots ================================================
+nmds_plot_comb_wUniF <- (NMDS_plot_crop + NMDS_plot_loc +  NMDS_plot_soil) + 
+  plot_annotation(tag_levels = 'A', tag_prefix = "D") + 
+  plot_layout(nrow = 1)
+
+
+nmds_plot_comb_wUniF
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/wUNifrac NMDS2-1.png" style="display: block; margin: auto;" />
+
+# ANOSIM
+
+ANOSIM test.
+
+``` r
+ps_dist_matrix <- UniFrac(physeq.norm.raref, weighted = TRUE, normalized = TRUE, parallel = FALSE)
+# Soil type
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Textural.class, permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix, grouping = phyloseq::sample_data(physeq.norm.raref)$Textural.class,      permutations = 999) 
+    ## Dissimilarity: 
+    ## 
+    ## ANOSIM statistic R: 0.06332 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Location
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Soil.Id, permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix, grouping = phyloseq::sample_data(physeq.norm.raref)$Soil.Id,      permutations = 999) 
+    ## Dissimilarity: 
+    ## 
+    ## ANOSIM statistic R: 0.1061 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Crop
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Crop, permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix, grouping = phyloseq::sample_data(physeq.norm.raref)$Crop,      permutations = 999) 
+    ## Dissimilarity: 
+    ## 
+    ## ANOSIM statistic R: 0.0763 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+## PERMANOVA on wUniFrac distance matrix
+
+# Crop
+permanova_crop <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(physeq.norm.raref)$Crop)
+# Location
+permanova_local <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(physeq.norm.raref)$Soil.Id)
+# Soil
+permanova_soil <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(physeq.norm.raref)$Textural.class)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+```
+
+|          |  Df | SumOfSqs |     R2 |     F | Pr(\>F) |
+|:---------|----:|---------:|-------:|------:|--------:|
+| Model    |   3 |   1.7042 | 0.0443 | 3.832 |   0.001 |
+| Residual | 248 |  36.7642 | 0.9557 |    NA |      NA |
+| Total    | 251 |  38.4684 | 1.0000 |    NA |      NA |
+
+PERMANOVA soil results
+
+``` r
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+```
+
+|          |  Df | SumOfSqs |     R2 |      F | Pr(\>F) |
+|:---------|----:|---------:|-------:|-------:|--------:|
+| Model    |   6 |   3.0972 | 0.0805 | 3.5755 |   0.001 |
+| Residual | 245 |  35.3712 | 0.9195 |     NA |      NA |
+| Total    | 251 |  38.4684 | 1.0000 |     NA |      NA |
+
+PERMANOVA crop results
+
+``` r
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+```
+
+|          |  Df | SumOfSqs |     R2 |      F | Pr(\>F) |
+|:---------|----:|---------:|-------:|-------:|--------:|
+| Model    |   8 |   4.2489 | 0.1105 | 3.7716 |   0.001 |
+| Residual | 243 |  34.2195 | 0.8895 |     NA |      NA |
+| Total    | 251 |  38.4684 | 1.0000 |     NA |      NA |
+
+PERMANOVA location results
+
+``` r
+save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, faith_combined_plot, faith_combined_plot2, nmds_plot_comb_wUniF,merged_pd_data, file = "../Comparisons/isolate_metabarcode_figs.RData")
 ```
 
 ``` r
@@ -3518,14 +4304,14 @@ installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
     ## pairwiseAdonis        cluster         scales      lubridate        forcats 
-    ##        "0.4.1"        "2.1.7"        "1.4.0"        "1.9.4"        "1.0.0" 
+    ##        "0.4.1"      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1" 
     ##        stringr          purrr          readr          tidyr      tidyverse 
-    ##        "1.5.1"        "1.0.4"        "2.1.5"        "1.3.1"        "2.0.0" 
+    ##        "1.5.2"        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0" 
     ##   RColorBrewer      patchwork       multcomp        TH.data           MASS 
-    ##        "1.1-3"        "1.3.2"       "1.4-26"        "1.1-2"       "7.3-61" 
+    ##        "1.1-3"        "1.3.2"       "1.4-29"        "1.1-4"       "7.3-65" 
     ##       survival        mvtnorm        ggplot2   multcompView         tibble 
-    ##        "3.7-0"        "1.3-2"        "4.0.0"       "0.1-10"        "3.2.1" 
-    ##        picante           nlme          vegan        lattice        permute 
-    ##        "1.8.2"      "3.1-166"        "2.6-8"       "0.22-6"        "0.9-7" 
-    ##            ape          dplyr       phyloseq 
-    ##        "5.8-1"        "1.1.4"       "1.50.0"
+    ##        "3.8-3"        "1.3-3"        "4.0.0"       "0.1-10"        "3.3.0" 
+    ##        picante           nlme          vegan        permute            ape 
+    ##        "1.8.2"      "3.1-168"        "2.7-2"        "0.9-8"        "5.8-1" 
+    ##          dplyr       phyloseq 
+    ##        "1.1.4"       "1.50.0"

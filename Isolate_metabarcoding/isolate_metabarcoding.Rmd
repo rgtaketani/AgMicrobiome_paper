@@ -1651,9 +1651,407 @@ taxa_plot_comb <- (tax_plot_crop + tax_plot_locat + tax_plot_soil) + plot_annota
 taxa_plot_comb
 
 ```
+
+
+# Analysis required by reviewers
+
+From here on we will include analysis required by reviewers. 
+
+## Alpha diversity with Faith's PD 
+
+```{r FaithPD, fig.height = 4, fig.width = 9, fig.align = "center"}
+library(picante)
+library(phyloseq)
+library(vegan)
+
+community_matrix <- as(t(otu_table(physeq.norm.raref)), "matrix")
+
+# Calculate Faith PD
+phy_tree_obj <- phy_tree(physeq.norm.raref)
+faith_pd_raw <- pd(community_matrix, phy_tree_obj, include.root = TRUE)
+
+# Create a simple vector of PD values
+FaithPD <- faith_pd_raw$PD
+
+# Create a Faith PD table
+faith_pd_table <- data.frame(
+  Sample = rownames(faith_pd_raw),
+  FaithPD = FaithPD
+)
+
+#print(faith_pd_table)
+# Merge with sample data
+
+library(dplyr)
+library(tibble)
+
+sample_data_df <- data.frame(sample_data(physeq.norm.raref)) %>% 
+  rownames_to_column("Sample")
+
+merged_pd_data <- merge(sample_data_df, faith_pd_table, by = "Sample")
+
+#head(merged_pd_data)
+
+# Run Shapiro-Wilk test for normality
+
+# Normality by crop
+shapiro_faith_crop <- by(merged_pd_data$FaithPD, merged_pd_data$Crop, shapiro.test)
+print(shapiro_faith_crop) # Normality met
+
+# Normality by location
+shapiro_faith_location <- by(merged_pd_data$FaithPD, merged_pd_data$Soil.Id, shapiro.test)
+print(shapiro_faith_location)
+
+# Normality by soil type
+shapiro_faith_soil <- by(merged_pd_data$FaithPD, merged_pd_data$Textural.class, shapiro.test)
+print(shapiro_faith_soil)
+
+# Since normality is  met we will use ANOVA
+# 
+# LOcation
+
+anova_faith_loc <- aov(FaithPD ~ Soil.Id, data = merged_pd_data)
+summary(anova_faith_loc)
+tukey_loc <- TukeyHSD(anova_faith_loc)
+print(tukey_loc)
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_loc, tukey_loc)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Soil.Id)
+cld$Soil.Id <- rownames(cld)
+ 
+library(ggplot2)
+
+faith_loc_plot <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD, fill = Soil.Id)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Location", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Soil.Id,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec, limits = local_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 4,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+faith_loc_plot2 <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Crop), width = 0.2) +
+  labs(x = "Location", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Soil.Id,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 3)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec, limits = local_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 4,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+
+# Soil type
+
+anova_faith_soil <- aov(FaithPD ~ Textural.class, data = merged_pd_data)
+summary(anova_faith_soil)
+tukey_soil <- TukeyHSD(anova_faith_soil)
+print(tukey_soil)
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_soil, tukey_soil)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Textural.class)
+cld$Textural.class <- rownames(cld)
+ 
+
+faith_soil_plot <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD, fill = Textural.class)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Soil type", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Textural.class,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 2.5,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+faith_soil_plot2 <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Soil.Id), width = 0.2) +
+  labs(x = "Soil type", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Textural.class,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 2.5,
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+# Crop
+anova_faith_crop <- aov(FaithPD ~ Crop, data = merged_pd_data)
+summary(anova_faith_crop)
+tukey_crop <- TukeyHSD(anova_faith_crop)
+print(tukey_crop)
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_crop, tukey_crop)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Crop)
+cld$Crop <- rownames(cld)
+ 
+
+faith_crop_plot <- ggplot(merged_pd_data, aes(x = Crop, y = FaithPD, fill = Crop)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Crop", y = "Faith’s PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Crop,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec, limits = crop_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", 
+           x = 4, 
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+# coloring jitter
+
+faith_crop_plot2 <- ggplot(merged_pd_data, aes(x = Crop, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Soil.Id), width = 0.2) +
+  labs(x = "Crop", y = "Faith’s PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Crop,
+                y = max(merged_pd_data$FaithPD) + 0.05 * max(merged_pd_data$FaithPD),
+                label = Letters),
+            size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec, limits = crop_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", 
+           x = 4, 
+           y = max(merged_pd_data$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
+                           max(merged_pd_data$FaithPD) * 1.2))
+
+
+library(patchwork)
+
+faith_combined_plot <- (faith_crop_plot + faith_loc_plot + faith_soil_plot) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+faith_combined_plot
+```
+
+
+```{r FaithPD2, fig.height = 6, fig.width = 11, fig.align = "center"}
+faith_combined_plot2 <- (faith_crop_plot2 + faith_loc_plot2 + faith_soil_plot2) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+faith_combined_plot2
+```
+
+## Now we will run NMDS using w-nifrac
+
+```{r wUNifrac NMDS}
+## === Weighted UniFrac NMDS =======================================
+
+NMDS <- ordinate(
+  physeq = physeq.norm.raref, 
+  method = "NMDS", 
+  distance = "unifrac",
+  weighted = TRUE
+)
+
+NMDS$stress
+
+NMDS_plot_all <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Soil.Id", 
+  shape = "Crop"
+) +
+  geom_point(size = 3) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  scale_shape_manual(values = shapesvec, name = NULL, labels = labelsvec, limits = crop_order) +
+  cowplot::theme_cowplot()
+
+NMDS_plot_all
+```
+
+```{r wUNifrac NMDS2, fig.height = 5, fig.width = 11, fig.align = "center"}
+library(scales)
+
+## === Location =====================================================
+
+NMDS_plot_loc <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Soil.Id"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+
+
+
+## === Crop =========================================================
+
+NMDS_plot_crop <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Crop"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+
+
+
+## === Textural.class =========================================================
+
+NMDS_plot_soil <- plot_ordination(
+  physeq = physeq.norm.raref, 
+  ordination = NMDS, 
+  color = "Textural.class"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+
+
+
+## === Combine Plots ================================================
+nmds_plot_comb_wUniF <- (NMDS_plot_crop + NMDS_plot_loc +  NMDS_plot_soil) + 
+  plot_annotation(tag_levels = 'A', tag_prefix = "D") + 
+  plot_layout(nrow = 1)
+
+
+nmds_plot_comb_wUniF
+```
+
+# ANOSIM
+
+ANOSIM test. 
+
+```{r}
+ps_dist_matrix <- UniFrac(physeq.norm.raref, weighted = TRUE, normalized = TRUE, parallel = FALSE)
+# Soil type
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Textural.class, permutations = 999)
+
+# Location
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Soil.Id, permutations = 999)
+# Crop
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Crop, permutations = 999)
+
+```
+
+```{r Permanova wUniFrac}
+
+## PERMANOVA on wUniFrac distance matrix
+
+# Crop
+permanova_crop <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(physeq.norm.raref)$Crop)
+# Location
+permanova_local <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(physeq.norm.raref)$Soil.Id)
+# Soil
+permanova_soil <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(physeq.norm.raref)$Textural.class)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+
+```
+
 ```{r}
 
-save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, file = "../Comparisons/isolate_metabarcode_figs.RData")
+save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, faith_combined_plot, faith_combined_plot2, nmds_plot_comb_wUniF,merged_pd_data, file = "../Comparisons/isolate_metabarcode_figs.RData")
 
 ```
 

@@ -1,6 +1,6 @@
 AgMicrobiome 16S metabarcoding
 ================
-2025-09-16
+2025-11-28
 
 # Importing data
 
@@ -300,10 +300,6 @@ library(picante)
     ## Loading required package: vegan
 
     ## Loading required package: permute
-
-    ## Loading required package: lattice
-
-    ## This is vegan 2.6-8
 
     ## Loading required package: nlme
 
@@ -2955,9 +2951,9 @@ library(tidyverse)
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ forcats   1.0.0     ✔ readr     2.1.5
-    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.1
-    ## ✔ purrr     1.0.4     ✔ tidyr     1.3.1
+    ## ✔ forcats   1.0.1     ✔ readr     2.1.5
+    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.2
+    ## ✔ purrr     1.1.0     ✔ tidyr     1.3.1
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::collapse() masks nlme::collapse()
     ## ✖ dplyr::filter()   masks stats::filter()
@@ -3624,8 +3620,758 @@ vegan::anosim(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Type, distance = "bra
     ## Permutation: free
     ## Number of permutations: 999
 
+# Analysis required by reviewers
+
+From here on we will include analysis required by reviewers.
+
+## Alpha diversity with Faith’s PD
+
 ``` r
-save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
+library(picante)
+library(phyloseq)
+library(vegan)
+
+community_matrix <- as(t(otu_table(physeq.norm.raref)), "matrix")
+
+# Calculate Faith PD
+phy_tree_obj <- phy_tree(physeq.norm.raref)
+faith_pd_raw <- pd(community_matrix, phy_tree_obj, include.root = TRUE)
+
+# Create a simple vector of PD values
+FaithPD <- faith_pd_raw$PD
+
+# Create a Faith PD table
+faith_pd_table <- data.frame(
+  Sample = rownames(faith_pd_raw),
+  FaithPD = FaithPD
+)
+
+#print(faith_pd_table)
+# Merge with sample data
+
+library(dplyr)
+library(tibble)
+
+sample_data_df <- data.frame(sample_data(physeq.norm.raref)) %>% 
+  rownames_to_column("Sample")
+
+merged_pd_data_unc <- merge(sample_data_df, faith_pd_table, by = "Sample")
+
+#head(merged_pd_data_unc)
+
+# Run Shapiro-Wilk test for normality
+
+# Normality by crop
+shapiro_faith_crop <- by(merged_pd_data_unc$FaithPD, merged_pd_data_unc$Type, shapiro.test)
+print(shapiro_faith_crop) # Normality met
+```
+
+    ## merged_pd_data_unc$Type: Barley
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96494, p-value = 0.1985
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Type: Beans
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96856, p-value = 0.2689
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Type: Bulksoil
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98077, p-value = 0.6511
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Type: Oats
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98319, p-value = 0.7493
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Type: OilseedRape
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95577, p-value = 0.1117
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Type: Sugarbeet
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98723, p-value = 0.8953
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Type: Wheat
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95747, p-value = 0.1046
+
+``` r
+# Normality by location
+shapiro_faith_location <- by(merged_pd_data_unc$FaithPD, merged_pd_data_unc$Soil.Location, shapiro.test)
+print(shapiro_faith_location)
+```
+
+    ## merged_pd_data_unc$Soil.Location: CL.BO
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.93677, p-value = 0.04467
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: CL.YO
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.90096, p-value = 0.005642
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: CY.BU
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95753, p-value = 0.1926
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: CY.YO
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.88299, p-value = 0.001679
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: SC.HE
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.9818, p-value = 0.8162
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: SC.SH
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96579, p-value = 0.3385
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: SL.AN
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.96283, p-value = 0.2776
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: SL.BE
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.94951, p-value = 0.1287
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil.Location: SL.SH
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.97339, p-value = 0.5792
+
+``` r
+# Normality by soil type
+shapiro_faith_soil <- by(merged_pd_data_unc$FaithPD, merged_pd_data_unc$Soil, shapiro.test)
+print(shapiro_faith_soil)
+```
+
+    ## merged_pd_data_unc$Soil: CL
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.93435, p-value = 0.001437
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil: CY
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.95613, p-value = 0.01645
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil: SC
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.9849, p-value = 0.5634
+    ## 
+    ## ------------------------------------------------------------ 
+    ## merged_pd_data_unc$Soil: SL
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  dd[x, ]
+    ## W = 0.98898, p-value = 0.5756
+
+``` r
+# Since normality is not met we will use Kruskal-Wallis test
+
+kruskal_faith_loc <- kruskal.test(FaithPD ~ Soil.Location, data = merged_pd_data_unc)
+print(kruskal_faith_loc)
+```
+
+    ## 
+    ##  Kruskal-Wallis rank sum test
+    ## 
+    ## data:  FaithPD by Soil.Location
+    ## Kruskal-Wallis chi-squared = 92.711, df = 8, p-value < 2.2e-16
+
+``` r
+p_value <- kruskal_faith_loc$p.value
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+pairwise_loc <- pairwise.wilcox.test(merged_pd_data_unc$FaithPD,
+                                     merged_pd_data_unc$Soil.Location,
+                                     p.adjust.method = "BH")
+
+p_values_matrix <- pairwise_loc$p.value
+sig_letters <- generate_significant_letters(p_values_matrix)
+```
+
+    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
+    ## not a multiple of vector length (arg 1)
+
+``` r
+letters_df <- data.frame(Soil.Location = names(sig_letters), Letters = sig_letters)
+
+library(ggplot2)
+
+faith_loc_plot <- ggplot(merged_pd_data_unc, aes(x = Soil.Location, y = FaithPD, fill = Soil.Location)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Location", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = letters_df,
+            aes(x = Soil.Location,
+                y = max(merged_pd_data_unc$FaithPD) + 0.05 * max(merged_pd_data_unc$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec, limits = local_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 4,
+           y = max(merged_pd_data_unc$FaithPD) * 1.15,
+           label = p_value_text, size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
+                           max(merged_pd_data_unc$FaithPD) * 1.2))
+
+faith_loc_plot2 <- ggplot(merged_pd_data_unc, aes(x = Soil.Location, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Type), width = 0.2) +
+  labs(x = "Location", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = letters_df,
+            aes(x = Soil.Location,
+                y = max(merged_pd_data_unc$FaithPD) + 0.05 * max(merged_pd_data_unc$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 3)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec, limits = local_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 4,
+           y = max(merged_pd_data_unc$FaithPD) * 1.15,
+           label = p_value_text, size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
+                           max(merged_pd_data_unc$FaithPD) * 1.2))
+faith_loc_plot
+```
+
+<img src="community_analysis_files/figure-gfm/FaithPD-1.png" style="display: block; margin: auto;" />
+
+``` r
+kruskal_faith_soil <- kruskal.test(FaithPD ~ Soil, data = merged_pd_data_unc)
+print(kruskal_faith_soil)
+```
+
+    ## 
+    ##  Kruskal-Wallis rank sum test
+    ## 
+    ## data:  FaithPD by Soil
+    ## Kruskal-Wallis chi-squared = 47.858, df = 3, p-value = 2.283e-10
+
+``` r
+p_value <- kruskal_faith_soil$p.value
+p_value_text <- paste0("p = ", formatC(p_value, format = "e", digits = 2))
+
+pairwise_soil <- pairwise.wilcox.test(merged_pd_data_unc$FaithPD,
+                                      merged_pd_data_unc$Soil,
+                                      p.adjust.method = "BH")
+
+p_values_matrix <- pairwise_soil$p.value
+sig_letters <- generate_significant_letters(p_values_matrix)
+```
+
+    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
+    ## not a multiple of vector length (arg 1)
+
+``` r
+letters_df <- data.frame(Soil = names(sig_letters), Letters = sig_letters)
+
+faith_soil_plot <- ggplot(merged_pd_data_unc, aes(x = Soil, y = FaithPD, fill = Soil)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Soil type", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = letters_df,
+            aes(x = Soil,
+                y = max(merged_pd_data_unc$FaithPD) + 0.05 * max(merged_pd_data_unc$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 2.5,
+           y = max(merged_pd_data_unc$FaithPD) * 1.15,
+           label = p_value_text, size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
+                           max(merged_pd_data_unc$FaithPD) * 1.2))
+
+faith_soil_plot2 <- ggplot(merged_pd_data_unc, aes(x = Soil, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Soil.Location), width = 0.2) +
+  labs(x = "Soil type", y = "Faith's PD") +
+  theme_classic() +
+  geom_text(data = letters_df,
+            aes(x = Soil,
+                y = max(merged_pd_data_unc$FaithPD) + 0.05 * max(merged_pd_data_unc$FaithPD),
+                label = Letters),
+            vjust = -0.5, size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", x = 2.5,
+           y = max(merged_pd_data_unc$FaithPD) * 1.15,
+           label = p_value_text, size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
+                           max(merged_pd_data_unc$FaithPD) * 1.2))
+
+
+
+anova_faith_crop <- aov(FaithPD ~ Type, data = merged_pd_data_unc)
+summary(anova_faith_crop)
+```
+
+    ##              Df Sum Sq Mean Sq F value Pr(>F)    
+    ## Type          6  22640    3773   16.72 <2e-16 ***
+    ## Residuals   301  67918     226                   
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+tukey_crop <- TukeyHSD(anova_faith_crop)
+print(tukey_crop)
+```
+
+    ##   Tukey multiple comparisons of means
+    ##     95% family-wise confidence level
+    ## 
+    ## Fit: aov(formula = FaithPD ~ Type, data = merged_pd_data_unc)
+    ## 
+    ## $Type
+    ##                               diff         lwr         upr     p adj
+    ## Beans-Barley           -5.22201146 -14.7284698   4.2844469 0.6626157
+    ## Bulksoil-Barley       -10.37628099 -19.8297781  -0.9227838 0.0210922
+    ## Oats-Barley           -24.91640384 -34.3699010 -15.4629067 0.0000000
+    ## OilseedRape-Barley     -5.09682588 -14.7756207   4.5819690 0.7059272
+    ## Sugarbeet-Barley       -5.07499900 -14.5284961   4.3784982 0.6866077
+    ## Wheat-Barley            3.75102260  -5.7554357  13.2574809 0.9044321
+    ## Bulksoil-Beans         -5.15426953 -14.6077667   4.2992276 0.6705297
+    ## Oats-Beans            -19.69439238 -29.1478895 -10.2408952 0.0000000
+    ## OilseedRape-Beans       0.12518558  -9.5536093   9.8039805 1.0000000
+    ## Sugarbeet-Beans         0.14701246  -9.3064847   9.6005096 1.0000000
+    ## Wheat-Beans             8.97303405  -0.5334243  18.4794924 0.0785358
+    ## Oats-Bulksoil         -14.54012285 -23.9403604  -5.1398853 0.0001309
+    ## OilseedRape-Bulksoil    5.27945511  -4.3473267  14.9062369 0.6643592
+    ## Sugarbeet-Bulksoil      5.30128199  -4.0989556  14.7015196 0.6339373
+    ## Wheat-Bulksoil         14.12730358   4.6738064  23.5808007 0.0002577
+    ## OilseedRape-Oats       19.81957796  10.1927961  29.4463598 0.0000001
+    ## Sugarbeet-Oats         19.84140484  10.4411673  29.2416424 0.0000000
+    ## Wheat-Oats             28.66742643  19.2139293  38.1209236 0.0000000
+    ## Sugarbeet-OilseedRape   0.02182688  -9.6049550   9.6486087 1.0000000
+    ## Wheat-OilseedRape       8.84784847  -0.8309464  18.5266433 0.0984022
+    ## Wheat-Sugarbeet         8.82602159  -0.6274756  18.2795187 0.0849850
+
+``` r
+library(multcompView)
+
+cld_result <- multcompLetters4(anova_faith_crop, tukey_crop)
+  
+
+# Extracting the compact letter display and adding it to the table
+cld <- as.data.frame.list(cld_result$Type)
+cld$Type <- rownames(cld)
+ 
+
+faith_crop_plot <- ggplot(merged_pd_data_unc, aes(x = Type, y = FaithPD, fill = Type)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  labs(x = "Crop", y = "Faith’s PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Type,
+                y = max(merged_pd_data_unc$FaithPD) + 0.05 * max(merged_pd_data_unc$FaithPD),
+                label = Letters),
+            size = 4) +
+  scale_fill_manual(values = colorvec, name = NULL) +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = labelsvec, limits = crop_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", 
+           x = 4, 
+           y = max(merged_pd_data_unc$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
+                           max(merged_pd_data_unc$FaithPD) * 1.2))
+
+faith_crop_plot2 <- ggplot(merged_pd_data_unc, aes(x = Type, y = FaithPD)) +
+  geom_boxplot() +
+  geom_jitter(aes(color = Soil.Location), width = 0.2) +
+  labs(x = "Crop", y = "Faith’s PD") +
+  theme_classic() +
+  geom_text(data = cld,
+            aes(x = Type,
+                y = max(merged_pd_data_unc$FaithPD) + 0.05 * max(merged_pd_data_unc$FaithPD),
+                label = Letters),
+            size = 4) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  guides(colour = guide_legend(ncol = 2)) +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = labelsvec, limits = crop_order) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  annotate("text", 
+           x = 4, 
+           y = max(merged_pd_data_unc$FaithPD) * 1.15,
+           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           size = 4) +
+  coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
+                           max(merged_pd_data_unc$FaithPD) * 1.2))
+
+library(patchwork)
+
+faith_combined_plot_unc <- (faith_crop_plot + faith_loc_plot + faith_soil_plot) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+faith_combined_plot_unc
+```
+
+<img src="community_analysis_files/figure-gfm/FaithPD-2.png" style="display: block; margin: auto;" />
+
+``` r
+faith_combined_plot2_unc <- (faith_crop_plot2 + faith_loc_plot2 + faith_soil_plot2) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+faith_combined_plot2_unc
+```
+
+<img src="community_analysis_files/figure-gfm/FaithPD2-1.png" style="display: block; margin: auto;" />
+\## Now we will run NMDS using w-nifrac
+
+``` r
+## === Weighted UniFrac NMDS =======================================
+
+NMDS <- ordinate(
+  physeq = physeq.norm.raref, 
+  method = "NMDS", 
+  distance = "unifrac",
+  weighted = TRUE
+)
+```
+
+    ## Warning in matrix(tree$edge[order(tree$edge[, 1]), ][, 2], byrow = TRUE, : data
+    ## length [18349] is not a sub-multiple or multiple of the number of rows [9175]
+
+    ## Run 0 stress 0.1499573 
+    ## Run 1 stress 0.1473901 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.02035071  max resid 0.141727 
+    ## Run 2 stress 0.1436469 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.01820428  max resid 0.1335872 
+    ## Run 3 stress 0.1405888 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.01349022  max resid 0.1437088 
+    ## Run 4 stress 0.1566301 
+    ## Run 5 stress 0.1559209 
+    ## Run 6 stress 0.1604217 
+    ## Run 7 stress 0.1540699 
+    ## Run 8 stress 0.1516692 
+    ## Run 9 stress 0.1523259 
+    ## Run 10 stress 0.1488705 
+    ## Run 11 stress 0.1583751 
+    ## Run 12 stress 0.1716524 
+    ## Run 13 stress 0.1566312 
+    ## Run 14 stress 0.1495165 
+    ## Run 15 stress 0.1761777 
+    ## Run 16 stress 0.1531496 
+    ## Run 17 stress 0.1557708 
+    ## Run 18 stress 0.1580329 
+    ## Run 19 stress 0.1557616 
+    ## Run 20 stress 0.1526893 
+    ## *** Best solution was not repeated -- monoMDS stopping criteria:
+    ##      1: no. of iterations >= maxit
+    ##     13: stress ratio > sratmax
+    ##      6: scale factor of the gradient < sfgrmin
+
+``` r
+NMDS$stress
+```
+
+    ## [1] 0.1405888
+
+``` r
+NMDS_plot_all <- plot_ordination(
+  physeq = physeq.norm, 
+  ordination = NMDS, 
+  color = "Soil.Location", 
+  shape = "Type"
+) +
+  geom_point(size = 3) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  scale_shape_manual(values = shapesvec, name = NULL, labels = labelsvec, limits = crop_order) +
+  cowplot::theme_cowplot()
+
+NMDS_plot_all
+```
+
+<img src="community_analysis_files/figure-gfm/wUNifrac NMDS-1.png" style="display: block; margin: auto;" />
+
+``` r
+library(scales)
+
+## === Location =====================================================
+
+NMDS_plot_loc <- plot_ordination(
+  physeq = physeq.norm, 
+  ordination = NMDS, 
+  color = "Soil.Location"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+NMDS_plot_loc
+```
+
+<img src="community_analysis_files/figure-gfm/wUNifrac NMDS-2.png" style="display: block; margin: auto;" />
+
+``` r
+## === Crop =========================================================
+
+NMDS_plot_crop <- plot_ordination(
+  physeq = physeq.norm, 
+  ordination = NMDS, 
+  color = "Type"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+NMDS_plot_crop
+```
+
+<img src="community_analysis_files/figure-gfm/wUNifrac NMDS-3.png" style="display: block; margin: auto;" />
+
+``` r
+## === Soil =========================================================
+
+NMDS_plot_soil <- plot_ordination(
+  physeq = physeq.norm, 
+  ordination = NMDS, 
+  color = "Soil"
+) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
+  cowplot::theme_cowplot() +
+  scale_x_continuous(labels = label_number(accuracy = 0.1)) +
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
+  theme(
+    legend.position = "bottom", 
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+NMDS_plot_soil
+```
+
+<img src="community_analysis_files/figure-gfm/wUNifrac NMDS-4.png" style="display: block; margin: auto;" />
+
+``` r
+## === Combine Plots ================================================
+nmds_plot_comb_wUniF_uncult <- (NMDS_plot_crop + NMDS_plot_loc +  NMDS_plot_soil) + 
+  plot_annotation(tag_levels = 'A', tag_prefix = "A") + 
+  plot_layout(nrow = 1)
+
+
+nmds_plot_comb_wUniF_uncult
+```
+
+<img src="community_analysis_files/figure-gfm/wUNifrac NMDS-5.png" style="display: block; margin: auto;" />
+
+# ANOSIM
+
+ANOSIM test.
+
+``` r
+ps_dist_matrix <- UniFrac(physeq.norm.raref, weighted = TRUE, normalized = TRUE, parallel = FALSE)
+```
+
+    ## Warning in matrix(tree$edge[order(tree$edge[, 1]), ][, 2], byrow = TRUE, : data
+    ## length [18349] is not a sub-multiple or multiple of the number of rows [9175]
+
+``` r
+# Soil type
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Soil, distance = "bray", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix, grouping = phyloseq::sample_data(physeq.norm.raref)$Soil,      permutations = 999, distance = "bray") 
+    ## Dissimilarity: 
+    ## 
+    ## ANOSIM statistic R: 0.4419 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Location
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Soil.Location, distance = "bray", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix, grouping = phyloseq::sample_data(physeq.norm.raref)$Soil.Location,      permutations = 999, distance = "bray") 
+    ## Dissimilarity: 
+    ## 
+    ## ANOSIM statistic R: 0.8814 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Crop
+vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Type, distance = "bray", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix, grouping = phyloseq::sample_data(physeq.norm.raref)$Type,      permutations = 999, distance = "bray") 
+    ## Dissimilarity: 
+    ## 
+    ## ANOSIM statistic R: 0.02695 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+## PERMANOVA on wUniFrac distance matrix
+
+# Crop
+permanova_crop <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(ps_tr)$Type)
+# Location
+permanova_local <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(ps_tr)$Soil.Location)
+# Soil
+permanova_soil <- vegan::adonis2(ps_dist_matrix ~ phyloseq::sample_data(ps_tr)$Soil)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+```
+
+|          |  Df | SumOfSqs |     R2 |       F | Pr(\>F) |
+|:---------|----:|---------:|-------:|--------:|--------:|
+| Model    |   3 |   0.1891 | 0.1814 | 22.4523 |   0.001 |
+| Residual | 304 |   0.8537 | 0.8186 |      NA |      NA |
+| Total    | 307 |   1.0428 | 1.0000 |      NA |      NA |
+
+PERMANOVA soil results
+
+``` r
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+```
+
+|          |  Df | SumOfSqs |     R2 |   F | Pr(\>F) |
+|:---------|----:|---------:|-------:|----:|--------:|
+| Model    |   6 |   0.0361 | 0.0346 | 1.8 |   0.001 |
+| Residual | 301 |   1.0067 | 0.9654 |  NA |      NA |
+| Total    | 307 |   1.0428 | 1.0000 |  NA |      NA |
+
+PERMANOVA crop results
+
+``` r
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+```
+
+|          |  Df | SumOfSqs |     R2 |       F | Pr(\>F) |
+|:---------|----:|---------:|-------:|--------:|--------:|
+| Model    |   8 |   0.5278 | 0.5062 | 38.3068 |   0.001 |
+| Residual | 299 |   0.5150 | 0.4938 |      NA |      NA |
+| Total    | 307 |   1.0428 | 1.0000 |      NA |      NA |
+
+PERMANOVA location results
+
+``` r
+save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
 ```
 
 ``` r
@@ -3633,12 +4379,12 @@ installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
     ## pairwiseAdonis        cluster         scales      lubridate        forcats 
-    ##        "0.4.1"        "2.1.7"        "1.4.0"        "1.9.4"        "1.0.0" 
+    ##        "0.4.1"      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1" 
     ##        stringr          purrr          readr          tidyr      tidyverse 
-    ##        "1.5.1"        "1.0.4"        "2.1.5"        "1.3.1"        "2.0.0" 
+    ##        "1.5.2"        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0" 
     ##   RColorBrewer      patchwork        ggplot2   multcompView          dplyr 
     ##        "1.1-3"        "1.3.2"        "4.0.0"       "0.1-10"        "1.1.4" 
-    ##         tibble        picante           nlme          vegan        lattice 
-    ##        "3.2.1"        "1.8.2"      "3.1-166"        "2.6-8"       "0.22-6" 
-    ##        permute            ape       phyloseq 
-    ##        "0.9-7"        "5.8-1"       "1.50.0"
+    ##         tibble        picante           nlme          vegan        permute 
+    ##        "3.3.0"        "1.8.2"      "3.1-168"        "2.7-2"        "0.9-8" 
+    ##            ape       phyloseq 
+    ##        "5.8-1"       "1.50.0"

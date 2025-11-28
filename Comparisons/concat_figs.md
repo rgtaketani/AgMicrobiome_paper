@@ -1,7 +1,7 @@
 Paper figures
 ================
 Rodrigo Taketani
-2025-09-24
+2025-11-28
 
 # Paper figures
 
@@ -111,7 +111,7 @@ nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func / ANOSIM_bars + plot
     ## Warning in plot_theme(plot): The `labels` theme element is not defined in the element hierarchy.
     ## The `labels` theme element is not defined in the element hierarchy.
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](concat_figs_files/figure-gfm/NMDS%20bray-1.png)<!-- -->
 
 Also adding a ANOSIM barplot
 
@@ -197,7 +197,7 @@ perm_bars <- bar_unc + bar_cult + bar_func + plot_annotation(tag_levels = 'A') &
 perm_bars
 ```
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](concat_figs_files/figure-gfm/PERMANOVA-1.png)<!-- -->
 
 ## Alpha diversity
 
@@ -206,7 +206,7 @@ alpha_combined_plot_uncult / alpha_shannon_isolates + plot_annotation(tag_levels
   theme(plot.tag = element_text(size = 14, face = "bold"))
 ```
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](concat_figs_files/figure-gfm/alpha-1.png)<!-- -->
 
 ## Functions
 
@@ -248,4 +248,83 @@ layout
     ## `label` cannot be a <ggplot2::element_blank> object.
     ## `label` cannot be a <ggplot2::element_blank> object.
 
-![](concat_figs_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](concat_figs_files/figure-gfm/functions-1.png)<!-- --> \# New plots
+requested by reviewers
+
+Let’s start by making the nmds plots with unifrac distance
+
+``` r
+df_unc <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.026, 0.8814, 0.4419),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_unc$Color) +
+  labs(
+    title = "16S Total Community",
+    y = "ANOSIM R",   # <- superscript 2
+    x = NULL
+  ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+df_cult <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.0763, 0.1061, 0.06332),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_cult$Color) +
+  labs(
+    title = "16S Culturable",
+    y = "ANOSIM R",   # <- superscript 2
+    x = NULL
+  ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+ANOSIM_bars <- bar_unc + bar_cult + plot_spacer()
+
+nmds_plot_comb_wUniF_uncult / nmds_plot_comb_wUniF / ANOSIM_bars + plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 14, face = "bold", hjust = 1, vjust = -1), 
+    plot.tag.position = c(0, 1),
+    plot.margin = margin(20, 20, 20, 20))
+```
+
+![](concat_figs_files/figure-gfm/NMDS%20wUnifrac-1.png)<!-- -->
+
+No the alphadiversity plot with Faith pd index.
+
+``` r
+faith_combined_plot2_unc / faith_combined_plot2 + plot_annotation(tag_levels = 'A') + 
+  plot_layout(guides = "collect") &
+  theme(plot.tag = element_text(size = 14, face = "bold"),
+        legend.position = "bottom")
+```
+
+![](concat_figs_files/figure-gfm/alpha%20faith-1.png)<!-- -->
+
+``` r
+installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
+```
+
+    ##    scales   ggplot2 patchwork 
+    ##   "1.4.0"   "4.0.0"   "1.3.2"
