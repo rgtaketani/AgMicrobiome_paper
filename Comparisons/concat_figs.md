@@ -1,7 +1,7 @@
 Paper figures
 ================
 Rodrigo Taketani
-2025-11-28
+2025-12-09
 
 # Paper figures
 

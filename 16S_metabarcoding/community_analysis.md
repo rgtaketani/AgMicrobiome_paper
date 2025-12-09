@@ -1,6 +1,6 @@
 AgMicrobiome 16S metabarcoding
 ================
-2025-11-28
+2025-12-09
 
 # Importing data
 
@@ -3996,6 +3996,9 @@ summary(anova_faith_crop)
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 ``` r
+#get p-value
+pval <- summary(anova_faith_crop)[[1]][["Pr(>F)"]][1]
+
 tukey_crop <- TukeyHSD(anova_faith_crop)
 print(tukey_crop)
 ```
@@ -4057,7 +4060,7 @@ faith_crop_plot <- ggplot(merged_pd_data_unc, aes(x = Type, y = FaithPD, fill = 
   annotate("text", 
            x = 4, 
            y = max(merged_pd_data_unc$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           label = paste0("p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
                            max(merged_pd_data_unc$FaithPD) * 1.2))
@@ -4080,7 +4083,7 @@ faith_crop_plot2 <- ggplot(merged_pd_data_unc, aes(x = Type, y = FaithPD)) +
   annotate("text", 
            x = 4, 
            y = max(merged_pd_data_unc$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           label = paste0("p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data_unc$FaithPD),
                            max(merged_pd_data_unc$FaithPD) * 1.2))

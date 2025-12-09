@@ -1,7 +1,7 @@
 Isolates Metabarcoding
 ================
 Rodrigo Taketani
-2025-11-28
+2025-12-09
 
 # Importing data
 
@@ -2771,42 +2771,48 @@ NMDS <- ordinate(physeq = physeq.norm.raref,
     ## Square root transformation
     ## Wisconsin double standardization
     ## Run 0 stress 0.3118237 
-    ## Run 1 stress 0.313976 
-    ## Run 2 stress 0.3122341 
-    ## ... Procrustes: rmse 0.01594606  max resid 0.1621917 
-    ## Run 3 stress 0.3183052 
-    ## Run 4 stress 0.3128313 
-    ## Run 5 stress 0.3123139 
-    ## ... Procrustes: rmse 0.01916841  max resid 0.1654285 
-    ## Run 6 stress 0.3120067 
-    ## ... Procrustes: rmse 0.01458911  max resid 0.1676868 
-    ## Run 7 stress 0.312609 
-    ## Run 8 stress 0.315365 
-    ## Run 9 stress 0.3358457 
-    ## Run 10 stress 0.312527 
-    ## Run 11 stress 0.3120499 
-    ## ... Procrustes: rmse 0.01296947  max resid 0.1657576 
-    ## Run 12 stress 0.3135471 
-    ## Run 13 stress 0.3139265 
-    ## Run 14 stress 0.3116225 
+    ## Run 1 stress 0.3124283 
+    ## Run 2 stress 0.3120019 
+    ## ... Procrustes: rmse 0.01576744  max resid 0.1667417 
+    ## Run 3 stress 0.3118399 
+    ## ... Procrustes: rmse 0.006193921  max resid 0.06192755 
+    ## Run 4 stress 0.3115794 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.0177464  max resid 0.1914029 
-    ## Run 15 stress 0.3368767 
-    ## Run 16 stress 0.3126265 
-    ## Run 17 stress 0.313338 
-    ## Run 18 stress 0.3123648 
-    ## Run 19 stress 0.3163615 
-    ## Run 20 stress 0.3119246 
-    ## ... Procrustes: rmse 0.01922854  max resid 0.1897319 
+    ## ... Procrustes: rmse 0.01305661  max resid 0.1676633 
+    ## Run 5 stress 0.3121359 
+    ## Run 6 stress 0.312015 
+    ## ... Procrustes: rmse 0.0135629  max resid 0.1142358 
+    ## Run 7 stress 0.3115779 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.01074204  max resid 0.08411012 
+    ## Run 8 stress 0.3123595 
+    ## Run 9 stress 0.3138762 
+    ## Run 10 stress 0.3134401 
+    ## Run 11 stress 0.3121562 
+    ## Run 12 stress 0.3120167 
+    ## ... Procrustes: rmse 0.01296885  max resid 0.1368124 
+    ## Run 13 stress 0.3117827 
+    ## ... Procrustes: rmse 0.01304379  max resid 0.1153396 
+    ## Run 14 stress 0.3117574 
+    ## ... Procrustes: rmse 0.01224246  max resid 0.1529945 
+    ## Run 15 stress 0.3116739 
+    ## ... Procrustes: rmse 0.009206113  max resid 0.09833918 
+    ## Run 16 stress 0.3122928 
+    ## Run 17 stress 0.3116995 
+    ## ... Procrustes: rmse 0.01498187  max resid 0.1644162 
+    ## Run 18 stress 0.3116273 
+    ## ... Procrustes: rmse 0.01167522  max resid 0.115498 
+    ## Run 19 stress 0.3337955 
+    ## Run 20 stress 0.3124292 
     ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##      9: no. of iterations >= maxit
-    ##     11: stress ratio > sratmax
+    ##      4: no. of iterations >= maxit
+    ##     16: stress ratio > sratmax
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.3116225
+    ## [1] 0.3115779
 
 ``` r
 iso_bac_phylo_norm <- bac_phylo_norm
@@ -3010,14 +3016,14 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Textural.class)
 
     ##                           pairs Df SumsOfSqs  F.Model         R2 p.value
     ## 1             Clay loam vs Clay  1  1.866854 4.875022 0.04243762   0.001
-    ## 2       Clay loam vs Sandy loam  1  1.096888 3.181155 0.02253243   0.003
+    ## 2       Clay loam vs Sandy loam  1  1.096888 3.181155 0.02253243   0.001
     ## 3  Clay loam vs Silty clay loam  1  1.217085 3.168675 0.02799957   0.001
     ## 4            Clay vs Sandy loam  1  3.057977 8.754101 0.05965149   0.001
     ## 5       Clay vs Silty clay loam  1  1.779650 4.566030 0.03985500   0.001
     ## 6 Sandy loam vs Silty clay loam  1  1.728770 4.935940 0.03453253   0.001
     ##   p.adjusted sig
     ## 1      0.006   *
-    ## 2      0.018   .
+    ## 2      0.006   *
     ## 3      0.006   *
     ## 4      0.006   *
     ## 5      0.006   *
@@ -3028,26 +3034,26 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Crop)
 ```
 
     ##                  pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
-    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.018      0.378    
+    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.016      0.336    
     ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.001      0.021   .
-    ## 3       Barley vs Oats  1 0.9597603 2.867802 0.03935623   0.002      0.042   .
-    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.028      0.588    
+    ## 3       Barley vs Oats  1 0.9597603 2.867802 0.03935623   0.001      0.021   .
+    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.020      0.420    
     ## 5  Barley vs Sugarbeet  1 1.0274182 2.836481 0.03894314   0.001      0.021   .
     ## 6      Barley vs Wheat  1 1.2123773 3.297626 0.04498953   0.001      0.021   .
-    ## 7        Beans vs Bulk  1 0.7246194 1.874812 0.02608441   0.009      0.189    
-    ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.004      0.084    
-    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.208      1.000    
-    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.012      0.252    
-    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.011      0.231    
+    ## 7        Beans vs Bulk  1 0.7246194 1.874812 0.02608441   0.010      0.210    
+    ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.002      0.042   .
+    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.205      1.000    
+    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.008      0.168    
+    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.020      0.420    
     ## 12        Bulk vs Oats  1 0.9958593 2.856177 0.03920295   0.001      0.021   .
-    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.064      1.000    
-    ## 14   Bulk vs Sugarbeet  1 1.0417453 2.769002 0.03805195   0.002      0.042   .
-    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.131      1.000    
+    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.060      1.000    
+    ## 14   Bulk vs Sugarbeet  1 1.0417453 2.769002 0.03805195   0.001      0.021   .
+    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.134      1.000    
     ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.022      0.462    
     ## 17   Oats vs Sugarbeet  1 1.1792089 3.268379 0.04460831   0.001      0.021   .
     ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.001      0.021   .
     ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.002      0.042   .
-    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.029      0.609    
+    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.021      0.441    
     ## 21  Sugarbeet vs Wheat  1 0.8971419 2.278298 0.03152119   0.001      0.021   .
 
 ``` r
@@ -3058,15 +3064,15 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
     ## 1  CL.BO vs CY.YO  1 1.1667592 3.175788 0.05554427   0.001      0.036   .
     ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.001      0.036   .
     ## 3  CL.BO vs CY.BU  1 1.5347727 4.169977 0.07168607   0.001      0.036   .
-    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.019      0.684    
-    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.040      1.000    
-    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.394      1.000    
+    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.014      0.504    
+    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.045      1.000    
+    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.368      1.000    
     ## 7  CL.BO vs SC.HE  1 1.7967801 5.118486 0.08658013   0.001      0.036   .
-    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.044      1.000    
+    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.030      1.000    
     ## 9  CY.YO vs CL.YO  1 1.4085635 3.719082 0.06443419   0.001      0.036   .
-    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.005      0.180    
+    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.002      0.072    
     ## 11 CY.YO vs SL.AN  1 1.4106260 4.073532 0.07014438   0.001      0.036   .
-    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.010      0.360    
+    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.012      0.432    
     ## 13 CY.YO vs SL.SH  1 1.0940152 2.971160 0.05215201   0.001      0.036   .
     ## 14 CY.YO vs SC.HE  1 2.3438077 6.433468 0.10645539   0.001      0.036   .
     ## 15 CY.YO vs SL.BE  1 1.9278954 6.036639 0.10054925   0.001      0.036   .
@@ -3077,15 +3083,15 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
     ## 20 CL.YO vs SC.HE  1 2.1798480 6.015285 0.10022921   0.001      0.036   .
     ## 21 CL.YO vs SL.BE  1 1.8418358 5.802232 0.09702367   0.001      0.036   .
     ## 22 CY.BU vs SL.AN  1 2.2559378 6.502168 0.10747001   0.001      0.036   .
-    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.002      0.072    
+    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.001      0.036   .
     ## 24 CY.BU vs SL.SH  1 1.3368964 3.624279 0.06289499   0.001      0.036   .
     ## 25 CY.BU vs SC.HE  1 2.5964509 7.114037 0.11640594   0.001      0.036   .
     ## 26 CY.BU vs SL.BE  1 2.6298133 8.217482 0.13207673   0.001      0.036   .
     ## 27 SL.AN vs SC.SH  1 1.2334569 3.638592 0.06312771   0.001      0.036   .
-    ## 28 SL.AN vs SL.SH  1 1.0502440 3.146020 0.05505230   0.001      0.036   .
+    ## 28 SL.AN vs SL.SH  1 1.0502440 3.146020 0.05505230   0.002      0.072    
     ## 29 SL.AN vs SC.HE  1 2.2220943 6.734926 0.11089050   0.001      0.036   .
-    ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.003      0.108    
-    ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.043      1.000    
+    ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.002      0.072    
+    ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.038      1.000    
     ## 32 SC.SH vs SC.HE  1 2.2214194 6.222167 0.10332021   0.001      0.036   .
     ## 33 SC.SH vs SL.BE  1 1.2358263 3.960120 0.06832491   0.001      0.036   .
     ## 34 SL.SH vs SC.HE  1 1.9896123 5.654609 0.09478914   0.001      0.036   .
@@ -3811,11 +3817,11 @@ faith_loc_plot <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD, fill = So
   scale_x_discrete(labels = labelsvec, limits = local_order) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   annotate("text", x = 4,
-           y = max(merged_pd_data$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
+           y = max(merged_pd_data$FaithPD) * 1.2,
+           label = paste0("p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
-                           max(merged_pd_data$FaithPD) * 1.2))
+                           max(merged_pd_data$FaithPD) * 1.25))
 
 faith_loc_plot2 <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD)) +
   geom_boxplot() +
@@ -3833,11 +3839,11 @@ faith_loc_plot2 <- ggplot(merged_pd_data, aes(x = Soil.Id, y = FaithPD)) +
   scale_x_discrete(labels = labelsvec, limits = local_order) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   annotate("text", x = 4,
-           y = max(merged_pd_data$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
+           y = max(merged_pd_data$FaithPD) * 1.2,
+           label = paste0("p = ", signif(summary(anova_faith_loc)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
-                           max(merged_pd_data$FaithPD) * 1.2))
+                           max(merged_pd_data$FaithPD) * 1.25))
 
 
 # Soil type
@@ -3895,11 +3901,11 @@ faith_soil_plot <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD, f
   scale_x_discrete(labels = labelsvec) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   annotate("text", x = 2.5,
-           y = max(merged_pd_data$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
+           y = max(merged_pd_data$FaithPD) * 1.2,
+           label = paste0("p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
-                           max(merged_pd_data$FaithPD) * 1.2))
+                           max(merged_pd_data$FaithPD) * 1.25))
 
 faith_soil_plot2 <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD)) +
   geom_boxplot() +
@@ -3917,11 +3923,11 @@ faith_soil_plot2 <- ggplot(merged_pd_data, aes(x = Textural.class, y = FaithPD))
   scale_x_discrete(labels = labelsvec) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   annotate("text", x = 2.5,
-           y = max(merged_pd_data$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
+           y = max(merged_pd_data$FaithPD) * 1.2,
+           label = paste0("p = ", signif(summary(anova_faith_soil)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
-                           max(merged_pd_data$FaithPD) * 1.2))
+                           max(merged_pd_data$FaithPD) * 1.25))
 
 # Crop
 anova_faith_crop <- aov(FaithPD ~ Crop, data = merged_pd_data)
@@ -3995,11 +4001,11 @@ faith_crop_plot <- ggplot(merged_pd_data, aes(x = Crop, y = FaithPD, fill = Crop
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   annotate("text", 
            x = 4, 
-           y = max(merged_pd_data$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           y = max(merged_pd_data$FaithPD) * 1.2,
+           label = paste0("p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
-                           max(merged_pd_data$FaithPD) * 1.2))
+                           max(merged_pd_data$FaithPD) * 1.25))
 
 # coloring jitter
 
@@ -4020,11 +4026,11 @@ faith_crop_plot2 <- ggplot(merged_pd_data, aes(x = Crop, y = FaithPD)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   annotate("text", 
            x = 4, 
-           y = max(merged_pd_data$FaithPD) * 1.15,
-           label = paste0("ANOVA p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
+           y = max(merged_pd_data$FaithPD) * 1.2,
+           label = paste0("p = ", signif(summary(anova_faith_crop)[[1]][["Pr(>F)"]][1], 3)),
            size = 4) +
   coord_cartesian(ylim = c(min(merged_pd_data$FaithPD),
-                           max(merged_pd_data$FaithPD) * 1.2))
+                           max(merged_pd_data$FaithPD) * 1.25))
 
 
 library(patchwork)
@@ -4062,39 +4068,43 @@ NMDS <- ordinate(
 ```
 
     ## Run 0 stress 0.2000125 
-    ## Run 1 stress 0.2024325 
-    ## Run 2 stress 0.2039124 
-    ## Run 3 stress 0.2111399 
-    ## Run 4 stress 0.2027339 
-    ## Run 5 stress 0.2030466 
-    ## Run 6 stress 0.2024599 
-    ## Run 7 stress 0.2130167 
-    ## Run 8 stress 0.1996424 
+    ## Run 1 stress 0.2004454 
+    ## ... Procrustes: rmse 0.0112789  max resid 0.1274388 
+    ## Run 2 stress 0.2052413 
+    ## Run 3 stress 0.1998524 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.01043728  max resid 0.1268076 
-    ## Run 9 stress 0.2005816 
-    ## Run 10 stress 0.2024695 
-    ## Run 11 stress 0.2007924 
-    ## Run 12 stress 0.203126 
-    ## Run 13 stress 0.2021945 
-    ## Run 14 stress 0.2005607 
-    ## Run 15 stress 0.1997016 
-    ## ... Procrustes: rmse 0.004703332  max resid 0.07371999 
-    ## Run 16 stress 0.207795 
-    ## Run 17 stress 0.2062813 
-    ## Run 18 stress 0.2025049 
-    ## Run 19 stress 0.2029784 
-    ## Run 20 stress 0.1997614 
-    ## ... Procrustes: rmse 0.003365729  max resid 0.05083799 
+    ## ... Procrustes: rmse 0.008173422  max resid 0.1272913 
+    ## Run 4 stress 0.210784 
+    ## Run 5 stress 0.2020332 
+    ## Run 6 stress 0.202437 
+    ## Run 7 stress 0.2036494 
+    ## Run 8 stress 0.1998201 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.005083884  max resid 0.05204573 
+    ## Run 9 stress 0.1996421 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.004967961  max resid 0.07389065 
+    ## Run 10 stress 0.2029075 
+    ## Run 11 stress 0.2023325 
+    ## Run 12 stress 0.1997701 
+    ## ... Procrustes: rmse 0.001528028  max resid 0.02356619 
+    ## Run 13 stress 0.203057 
+    ## Run 14 stress 0.2025016 
+    ## Run 15 stress 0.2024327 
+    ## Run 16 stress 0.2095478 
+    ## Run 17 stress 0.2052126 
+    ## Run 18 stress 0.2029722 
+    ## Run 19 stress 0.2128037 
+    ## Run 20 stress 0.2023781 
     ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##      3: no. of iterations >= maxit
-    ##     17: stress ratio > sratmax
+    ##     18: stress ratio > sratmax
+    ##      2: scale factor of the gradient < sfgrmin
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.1996424
+    ## [1] 0.1996421
 
 ``` r
 NMDS_plot_all <- plot_ordination(
