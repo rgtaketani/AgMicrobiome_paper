@@ -1422,7 +1422,8 @@ vegan::anosim(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Type, distance = "bra
 
 
 
-# Analysis required by reviewers
+# Analysis required by reviewers 
+## Review 1
 
 From here on we will include analysis required by reviewers. 
 
@@ -1781,7 +1782,7 @@ nmds_plot_comb_wUniF_uncult
 
  ANOSIM test. 
 
-```{r}
+```{r ANOSIM on w-Unifrac}
 ps_dist_matrix <- UniFrac(physeq.norm.raref, weighted = TRUE, normalized = TRUE, parallel = FALSE)
 # Soil type
 vegan::anosim(ps_dist_matrix, phyloseq::sample_data(physeq.norm.raref)$Soil, distance = "bray", permutations = 999)
@@ -1811,11 +1812,250 @@ knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA lo
 
 ```
 
+## Review 2
+
+In the second round of reviews, one of the reviewers requested that we use methods that acounted for the compositional nature of the data. Thus, we will below add the analysis using Aitchison distance (CLR transformation + Euclidean distance). 
+```{r Aitchison PCA, fig.height = 5, fig.width = 11, fig.align = "center"}
+
+# Transform data using CLR
+
+ps_tr <- microbiome::transform(physeq.norm, "clr")
+
+# Calculate Euclidean distance matrix
+
+ps_dist_matrix_aitchison <- phyloseq::distance(ps_tr, method = "euclidean")
+
+# Perform PCA ordination
+
+clr_mat <- t(otu_table(ps_tr))   # samples × features
+
+pca_res <- prcomp(clr_mat, center = TRUE, scale. = FALSE)
+
+pca_df <- as.data.frame(pca_res$x)  # PC scores
+
+# Add sample metadata
+pca_df$SampleID <- rownames(pca_df)
+meta_df <- as.data.frame(sample_data(ps_tr))
+pca_df <- cbind(meta_df, pca_df)
+
+library(ggplot2)
+library(scales)
+library(cowplot)
+
+# Calculate variance explained
+var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+
+PCA_plot_loc_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Soil.Location)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = local_order) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_loc_aitchison
+
+PCA_plot_crop_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Type)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = crop_order) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_crop_aitchison
+
+
+PCA_plot_soil_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Soil)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_soil_aitchison
+
+# Combine plots
+
+PCA_plot_comb_aitchison_unc <- (PCA_plot_crop_aitchison + PCA_plot_loc_aitchison + PCA_plot_soil_aitchison) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+PCA_plot_comb_aitchison_unc
+
+```
+
+
+```{r UMAP, fig.height = 5, fig.width = 11, fig.align = "center"}
+# --- 0) Packages --------------------------------------------------------------
+library(phyloseq)
+library(microbiome)
+library(ggplot2)
+library(scales)
+library(cowplot)
+library(patchwork)
+library(uwot)
+
+# --- 1) CLR transform (Aitchison) --------------------------------------------
+ps_tr <- microbiome::transform(physeq.norm, "clr")
+
+# Create samples × features matrix
+clr_mat <- t(otu_table(ps_tr))
+
+# --- 2) PCA on CLR -----------------------------------------------------------
+pca_res <- prcomp(clr_mat, center = TRUE, scale. = FALSE)
+pca_scores <- pca_res$x
+
+# Inspect variance explained if you want
+var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+# print(cumsum(var_exp)[1:30])
+
+# Choose number of PCs for UMAP (typical 20–50; adjust as needed)
+n_pcs <- min(50, ncol(pca_scores))  # safe if features < 30
+pc_mat <- pca_scores[, 1:n_pcs, drop = FALSE]
+
+# --- 3) UMAP on top of PCA ---------------------------------------------------
+set.seed(123)  # reproducibility
+umap_res <- umap(
+  pc_mat,
+  n_neighbors = 100,
+  min_dist    = 0.5,
+  metric      = "euclidean",
+  n_components = 2,
+  verbose = TRUE
+)
+
+# Build plotting DF with metadata
+umap_df <- as.data.frame(umap_res)
+colnames(umap_df) <- c("UMAP1", "UMAP2")
+
+meta_df <- as.data.frame(sample_data(ps_tr))
+umap_df <- cbind(meta_df, umap_df)
+
+# --- 4) Plots (match your aesthetics) ----------------------------------------
+UMAP_plot_loc <- ggplot(umap_df, 
+                        aes(x = UMAP1, y = UMAP2, color = Soil.Location)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = local_order) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+UMAP_plot_crop <- ggplot(umap_df, 
+                         aes(x = UMAP1, y = UMAP2, color = Type)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = crop_order) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+UMAP_plot_soil <- ggplot(umap_df, 
+                         aes(x = UMAP1, y = UMAP2, color = Soil)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+# Display individual panels
+UMAP_plot_loc
+UMAP_plot_crop
+UMAP_plot_soil
+
+# --- 5) Combine panels (triptych) --------------------------------------------
+UMAP_plot_comb_unc <- (UMAP_plot_crop + UMAP_plot_loc + UMAP_plot_soil) +
+  plot_annotation(tag_levels = 'A') +
+  plot_layout(nrow = 1)
+
+UMAP_plot_comb_unc
+```
+
+## PERMANOVA with Aitchison distance
+
+```{r Permanova Aitchison}
+
+## PERMANOVA on wUniFrac distance matrix
+
+# Crop
+permanova_crop <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Type)
+# Location
+permanova_local <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Soil.Location)
+# Soil
+permanova_soil <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Soil)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+
+```
+
+## ANOSIM on Aitchinson
+
+```{r ANOSIM on Aitchinson}
+
+# Soil type
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)$Soil, distance = "Euclidean", permutations = 999)
+
+# Location
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)$Soil.Location, distance = "Euclidean", permutations = 999)
+# Crop
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)$Type, distance = "Euclidean", permutations = 999)
+
+```
+
+# Export objects 
+
+We will export some object to be used in other scripts down the line such as comparisons.
 
 
 ```{r}
 
-save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
+save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, PCA_plot_comb_aitchison_unc, UMAP_plot_comb_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
 
 ```
 

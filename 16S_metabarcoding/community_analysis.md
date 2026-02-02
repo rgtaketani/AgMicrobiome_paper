@@ -1,6 +1,6 @@
 AgMicrobiome 16S metabarcoding
 ================
-2025-12-09
+2026-02-02
 
 # Importing data
 
@@ -3622,6 +3622,8 @@ vegan::anosim(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Type, distance = "bra
 
 # Analysis required by reviewers
 
+## Review 1
+
 From here on we will include analysis required by reviewers.
 
 ## Alpha diversity with Faith’s PD
@@ -4373,21 +4375,426 @@ knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA lo
 
 PERMANOVA location results
 
+## Review 2
+
+In the second round of reviews, one of the reviewers requested that we
+use methods that acounted for the compositional nature of the data.
+Thus, we will below add the analysis using Aitchison distance (CLR
+transformation + Euclidean distance).
+
 ``` r
-save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
+# Transform data using CLR
+
+ps_tr <- microbiome::transform(physeq.norm, "clr")
+
+# Calculate Euclidean distance matrix
+
+ps_dist_matrix_aitchison <- phyloseq::distance(ps_tr, method = "euclidean")
+
+# Perform PCA ordination
+
+clr_mat <- t(otu_table(ps_tr))   # samples × features
+
+pca_res <- prcomp(clr_mat, center = TRUE, scale. = FALSE)
+
+pca_df <- as.data.frame(pca_res$x)  # PC scores
+
+# Add sample metadata
+pca_df$SampleID <- rownames(pca_df)
+meta_df <- as.data.frame(sample_data(ps_tr))
+pca_df <- cbind(meta_df, pca_df)
+
+library(ggplot2)
+library(scales)
+library(cowplot)
+```
+
+    ## 
+    ## Attaching package: 'cowplot'
+
+    ## The following object is masked from 'package:lubridate':
+    ## 
+    ##     stamp
+
+    ## The following object is masked from 'package:patchwork':
+    ## 
+    ##     align_plots
+
+``` r
+# Calculate variance explained
+var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+
+PCA_plot_loc_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Soil.Location)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = local_order) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_loc_aitchison
+```
+
+<img src="community_analysis_files/figure-gfm/Aitchison PCA-1.png" style="display: block; margin: auto;" />
+
+``` r
+PCA_plot_crop_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Type)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = crop_order) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_crop_aitchison
+```
+
+<img src="community_analysis_files/figure-gfm/Aitchison PCA-2.png" style="display: block; margin: auto;" />
+
+``` r
+PCA_plot_soil_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Soil)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_soil_aitchison
+```
+
+<img src="community_analysis_files/figure-gfm/Aitchison PCA-3.png" style="display: block; margin: auto;" />
+
+``` r
+# Combine plots
+
+PCA_plot_comb_aitchison_unc <- (PCA_plot_crop_aitchison + PCA_plot_loc_aitchison + PCA_plot_soil_aitchison) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+PCA_plot_comb_aitchison_unc
+```
+
+<img src="community_analysis_files/figure-gfm/Aitchison PCA-4.png" style="display: block; margin: auto;" />
+
+``` r
+# --- 0) Packages --------------------------------------------------------------
+library(phyloseq)
+library(microbiome)
+```
+
+    ## 
+    ## microbiome R package (microbiome.github.com)
+    ##     
+    ## 
+    ## 
+    ##  Copyright (C) 2011-2022 Leo Lahti, 
+    ##     Sudarshan Shetty et al. <microbiome.github.io>
+
+    ## 
+    ## Attaching package: 'microbiome'
+
+    ## The following object is masked from 'package:scales':
+    ## 
+    ##     alpha
+
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     alpha
+
+    ## The following object is masked from 'package:vegan':
+    ## 
+    ##     diversity
+
+    ## The following object is masked from 'package:base':
+    ## 
+    ##     transform
+
+``` r
+library(ggplot2)
+library(scales)
+library(cowplot)
+library(patchwork)
+library(uwot)
+```
+
+    ## Loading required package: Matrix
+
+    ## 
+    ## Attaching package: 'Matrix'
+
+    ## The following objects are masked from 'package:tidyr':
+    ## 
+    ##     expand, pack, unpack
+
+``` r
+# --- 1) CLR transform (Aitchison) --------------------------------------------
+ps_tr <- microbiome::transform(physeq.norm, "clr")
+
+# Create samples × features matrix
+clr_mat <- t(otu_table(ps_tr))
+
+# --- 2) PCA on CLR -----------------------------------------------------------
+pca_res <- prcomp(clr_mat, center = TRUE, scale. = FALSE)
+pca_scores <- pca_res$x
+
+# Inspect variance explained if you want
+var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+# print(cumsum(var_exp)[1:30])
+
+# Choose number of PCs for UMAP (typical 20–50; adjust as needed)
+n_pcs <- min(50, ncol(pca_scores))  # safe if features < 30
+pc_mat <- pca_scores[, 1:n_pcs, drop = FALSE]
+
+# --- 3) UMAP on top of PCA ---------------------------------------------------
+set.seed(123)  # reproducibility
+umap_res <- umap(
+  pc_mat,
+  n_neighbors = 100,
+  min_dist    = 0.5,
+  metric      = "euclidean",
+  n_components = 2,
+  verbose = TRUE
+)
+```
+
+    ## 11:29:51 UMAP embedding parameters a = 0.583 b = 1.334
+
+    ## 11:29:51 Read 308 rows and found 50 numeric columns
+
+    ## 11:29:51 Using FNN for neighbor search, n_neighbors = 100
+
+    ## 11:29:51 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 100
+    ## 11:29:52 Initializing from normalized Laplacian + noise (using RSpectra)
+    ## 11:29:52 Commencing optimization for 500 epochs, with 35840 positive edges
+    ## 11:29:52 Using rng type: pcg
+    ## 11:29:52 Optimization finished
+
+``` r
+# Build plotting DF with metadata
+umap_df <- as.data.frame(umap_res)
+colnames(umap_df) <- c("UMAP1", "UMAP2")
+
+meta_df <- as.data.frame(sample_data(ps_tr))
+umap_df <- cbind(meta_df, umap_df)
+
+# --- 4) Plots (match your aesthetics) ----------------------------------------
+UMAP_plot_loc <- ggplot(umap_df, 
+                        aes(x = UMAP1, y = UMAP2, color = Soil.Location)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = local_order) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+UMAP_plot_crop <- ggplot(umap_df, 
+                         aes(x = UMAP1, y = UMAP2, color = Type)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = crop_order) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+UMAP_plot_soil <- ggplot(umap_df, 
+                         aes(x = UMAP1, y = UMAP2, color = Soil)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+# Display individual panels
+UMAP_plot_loc
+```
+
+<img src="community_analysis_files/figure-gfm/UMAP-1.png" style="display: block; margin: auto;" />
+
+``` r
+UMAP_plot_crop
+```
+
+<img src="community_analysis_files/figure-gfm/UMAP-2.png" style="display: block; margin: auto;" />
+
+``` r
+UMAP_plot_soil
+```
+
+<img src="community_analysis_files/figure-gfm/UMAP-3.png" style="display: block; margin: auto;" />
+
+``` r
+# --- 5) Combine panels (triptych) --------------------------------------------
+UMAP_plot_comb_unc <- (UMAP_plot_crop + UMAP_plot_loc + UMAP_plot_soil) +
+  plot_annotation(tag_levels = 'A') +
+  plot_layout(nrow = 1)
+
+UMAP_plot_comb_unc
+```
+
+<img src="community_analysis_files/figure-gfm/UMAP-4.png" style="display: block; margin: auto;" />
+
+## PERMANOVA with Aitchison distance
+
+``` r
+## PERMANOVA on wUniFrac distance matrix
+
+# Crop
+permanova_crop <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Type)
+# Location
+permanova_local <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Soil.Location)
+# Soil
+permanova_soil <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Soil)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+```
+
+|          |  Df |  SumOfSqs |     R2 |       F | Pr(\>F) |
+|:---------|----:|----------:|-------:|--------:|--------:|
+| Model    |   3 |  815206.3 | 0.1351 | 15.8311 |   0.001 |
+| Residual | 304 | 5218061.8 | 0.8649 |      NA |      NA |
+| Total    | 307 | 6033268.2 | 1.0000 |      NA |      NA |
+
+PERMANOVA soil results
+
+``` r
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+```
+
+|          |  Df |  SumOfSqs |     R2 |      F | Pr(\>F) |
+|:---------|----:|----------:|-------:|-------:|--------:|
+| Model    |   6 |  239222.7 | 0.0397 | 2.0713 |   0.001 |
+| Residual | 301 | 5794045.5 | 0.9603 |     NA |      NA |
+| Total    | 307 | 6033268.2 | 1.0000 |     NA |      NA |
+
+PERMANOVA crop results
+
+``` r
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+```
+
+|          |  Df | SumOfSqs |     R2 |       F | Pr(\>F) |
+|:---------|----:|---------:|-------:|--------:|--------:|
+| Model    |   8 |  2090507 | 0.3465 | 19.8168 |   0.001 |
+| Residual | 299 |  3942761 | 0.6535 |      NA |      NA |
+| Total    | 307 |  6033268 | 1.0000 |      NA |      NA |
+
+PERMANOVA location results
+
+## ANOSIM on Aitchinson
+
+``` r
+# Soil type
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)$Soil, distance = "Euclidean", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix_aitchison, grouping = phyloseq::sample_data(physeq.norm.raref)$Soil,      permutations = 999, distance = "Euclidean") 
+    ## Dissimilarity: euclidean 
+    ## 
+    ## ANOSIM statistic R: 0.4284 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Location
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)$Soil.Location, distance = "Euclidean", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix_aitchison, grouping = phyloseq::sample_data(physeq.norm.raref)$Soil.Location,      permutations = 999, distance = "Euclidean") 
+    ## Dissimilarity: euclidean 
+    ## 
+    ## ANOSIM statistic R: 0.931 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Crop
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)$Type, distance = "Euclidean", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix_aitchison, grouping = phyloseq::sample_data(physeq.norm.raref)$Type,      permutations = 999, distance = "Euclidean") 
+    ## Dissimilarity: euclidean 
+    ## 
+    ## ANOSIM statistic R: 0.04764 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+# Export objects
+
+We will export some object to be used in other scripts down the line
+such as comparisons.
+
+``` r
+save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, PCA_plot_comb_aitchison_unc, UMAP_plot_comb_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
 ```
 
 ``` r
 installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
-    ## pairwiseAdonis        cluster         scales      lubridate        forcats 
-    ##        "0.4.1"      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1" 
-    ##        stringr          purrr          readr          tidyr      tidyverse 
-    ##        "1.5.2"        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0" 
-    ##   RColorBrewer      patchwork        ggplot2   multcompView          dplyr 
-    ##        "1.1-3"        "1.3.2"        "4.0.0"       "0.1-10"        "1.1.4" 
-    ##         tibble        picante           nlme          vegan        permute 
-    ##        "3.3.0"        "1.8.2"      "3.1-168"        "2.7-2"        "0.9-8" 
-    ##            ape       phyloseq 
-    ##        "5.8-1"       "1.50.0"
+    ##           uwot         Matrix     microbiome        cowplot pairwiseAdonis 
+    ##        "0.2.4"        "1.7-4"       "1.28.0"        "1.2.0"        "0.4.1" 
+    ##        cluster         scales      lubridate        forcats        stringr 
+    ##      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1"        "1.5.2" 
+    ##          purrr          readr          tidyr      tidyverse   RColorBrewer 
+    ##        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0"        "1.1-3" 
+    ##      patchwork        ggplot2   multcompView          dplyr         tibble 
+    ##        "1.3.2"        "4.0.0"       "0.1-10"        "1.1.4"        "3.3.0" 
+    ##        picante           nlme          vegan        permute            ape 
+    ##        "1.8.2"      "3.1-168"        "2.7-2"        "0.9-8"        "5.8-1" 
+    ##       phyloseq 
+    ##       "1.50.0"

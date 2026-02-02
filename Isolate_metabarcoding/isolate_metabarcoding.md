@@ -1,7 +1,7 @@
 Isolates Metabarcoding
 ================
 Rodrigo Taketani
-2025-12-09
+2026-02-02
 
 # Importing data
 
@@ -2771,48 +2771,43 @@ NMDS <- ordinate(physeq = physeq.norm.raref,
     ## Square root transformation
     ## Wisconsin double standardization
     ## Run 0 stress 0.3118237 
-    ## Run 1 stress 0.3124283 
-    ## Run 2 stress 0.3120019 
-    ## ... Procrustes: rmse 0.01576744  max resid 0.1667417 
-    ## Run 3 stress 0.3118399 
-    ## ... Procrustes: rmse 0.006193921  max resid 0.06192755 
-    ## Run 4 stress 0.3115794 
+    ## Run 1 stress 0.3122753 
+    ## ... Procrustes: rmse 0.01062647  max resid 0.1258497 
+    ## Run 2 stress 0.3120501 
+    ## ... Procrustes: rmse 0.01498661  max resid 0.139682 
+    ## Run 3 stress 0.3135155 
+    ## Run 4 stress 0.3123262 
+    ## Run 5 stress 0.312401 
+    ## Run 6 stress 0.3120343 
+    ## ... Procrustes: rmse 0.009758387  max resid 0.09353057 
+    ## Run 7 stress 0.3115798 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.01305661  max resid 0.1676633 
-    ## Run 5 stress 0.3121359 
-    ## Run 6 stress 0.312015 
-    ## ... Procrustes: rmse 0.0135629  max resid 0.1142358 
-    ## Run 7 stress 0.3115779 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.01074204  max resid 0.08411012 
-    ## Run 8 stress 0.3123595 
-    ## Run 9 stress 0.3138762 
-    ## Run 10 stress 0.3134401 
-    ## Run 11 stress 0.3121562 
-    ## Run 12 stress 0.3120167 
-    ## ... Procrustes: rmse 0.01296885  max resid 0.1368124 
-    ## Run 13 stress 0.3117827 
-    ## ... Procrustes: rmse 0.01304379  max resid 0.1153396 
-    ## Run 14 stress 0.3117574 
-    ## ... Procrustes: rmse 0.01224246  max resid 0.1529945 
-    ## Run 15 stress 0.3116739 
-    ## ... Procrustes: rmse 0.009206113  max resid 0.09833918 
-    ## Run 16 stress 0.3122928 
-    ## Run 17 stress 0.3116995 
-    ## ... Procrustes: rmse 0.01498187  max resid 0.1644162 
-    ## Run 18 stress 0.3116273 
-    ## ... Procrustes: rmse 0.01167522  max resid 0.115498 
-    ## Run 19 stress 0.3337955 
-    ## Run 20 stress 0.3124292 
+    ## ... Procrustes: rmse 0.01593682  max resid 0.1942868 
+    ## Run 8 stress 0.3134509 
+    ## Run 9 stress 0.3122204 
+    ## Run 10 stress 0.3125242 
+    ## Run 11 stress 0.3119913 
+    ## ... Procrustes: rmse 0.0120463  max resid 0.1136684 
+    ## Run 12 stress 0.3262805 
+    ## Run 13 stress 0.3127822 
+    ## Run 14 stress 0.3124953 
+    ## Run 15 stress 0.3127472 
+    ## Run 16 stress 0.312542 
+    ## Run 17 stress 0.312312 
+    ## Run 18 stress 0.3164448 
+    ## Run 19 stress 0.3324717 
+    ## Run 20 stress 0.3116253 
+    ## ... Procrustes: rmse 0.009183876  max resid 0.08946551 
     ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##      4: no. of iterations >= maxit
-    ##     16: stress ratio > sratmax
+    ##      9: no. of iterations >= maxit
+    ##     10: stress ratio > sratmax
+    ##      1: scale factor of the gradient < sfgrmin
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.3115779
+    ## [1] 0.3115798
 
 ``` r
 iso_bac_phylo_norm <- bac_phylo_norm
@@ -3034,26 +3029,26 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Crop)
 ```
 
     ##                  pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
-    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.016      0.336    
-    ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.001      0.021   .
+    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.022      0.462    
+    ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.002      0.042   .
     ## 3       Barley vs Oats  1 0.9597603 2.867802 0.03935623   0.001      0.021   .
-    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.020      0.420    
+    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.029      0.609    
     ## 5  Barley vs Sugarbeet  1 1.0274182 2.836481 0.03894314   0.001      0.021   .
     ## 6      Barley vs Wheat  1 1.2123773 3.297626 0.04498953   0.001      0.021   .
     ## 7        Beans vs Bulk  1 0.7246194 1.874812 0.02608441   0.010      0.210    
-    ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.002      0.042   .
-    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.205      1.000    
-    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.008      0.168    
-    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.020      0.420    
-    ## 12        Bulk vs Oats  1 0.9958593 2.856177 0.03920295   0.001      0.021   .
-    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.060      1.000    
+    ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.003      0.063    
+    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.200      1.000    
+    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.011      0.231    
+    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.016      0.336    
+    ## 12        Bulk vs Oats  1 0.9958593 2.856177 0.03920295   0.002      0.042   .
+    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.063      1.000    
     ## 14   Bulk vs Sugarbeet  1 1.0417453 2.769002 0.03805195   0.001      0.021   .
-    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.134      1.000    
-    ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.022      0.462    
+    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.139      1.000    
+    ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.025      0.525    
     ## 17   Oats vs Sugarbeet  1 1.1792089 3.268379 0.04460831   0.001      0.021   .
-    ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.001      0.021   .
-    ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.002      0.042   .
-    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.021      0.441    
+    ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.002      0.042   .
+    ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.001      0.021   .
+    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.024      0.504    
     ## 21  Sugarbeet vs Wheat  1 0.8971419 2.278298 0.03152119   0.001      0.021   .
 
 ``` r
@@ -3062,28 +3057,28 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
 
     ##             pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
     ## 1  CL.BO vs CY.YO  1 1.1667592 3.175788 0.05554427   0.001      0.036   .
-    ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.001      0.036   .
+    ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.002      0.072    
     ## 3  CL.BO vs CY.BU  1 1.5347727 4.169977 0.07168607   0.001      0.036   .
-    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.014      0.504    
-    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.045      1.000    
-    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.368      1.000    
+    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.020      0.720    
+    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.047      1.000    
+    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.394      1.000    
     ## 7  CL.BO vs SC.HE  1 1.7967801 5.118486 0.08658013   0.001      0.036   .
-    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.030      1.000    
+    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.027      0.972    
     ## 9  CY.YO vs CL.YO  1 1.4085635 3.719082 0.06443419   0.001      0.036   .
-    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.002      0.072    
+    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.001      0.036   .
     ## 11 CY.YO vs SL.AN  1 1.4106260 4.073532 0.07014438   0.001      0.036   .
-    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.012      0.432    
+    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.014      0.504    
     ## 13 CY.YO vs SL.SH  1 1.0940152 2.971160 0.05215201   0.001      0.036   .
     ## 14 CY.YO vs SC.HE  1 2.3438077 6.433468 0.10645539   0.001      0.036   .
     ## 15 CY.YO vs SL.BE  1 1.9278954 6.036639 0.10054925   0.001      0.036   .
     ## 16 CL.YO vs CY.BU  1 1.4205168 3.744109 0.06483967   0.001      0.036   .
     ## 17 CL.YO vs SL.AN  1 1.8628885 5.409701 0.09105754   0.001      0.036   .
     ## 18 CL.YO vs SC.SH  1 1.1195847 3.014159 0.05286686   0.001      0.036   .
-    ## 19 CL.YO vs SL.SH  1 0.8168638 2.230153 0.03966116   0.003      0.108    
+    ## 19 CL.YO vs SL.SH  1 0.8168638 2.230153 0.03966116   0.004      0.144    
     ## 20 CL.YO vs SC.HE  1 2.1798480 6.015285 0.10022921   0.001      0.036   .
     ## 21 CL.YO vs SL.BE  1 1.8418358 5.802232 0.09702367   0.001      0.036   .
     ## 22 CY.BU vs SL.AN  1 2.2559378 6.502168 0.10747001   0.001      0.036   .
-    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.001      0.036   .
+    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.002      0.072    
     ## 24 CY.BU vs SL.SH  1 1.3368964 3.624279 0.06289499   0.001      0.036   .
     ## 25 CY.BU vs SC.HE  1 2.5964509 7.114037 0.11640594   0.001      0.036   .
     ## 26 CY.BU vs SL.BE  1 2.6298133 8.217482 0.13207673   0.001      0.036   .
@@ -3091,7 +3086,7 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
     ## 28 SL.AN vs SL.SH  1 1.0502440 3.146020 0.05505230   0.002      0.072    
     ## 29 SL.AN vs SC.HE  1 2.2220943 6.734926 0.11089050   0.001      0.036   .
     ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.002      0.072    
-    ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.038      1.000    
+    ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.034      1.000    
     ## 32 SC.SH vs SC.HE  1 2.2214194 6.222167 0.10332021   0.001      0.036   .
     ## 33 SC.SH vs SL.BE  1 1.2358263 3.960120 0.06832491   0.001      0.036   .
     ## 34 SL.SH vs SC.HE  1 1.9896123 5.654609 0.09478914   0.001      0.036   .
@@ -3512,6 +3507,8 @@ taxa_plot_comb
 <img src="isolate_metabarcoding_files/figure-gfm/unnamed-chunk-33-1.png" style="display: block; margin: auto;" />
 
 # Analysis required by reviewers
+
+## First round
 
 From here on we will include analysis required by reviewers.
 
@@ -4068,43 +4065,42 @@ NMDS <- ordinate(
 ```
 
     ## Run 0 stress 0.2000125 
-    ## Run 1 stress 0.2004454 
-    ## ... Procrustes: rmse 0.0112789  max resid 0.1274388 
-    ## Run 2 stress 0.2052413 
-    ## Run 3 stress 0.1998524 
+    ## Run 1 stress 0.2005581 
+    ## Run 2 stress 0.1997875 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.008173422  max resid 0.1272913 
-    ## Run 4 stress 0.210784 
-    ## Run 5 stress 0.2020332 
-    ## Run 6 stress 0.202437 
-    ## Run 7 stress 0.2036494 
-    ## Run 8 stress 0.1998201 
+    ## ... Procrustes: rmse 0.009309628  max resid 0.126699 
+    ## Run 3 stress 0.2159637 
+    ## Run 4 stress 0.1996425 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.005083884  max resid 0.05204573 
-    ## Run 9 stress 0.1996421 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.004967961  max resid 0.07389065 
-    ## Run 10 stress 0.2029075 
-    ## Run 11 stress 0.2023325 
-    ## Run 12 stress 0.1997701 
-    ## ... Procrustes: rmse 0.001528028  max resid 0.02356619 
-    ## Run 13 stress 0.203057 
-    ## Run 14 stress 0.2025016 
-    ## Run 15 stress 0.2024327 
-    ## Run 16 stress 0.2095478 
-    ## Run 17 stress 0.2052126 
-    ## Run 18 stress 0.2029722 
-    ## Run 19 stress 0.2128037 
-    ## Run 20 stress 0.2023781 
+    ## ... Procrustes: rmse 0.004643324  max resid 0.05213965 
+    ## Run 5 stress 0.2024229 
+    ## Run 6 stress 0.2016831 
+    ## Run 7 stress 0.2050204 
+    ## Run 8 stress 0.200594 
+    ## Run 9 stress 0.2054942 
+    ## Run 10 stress 0.2025108 
+    ## Run 11 stress 0.2031257 
+    ## Run 12 stress 0.202159 
+    ## Run 13 stress 0.1999185 
+    ## ... Procrustes: rmse 0.009351023  max resid 0.1275827 
+    ## Run 14 stress 0.2020578 
+    ## Run 15 stress 0.2025055 
+    ## Run 16 stress 0.2024229 
+    ## Run 17 stress 0.2143739 
+    ## Run 18 stress 0.1997743 
+    ## ... Procrustes: rmse 0.008804359  max resid 0.1270066 
+    ## Run 19 stress 0.1997743 
+    ## ... Procrustes: rmse 0.008797283  max resid 0.1270254 
+    ## Run 20 stress 0.233697 
     ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##     18: stress ratio > sratmax
-    ##      2: scale factor of the gradient < sfgrmin
+    ##     19: stress ratio > sratmax
+    ##      1: scale factor of the gradient < sfgrmin
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.1996421
+    ## [1] 0.1996425
 
 ``` r
 NMDS_plot_all <- plot_ordination(
@@ -4305,23 +4301,425 @@ knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA lo
 
 PERMANOVA location results
 
+## Second round
+
+In the second round of reviews, one of the reviewers requested that we
+use methods that acounted for the compositional nature of the data.
+Thus, we will below add the analysis using Aitchison distance (CLR
+transformation + Euclidean distance).
+
 ``` r
-save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, faith_combined_plot, faith_combined_plot2, nmds_plot_comb_wUniF,merged_pd_data, file = "../Comparisons/isolate_metabarcode_figs.RData")
+# Transform data using CLR
+
+ps_tr <- microbiome::transform(bac_phylo, "clr")
+
+# Calculate Euclidean distance matrix
+
+ps_dist_matrix_aitchison <- phyloseq::distance(ps_tr, method = "euclidean")
+
+# Perform PCA ordination
+
+clr_mat <- t(otu_table(ps_tr))   # samples × features
+
+pca_res <- prcomp(clr_mat, center = TRUE, scale. = FALSE)
+
+pca_df <- as.data.frame(pca_res$x)  # PC scores
+
+# Add sample metadata
+pca_df$SampleID <- rownames(pca_df)
+meta_df <- as.data.frame(sample_data(ps_tr))
+pca_df <- cbind(meta_df, pca_df)
+
+library(ggplot2)
+library(scales)
+library(cowplot)
+```
+
+    ## 
+    ## Attaching package: 'cowplot'
+
+    ## The following object is masked from 'package:lubridate':
+    ## 
+    ##     stamp
+
+    ## The following object is masked from 'package:patchwork':
+    ## 
+    ##     align_plots
+
+``` r
+# Calculate variance explained
+var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
+
+PCA_plot_loc_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Soil.Id)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = local_order) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_loc_aitchison
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/Aitchison PCA-1.png" style="display: block; margin: auto;" />
+
+``` r
+PCA_plot_crop_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Crop)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = crop_order) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_crop_aitchison
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/Aitchison PCA-2.png" style="display: block; margin: auto;" />
+
+``` r
+PCA_plot_soil_aitchison <- ggplot(pca_df, 
+                                 aes(x = PC1, y = PC2, color = Textural.class)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec) +
+  theme_cowplot() +
+  xlab(paste0("PC1 (", percent(var_exp[1]), ")")) +
+  ylab(paste0("PC2 (", percent(var_exp[2]), ")")) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+PCA_plot_soil_aitchison
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/Aitchison PCA-3.png" style="display: block; margin: auto;" />
+
+``` r
+# Combine plots
+
+PCA_plot_comb_aitchison_cult <- (PCA_plot_crop_aitchison + PCA_plot_loc_aitchison + PCA_plot_soil_aitchison) + 
+  plot_annotation(tag_levels = 'A') + 
+  plot_layout(nrow = 1)
+
+PCA_plot_comb_aitchison_cult
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/Aitchison PCA-4.png" style="display: block; margin: auto;" />
+
+``` r
+# --- 0) Packages --------------------------------------------------------------
+library(phyloseq)
+library(microbiome)
+```
+
+    ## 
+    ## microbiome R package (microbiome.github.com)
+    ##     
+    ## 
+    ## 
+    ##  Copyright (C) 2011-2022 Leo Lahti, 
+    ##     Sudarshan Shetty et al. <microbiome.github.io>
+
+    ## 
+    ## Attaching package: 'microbiome'
+
+    ## The following object is masked from 'package:scales':
+    ## 
+    ##     alpha
+
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     alpha
+
+    ## The following object is masked from 'package:vegan':
+    ## 
+    ##     diversity
+
+    ## The following object is masked from 'package:base':
+    ## 
+    ##     transform
+
+``` r
+library(ggplot2)
+library(scales)
+library(cowplot)
+library(patchwork)
+library(uwot)
+```
+
+    ## Loading required package: Matrix
+
+    ## 
+    ## Attaching package: 'Matrix'
+
+    ## The following objects are masked from 'package:tidyr':
+    ## 
+    ##     expand, pack, unpack
+
+``` r
+# --- 1) CLR transform (Aitchison) --------------------------------------------
+ps_tr <- microbiome::transform(bac_phylo, "clr")
+
+# Build samples × features CLR matrix
+clr_mat <- t(otu_table(ps_tr))
+
+# --- 2) PCA on CLR -----------------------------------------------------------
+pca_res <- prcomp(clr_mat, center = TRUE, scale. = FALSE)
+pca_scores <- pca_res$x
+
+# Choose number of PCs for UMAP (typical: 20–50)
+n_pcs <- min(50, ncol(pca_scores)) 
+pc_mat <- pca_scores[, 1:n_pcs, drop = FALSE]
+
+# --- 3) UMAP on PCA-reduced space -------------------------------------------
+set.seed(123)
+umap_res <- umap(
+  pc_mat,
+  n_neighbors = 50,
+  min_dist    = 0.1,
+  metric      = "euclidean",
+  n_components = 2,
+  verbose = TRUE
+)
+```
+
+    ## 11:17:09 UMAP embedding parameters a = 1.577 b = 0.8951
+
+    ## 11:17:09 Read 252 rows and found 50 numeric columns
+
+    ## 11:17:09 Using FNN for neighbor search, n_neighbors = 50
+
+    ## 11:17:09 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 50
+    ## 11:17:09 Initializing from normalized Laplacian + noise (using RSpectra)
+    ## 11:17:09 Commencing optimization for 500 epochs, with 19780 positive edges
+    ## 11:17:09 Using rng type: pcg
+    ## 11:17:10 Optimization finished
+
+``` r
+# Add metadata into UMAP data frame
+umap_df <- as.data.frame(umap_res)
+colnames(umap_df) <- c("UMAP1", "UMAP2")
+
+meta_df <- as.data.frame(sample_data(ps_tr))
+umap_df <- cbind(meta_df, umap_df)
+
+# --- 4) Plotting (your style preserved) --------------------------------------
+
+UMAP_plot_loc <- ggplot(umap_df, 
+                        aes(x = UMAP1, y = UMAP2, color = Soil.Id)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = local_order) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+UMAP_plot_crop <- ggplot(umap_df, 
+                         aes(x = UMAP1, y = UMAP2, color = Crop)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec,
+                     limits = crop_order) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+UMAP_plot_soil <- ggplot(umap_df, 
+                         aes(x = UMAP1, y = UMAP2, color = Textural.class)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = colorvec,
+                     name = NULL,
+                     labels = labelsvec) +
+  theme_cowplot() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    axis.title = element_blank()
+  ) +
+  guides(color = guide_legend(ncol = 2))
+
+# View individual plots
+UMAP_plot_loc
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/UMAP-1.png" style="display: block; margin: auto;" />
+
+``` r
+UMAP_plot_crop
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/UMAP-2.png" style="display: block; margin: auto;" />
+
+``` r
+UMAP_plot_soil
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/UMAP-3.png" style="display: block; margin: auto;" />
+
+``` r
+# --- 5) Combined figure --------------------------------------------------------
+UMAP_plot_comb_cult <- (UMAP_plot_crop + UMAP_plot_loc + UMAP_plot_soil) +
+  plot_annotation(tag_levels = 'A') +
+  plot_layout(nrow = 1)
+
+UMAP_plot_comb_cult
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/UMAP-4.png" style="display: block; margin: auto;" />
+
+PERMANOVA with Aitchison distance
+
+``` r
+## PERMANOVA on wUniFrac distance matrix
+
+# Crop
+permanova_crop <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Crop)
+# Location
+permanova_local <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Soil.Id)
+# Soil
+permanova_soil <- vegan::adonis2(ps_dist_matrix_aitchison ~ phyloseq::sample_data(ps_tr)$Textural.class)
+
+
+knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soil results")
+```
+
+|          |  Df |  SumOfSqs |     R2 |      F | Pr(\>F) |
+|:---------|----:|----------:|-------:|-------:|--------:|
+| Model    |   3 |  11206.84 | 0.0306 | 2.6071 |   0.001 |
+| Residual | 248 | 355355.55 | 0.9694 |     NA |      NA |
+| Total    | 251 | 366562.39 | 1.0000 |     NA |      NA |
+
+PERMANOVA soil results
+
+``` r
+knitr::kable(as.data.frame(permanova_crop), digits = 4, caption = "PERMANOVA crop results")
+```
+
+|          |  Df |  SumOfSqs |    R2 |      F | Pr(\>F) |
+|:---------|----:|----------:|------:|-------:|--------:|
+| Model    |   6 |  17212.08 | 0.047 | 2.0118 |   0.001 |
+| Residual | 245 | 349350.31 | 0.953 |     NA |      NA |
+| Total    | 251 | 366562.39 | 1.000 |     NA |      NA |
+
+PERMANOVA crop results
+
+``` r
+knitr::kable(as.data.frame(permanova_local), digits = 4, caption = "PERMANOVA location results")
+```
+
+|          |  Df |  SumOfSqs |     R2 |      F | Pr(\>F) |
+|:---------|----:|----------:|-------:|-------:|--------:|
+| Model    |   8 |  26098.65 | 0.0712 | 2.3284 |   0.001 |
+| Residual | 243 | 340463.74 | 0.9288 |     NA |      NA |
+| Total    | 251 | 366562.39 | 1.0000 |     NA |      NA |
+
+PERMANOVA location results
+
+## ANOSIM on Aitchinson
+
+``` r
+# Soil type
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(bac_phylo)$Textural.class, distance = "Euclidean", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix_aitchison, grouping = phyloseq::sample_data(bac_phylo)$Textural.class,      permutations = 999, distance = "Euclidean") 
+    ## Dissimilarity: euclidean 
+    ## 
+    ## ANOSIM statistic R: 0.08736 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Location
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(bac_phylo)$Soil.Id, distance = "Euclidean", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix_aitchison, grouping = phyloseq::sample_data(bac_phylo)$Soil.Id,      permutations = 999, distance = "Euclidean") 
+    ## Dissimilarity: euclidean 
+    ## 
+    ## ANOSIM statistic R: 0.1207 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+``` r
+# Crop
+vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(bac_phylo)$Crop, distance = "Euclidean", permutations = 999)
+```
+
+    ## 
+    ## Call:
+    ## vegan::anosim(x = ps_dist_matrix_aitchison, grouping = phyloseq::sample_data(bac_phylo)$Crop,      permutations = 999, distance = "Euclidean") 
+    ## Dissimilarity: euclidean 
+    ## 
+    ## ANOSIM statistic R: 0.06817 
+    ##       Significance: 0.001 
+    ## 
+    ## Permutation: free
+    ## Number of permutations: 999
+
+# Export objects
+
+We will export some object to be used in other scripts down the line
+such as comparisons.
+
+``` r
+save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, faith_combined_plot, faith_combined_plot2, nmds_plot_comb_wUniF, merged_pd_data,PCA_plot_comb_aitchison_cult, UMAP_plot_comb_cult, file = "../Comparisons/isolate_metabarcode_figs.RData")
 ```
 
 ``` r
 installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
-    ## pairwiseAdonis        cluster         scales      lubridate        forcats 
-    ##        "0.4.1"      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1" 
-    ##        stringr          purrr          readr          tidyr      tidyverse 
-    ##        "1.5.2"        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0" 
-    ##   RColorBrewer      patchwork       multcomp        TH.data           MASS 
-    ##        "1.1-3"        "1.3.2"       "1.4-29"        "1.1-4"       "7.3-65" 
-    ##       survival        mvtnorm        ggplot2   multcompView         tibble 
-    ##        "3.8-3"        "1.3-3"        "4.0.0"       "0.1-10"        "3.3.0" 
-    ##        picante           nlme          vegan        permute            ape 
-    ##        "1.8.2"      "3.1-168"        "2.7-2"        "0.9-8"        "5.8-1" 
-    ##          dplyr       phyloseq 
-    ##        "1.1.4"       "1.50.0"
+    ##           uwot         Matrix     microbiome        cowplot pairwiseAdonis 
+    ##        "0.2.4"        "1.7-4"       "1.28.0"        "1.2.0"        "0.4.1" 
+    ##        cluster         scales      lubridate        forcats        stringr 
+    ##      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1"        "1.5.2" 
+    ##          purrr          readr          tidyr      tidyverse   RColorBrewer 
+    ##        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0"        "1.1-3" 
+    ##      patchwork       multcomp        TH.data           MASS       survival 
+    ##        "1.3.2"       "1.4-29"        "1.1-4"       "7.3-65"        "3.8-3" 
+    ##        mvtnorm        ggplot2   multcompView         tibble        picante 
+    ##        "1.3-3"        "4.0.0"       "0.1-10"        "3.3.0"        "1.8.2" 
+    ##           nlme          vegan        permute            ape          dplyr 
+    ##      "3.1-168"        "2.7-2"        "0.9-8"        "5.8-1"        "1.1.4" 
+    ##       phyloseq 
+    ##       "1.50.0"

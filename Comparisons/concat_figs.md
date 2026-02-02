@@ -1,7 +1,7 @@
 Paper figures
 ================
 Rodrigo Taketani
-2025-12-09
+2026-02-02
 
 # Paper figures
 
@@ -251,6 +251,8 @@ layout
 ![](concat_figs_files/figure-gfm/functions-1.png)<!-- --> \# New plots
 requested by reviewers
 
+## First round of revisions
+
 Let’s start by making the nmds plots with unifrac distance
 
 ``` r
@@ -321,6 +323,75 @@ faith_combined_plot2_unc / faith_combined_plot2 + plot_annotation(tag_levels = '
 ```
 
 ![](concat_figs_files/figure-gfm/alpha%20faith-1.png)<!-- -->
+
+## Second round of revisions
+
+``` r
+df_unc <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.047, 0.931, 0.428),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_unc <- ggplot(df_unc, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_unc$Color) +
+  labs(
+    title = "16S Total Community",
+    y = "ANOSIM R",   # <- superscript 2
+    x = NULL
+  ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+df_cult <- data.frame(
+  Factor = c("Crop", "Location", "Soil type"),
+  R2 = c(0.068, 0.12, 0.087),
+  Color = c("#40798c", "#b33939", "#c57b57")
+)
+
+# Plot
+bar_cult <- ggplot(df_cult, aes(x = Factor, y = R2, fill = Factor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = df_cult$Color) +
+  labs(
+    title = "16S Culturable",
+    y = "ANOSIM R",   # <- superscript 2
+    x = NULL
+  ) +
+  scale_y_continuous(labels = label_number(accuracy = 0.01)) +
+  cowplot::theme_cowplot()+
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+ANOSIM_bars <- bar_unc + bar_cult + plot_spacer()
+
+PCA_plot_comb_aitchison_unc / PCA_plot_comb_aitchison_cult / ANOSIM_bars + plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 14, face = "bold", hjust = 1, vjust = -1), 
+    plot.tag.position = c(0, 1),
+    plot.margin = margin(20, 20, 20, 20))
+```
+
+![](concat_figs_files/figure-gfm/PCA%20Aitchinson-1.png)<!-- -->
+
+``` r
+UMAP_plot_comb_unc / UMAP_plot_comb_cult / ANOSIM_bars + plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 14, face = "bold", hjust = 1, vjust = -1), 
+    plot.tag.position = c(0, 1),
+    plot.margin = margin(20, 20, 20, 20))
+```
+
+![](concat_figs_files/figure-gfm/PCA%20Aitchinson-2.png)<!-- -->
 
 ``` r
 installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
