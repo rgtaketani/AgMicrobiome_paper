@@ -387,6 +387,14 @@ UMAP_plot_comb_unc / UMAP_plot_comb_cult / ANOSIM_bars + plot_annotation(tag_lev
 
 ```
 
+## Alpha diversity using DivNet estimates
+
+Here we are plotting the Shannon diversity estimates from DivNet for both datasets.
+
+```{r DivNet, fig.width=9, fig.height=7}
+combined_plot_unc /combined_plot_iso + plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 14, face = "bold"))
+```
 
 
 ```{r}

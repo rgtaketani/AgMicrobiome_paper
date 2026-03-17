@@ -1,7 +1,7 @@
 Paper figures
 ================
 Rodrigo Taketani
-2026-02-02
+2026-03-17
 
 # Paper figures
 
@@ -25,6 +25,11 @@ load("funct_figs.RData")
 ``` r
  library(patchwork)
 library(ggplot2)
+```
+
+    ## Warning: package 'ggplot2' was built under R version 4.4.3
+
+``` r
 library(scales)
 
 # Make ANOSIM values plot
@@ -108,8 +113,11 @@ nmds_plot_comb_uncult / nmds_plot_comb_isolates / nmds_func / ANOSIM_bars + plot
     plot.margin = margin(20, 20, 20, 20))
 ```
 
-    ## Warning in plot_theme(plot): The `labels` theme element is not defined in the element hierarchy.
-    ## The `labels` theme element is not defined in the element hierarchy.
+    ## Warning in plot_theme(plot): The `labels` theme element is not defined in the
+    ## element hierarchy.
+
+    ## Warning in plot_theme(plot): The `labels` theme element is not defined in the
+    ## element hierarchy.
 
 ![](concat_figs_files/figure-gfm/NMDS%20bray-1.png)<!-- -->
 
@@ -393,9 +401,21 @@ UMAP_plot_comb_unc / UMAP_plot_comb_cult / ANOSIM_bars + plot_annotation(tag_lev
 
 ![](concat_figs_files/figure-gfm/PCA%20Aitchinson-2.png)<!-- -->
 
+## Alpha diversity using DivNet estimates
+
+Here we are plotting the Shannon diversity estimates from DivNet for
+both datasets.
+
+``` r
+combined_plot_unc /combined_plot_iso + plot_annotation(tag_levels = 'A') &
+  theme(plot.tag = element_text(size = 14, face = "bold"))
+```
+
+![](concat_figs_files/figure-gfm/DivNet-1.png)<!-- -->
+
 ``` r
 installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
     ##    scales   ggplot2 patchwork 
-    ##   "1.4.0"   "4.0.0"   "1.3.2"
+    ##   "1.4.0"   "4.0.2"   "1.3.2"

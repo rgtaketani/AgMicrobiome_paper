@@ -1,6 +1,6 @@
 AgMicrobiome 16S metabarcoding
 ================
-2026-02-02
+2026-03-17
 
 # Importing data
 
@@ -326,320 +326,7 @@ diversity_table <- data.frame(
   Shannon = shannon_index,
   Pielou = pielou_evenness
 )
-
-# Print the diversity table
-print(diversity_table)
 ```
-
-    ##                  Sample Sobs  Shannon    Pielou
-    ## CO.CL.BO.01 CO.CL.BO.01  680 6.101121 0.9354545
-    ## CO.CL.BO.02 CO.CL.BO.02  738 6.168157 0.9340112
-    ## CO.CL.BO.03 CO.CL.BO.03  519 5.790952 0.9262702
-    ## CO.CL.BO.04 CO.CL.BO.04 1022 6.498367 0.9377807
-    ## CO.CL.BO.05 CO.CL.BO.05 1150 6.605761 0.9373175
-    ## CO.CL.YO.01 CO.CL.YO.01  654 5.756766 0.8879639
-    ## CO.CL.YO.02 CO.CL.YO.02  903 6.332235 0.9304281
-    ## CO.CL.YO.03 CO.CL.YO.03  893 6.296536 0.9266989
-    ## CO.CL.YO.04 CO.CL.YO.04  875 6.301333 0.9301926
-    ## CO.CL.YO.05 CO.CL.YO.05 1140 6.571782 0.9336531
-    ## CO.CY.BU.01 CO.CY.BU.01  627 5.833169 0.9056385
-    ## CO.CY.BU.02 CO.CY.BU.02  520 5.654295 0.9041334
-    ## CO.CY.BU.03 CO.CY.BU.03  718 5.970477 0.9078544
-    ## CO.CY.BU.04 CO.CY.BU.04  755 5.972389 0.9012589
-    ## CO.CY.BU.05 CO.CY.BU.05  846 6.074084 0.9011300
-    ## CO.CY.YO.01 CO.CY.YO.01  922 6.385808 0.9354378
-    ## CO.CY.YO.02 CO.CY.YO.02  920 6.324544 0.9267582
-    ## CO.CY.YO.03 CO.CY.YO.03  709 6.074165 0.9253959
-    ## CO.CY.YO.04 CO.CY.YO.04  882 6.335467 0.9341327
-    ## CO.CY.YO.05 CO.CY.YO.05  827 6.256672 0.9313566
-    ## CO.SC.HE.01 CO.SC.HE.01  610 5.678312 0.8853744
-    ## CO.SC.HE.02 CO.SC.HE.02  567 5.641928 0.8898436
-    ## CO.SC.HE.03 CO.SC.HE.03  638 5.785000 0.8957412
-    ## CO.SC.HE.04 CO.SC.HE.04  565 5.569601 0.8789260
-    ## CO.SC.HE.05 CO.SC.HE.05  520 5.527887 0.8839205
-    ## CO.SC.SH.01 CO.SC.SH.01  708 6.010550 0.9159012
-    ## CO.SC.SH.02 CO.SC.SH.02  591 5.752458 0.9013826
-    ## CO.SC.SH.03 CO.SC.SH.03  721 5.865080 0.8912630
-    ## CO.SC.SH.04 CO.SC.SH.04  743 5.978096 0.9043067
-    ## CO.SC.SH.05 CO.SC.SH.05  679 5.940513 0.9110348
-    ## CO.SL.AN.01 CO.SL.AN.01  773 6.146902 0.9243073
-    ## CO.SL.AN.02 CO.SL.AN.02  769 6.135342 0.9232894
-    ## CO.SL.AN.03 CO.SL.AN.03  799 6.193143 0.9266510
-    ## CO.SL.AN.04 CO.SL.AN.04  707 6.046653 0.9216011
-    ## CO.SL.AN.05 CO.SL.AN.05  722 6.050338 0.9192214
-    ## CO.SL.BE.01 CO.SL.BE.01  687 6.086104 0.9316890
-    ## CO.SL.BE.02 CO.SL.BE.02  700 6.131492 0.9359513
-    ## CO.SL.BE.03 CO.SL.BE.03  654 5.977565 0.9220215
-    ## CO.SL.BE.04 CO.SL.BE.04  690 6.056811 0.9265866
-    ## CO.SL.BE.05 CO.SL.BE.05  300 5.240419 0.9187620
-    ## CO.SL.SH.01 CO.SL.SH.01  719 6.022284 0.9155383
-    ## CO.SL.SH.02 CO.SL.SH.02  876 6.223119 0.9184919
-    ## CO.SL.SH.03 CO.SL.SH.03  557 5.812221 0.9192821
-    ## CO.SL.SH.04 CO.SL.SH.04  773 6.073654 0.9132931
-    ## CO.SL.SH.05 CO.SL.SH.05  474 5.657569 0.9182566
-    ## FB.CL.BO.01 FB.CL.BO.01  839 6.277515 0.9324597
-    ## FB.CL.BO.02 FB.CL.BO.02  996 6.492709 0.9404616
-    ## FB.CL.BO.03 FB.CL.BO.03 1073 6.538270 0.9369547
-    ## FB.CL.BO.04 FB.CL.BO.04 1183 6.667464 0.9422900
-    ## FB.CL.BO.05 FB.CL.BO.05  745 6.204150 0.9381203
-    ## FB.CL.YO.01 FB.CL.YO.01 1020 6.443756 0.9301627
-    ## FB.CL.YO.02 FB.CL.YO.02 1079 6.540501 0.9365261
-    ## FB.CL.YO.03 FB.CL.YO.03  899 6.349965 0.9336423
-    ## FB.CL.YO.04 FB.CL.YO.04  874 6.325906 0.9339776
-    ## FB.CL.YO.05 FB.CL.YO.05  690 6.104990 0.9339571
-    ## FB.CY.BU.01 FB.CY.BU.01  646 5.807189 0.8974454
-    ## FB.CY.BU.02 FB.CY.BU.02  619 5.857188 0.9111842
-    ## FB.CY.BU.03 FB.CY.BU.03  700 5.884658 0.8982729
-    ## FB.CY.BU.04 FB.CY.BU.04  691 5.892270 0.9012150
-    ## FB.CY.BU.05 FB.CY.BU.05  574 5.683107 0.8946071
-    ## FB.CY.YO.01 FB.CY.YO.01  846 6.314755 0.9368351
-    ## FB.CY.YO.02 FB.CY.YO.02  820 6.219171 0.9269472
-    ## FB.CY.YO.03 FB.CY.YO.03  877 6.331624 0.9343493
-    ## FB.CY.YO.04 FB.CY.YO.04  664 6.070216 0.9341262
-    ## FB.SC.HE.01 FB.SC.HE.01  741 5.905221 0.8936471
-    ## FB.SC.HE.02 FB.SC.HE.02  517 5.599148 0.8961444
-    ## FB.SC.HE.03 FB.SC.HE.03  720 5.927445 0.9009300
-    ## FB.SC.HE.04 FB.SC.HE.04  776 6.015963 0.9040915
-    ## FB.SC.HE.05 FB.SC.HE.05  721 5.899774 0.8965351
-    ## FB.SC.SH.01 FB.SC.SH.01 1072 6.478176 0.9284671
-    ## FB.SC.SH.02 FB.SC.SH.02 1136 6.535806 0.9290059
-    ## FB.SC.SH.03 FB.SC.SH.03  452 5.581865 0.9130120
-    ## FB.SC.SH.04 FB.SC.SH.04  941 6.285685 0.9180280
-    ## FB.SC.SH.05 FB.SC.SH.05  348 5.219317 0.8918551
-    ## FB.SL.AN.01 FB.SL.AN.01  746 6.078094 0.9188732
-    ## FB.SL.AN.02 FB.SL.AN.02  914 6.351785 0.9316432
-    ## FB.SL.AN.03 FB.SL.AN.03  605 5.881005 0.9181569
-    ## FB.SL.AN.04 FB.SL.AN.04 1146 6.556645 0.9308085
-    ## FB.SL.AN.05 FB.SL.AN.05  952 6.409160 0.9344753
-    ## FB.SL.BE.01 FB.SL.BE.01  673 6.074068 0.9327865
-    ## FB.SL.BE.02 FB.SL.BE.02  711 6.107701 0.9301059
-    ## FB.SL.BE.03 FB.SL.BE.03  722 6.103047 0.9272293
-    ## FB.SL.BE.04 FB.SL.BE.04  323 5.199616 0.8999531
-    ## FB.SL.BE.05 FB.SL.BE.05  548 5.859521 0.9291572
-    ## FB.SL.SH.01 FB.SL.SH.01  613 5.914098 0.9214338
-    ## FB.SL.SH.02 FB.SL.SH.02  866 6.300787 0.9315338
-    ## FB.SL.SH.03 FB.SL.SH.03  575 5.895020 0.9277112
-    ## FB.SL.SH.04 FB.SL.SH.04  958 6.336883 0.9230916
-    ## FB.SL.SH.05 FB.SL.SH.05  548 5.781795 0.9168320
-    ## OR.CL.BO.01 OR.CL.BO.01  808 6.196590 0.9256155
-    ## OR.CL.BO.02 OR.CL.BO.02  806 6.234892 0.9316817
-    ## OR.CL.BO.03 OR.CL.BO.03  904 6.378447 0.9370658
-    ## OR.CL.BO.04 OR.CL.BO.04  797 6.233274 0.9330055
-    ## OR.CL.BO.05 OR.CL.BO.05  975 6.421656 0.9330497
-    ## OR.CL.YO.01 OR.CL.YO.01  985 6.482480 0.9404929
-    ## OR.CL.YO.02 OR.CL.YO.02 1001 6.450356 0.9336495
-    ## OR.CL.YO.03 OR.CL.YO.03 1066 6.499304 0.9322451
-    ## OR.CL.YO.04 OR.CL.YO.04  907 6.386958 0.9378597
-    ## OR.CY.BU.01 OR.CY.BU.01  684 6.003578 0.9196717
-    ## OR.CY.BU.02 OR.CY.BU.02  829 6.097663 0.9073607
-    ## OR.CY.BU.03 OR.CY.BU.03  748 6.017318 0.9093171
-    ## OR.CY.BU.04 OR.CY.BU.04  806 6.032479 0.9014351
-    ## OR.CY.BU.05 OR.CY.BU.05  798 6.102121 0.9132030
-    ## OR.CY.YO.01 OR.CY.YO.01  743 6.192328 0.9367135
-    ## OR.CY.YO.02 OR.CY.YO.02  805 6.225285 0.9304187
-    ## OR.CY.YO.03 OR.CY.YO.03  715 6.130950 0.9328495
-    ## OR.CY.YO.04 OR.CY.YO.04  951 6.421978 0.9364877
-    ## OR.CY.YO.05 OR.CY.YO.05  978 6.486619 0.9420681
-    ## OR.SC.HE.01 OR.SC.HE.01  645 5.740104 0.8872905
-    ## OR.SC.HE.02 OR.SC.HE.02  715 5.906604 0.8987142
-    ## OR.SC.HE.03 OR.SC.HE.03  679 5.849289 0.8970448
-    ## OR.SC.HE.04 OR.SC.HE.04  621 5.729688 0.8909024
-    ## OR.SC.HE.05 OR.SC.HE.05  590 5.759158 0.9026720
-    ## OR.SC.SH.01 OR.SC.SH.01  810 6.063817 0.9054481
-    ## OR.SC.SH.02 OR.SC.SH.02  649 5.938012 0.9170062
-    ## OR.SC.SH.03 OR.SC.SH.03  585 5.830880 0.9151343
-    ## OR.SC.SH.04 OR.SC.SH.04  328 5.054279 0.8724783
-    ## OR.SC.SH.05 OR.SC.SH.05  322 5.220376 0.9040314
-    ## OR.SL.AN.01 OR.SL.AN.01  580 5.854730 0.9201170
-    ## OR.SL.AN.02 OR.SL.AN.02  622 5.908493 0.9184748
-    ## OR.SL.AN.03 OR.SL.AN.03  728 6.064470 0.9202113
-    ## OR.SL.AN.04 OR.SL.AN.04  811 6.216058 0.9280097
-    ## OR.SL.AN.05 OR.SL.AN.05 1016 6.465737 0.9338654
-    ## OR.SL.BE.01 OR.SL.BE.01  770 6.191203 0.9315136
-    ## OR.SL.BE.02 OR.SL.BE.02  795 6.250171 0.9358867
-    ## OR.SL.BE.03 OR.SL.BE.03  777 6.239093 0.9374426
-    ## OR.SL.BE.04 OR.SL.BE.04  661 6.066699 0.9342361
-    ## OR.SL.SH.03 OR.SL.SH.03  880 6.249809 0.9218113
-    ## OR.SL.SH.04 OR.SL.SH.04  852 6.226426 0.9227634
-    ## OR.SL.SH.05 OR.SL.SH.05  740 6.134198 0.9284883
-    ## SB.CL.BO.01 SB.CL.BO.01  969 6.445653 0.9373772
-    ## SB.CL.BO.02 SB.CL.BO.02  820 6.266173 0.9339527
-    ## SB.CL.BO.03 SB.CL.BO.03  890 6.329616 0.9320290
-    ## SB.CL.BO.04 SB.CL.BO.04  712 6.099225 0.9286165
-    ## SB.CL.BO.05 SB.CL.BO.05 1038 6.501409 0.9361211
-    ## SB.CL.YO.01 SB.CL.YO.01  988 6.451684 0.9356121
-    ## SB.CL.YO.02 SB.CL.YO.02  726 6.113650 0.9280613
-    ## SB.CL.YO.03 SB.CL.YO.03 1006 6.446590 0.9324320
-    ## SB.CL.YO.04 SB.CL.YO.04  933 6.396143 0.9353266
-    ## SB.CY.BU.01 SB.CY.BU.01  949 6.330037 0.9233639
-    ## SB.CY.BU.02 SB.CY.BU.02  912 6.223900 0.9131792
-    ## SB.CY.BU.03 SB.CY.BU.03  910 6.270138 0.9202596
-    ## SB.CY.BU.04 SB.CY.BU.04  849 6.192160 0.9181651
-    ## SB.CY.BU.05 SB.CY.BU.05  853 6.138932 0.9096385
-    ## SB.CY.YO.01 SB.CY.YO.01 1060 6.562035 0.9420057
-    ## SB.CY.YO.02 SB.CY.YO.02 1039 6.562245 0.9447498
-    ## SB.CY.YO.03 SB.CY.YO.03 1034 6.514636 0.9385473
-    ## SB.CY.YO.04 SB.CY.YO.04  951 6.445213 0.9398761
-    ## SB.CY.YO.05 SB.CY.YO.05  905 6.364745 0.9349010
-    ## SB.SC.HE.01 SB.SC.HE.01  552 5.661286 0.8966885
-    ## SB.SC.HE.02 SB.SC.HE.02  470 5.499084 0.8937629
-    ## SB.SC.HE.03 SB.SC.HE.03  949 6.226283 0.9082292
-    ## SB.SC.HE.04 SB.SC.HE.04  658 5.792122 0.8925781
-    ## SB.SC.HE.05 SB.SC.HE.05  646 5.798346 0.8960787
-    ## SB.SC.SH.01 SB.SC.SH.01  858 6.081144 0.9002962
-    ## SB.SC.SH.02 SB.SC.SH.02  967 6.321108 0.9195411
-    ## SB.SC.SH.03 SB.SC.SH.03  848 6.203424 0.9199961
-    ## SB.SC.SH.04 SB.SC.SH.04  635 5.841290 0.9051177
-    ## SB.SC.SH.05 SB.SC.SH.05  865 6.249920 0.9241712
-    ## SB.SL.AN.01 SB.SL.AN.01  675 6.006067 0.9219236
-    ## SB.SL.AN.02 SB.SL.AN.02 1132 6.582370 0.9360939
-    ## SB.SL.AN.03 SB.SL.AN.03  995 6.420502 0.9301378
-    ## SB.SL.AN.04 SB.SL.AN.04 1070 6.508223 0.9330232
-    ## SB.SL.AN.05 SB.SL.AN.05  992 6.419231 0.9303606
-    ## SB.SL.BE.01 SB.SL.BE.01  903 6.350725 0.9331449
-    ## SB.SL.BE.02 SB.SL.BE.02  859 6.298148 0.9322622
-    ## SB.SL.BE.03 SB.SL.BE.03  635 5.973801 0.9256504
-    ## SB.SL.BE.04 SB.SL.BE.04  599 5.900763 0.9226774
-    ## SB.SL.BE.05 SB.SL.BE.05  683 6.031816 0.9242045
-    ## SB.SL.SH.01 SB.SL.SH.01  645 5.960078 0.9212935
-    ## SB.SL.SH.02 SB.SL.SH.02  743 6.125807 0.9266509
-    ## SB.SL.SH.03 SB.SL.SH.03  825 6.229823 0.9276943
-    ## SB.SL.SH.04 SB.SL.SH.04  698 6.040520 0.9224675
-    ## SB.SL.SH.05 SB.SL.SH.05  658 6.009015 0.9260018
-    ## SO.CL.BO.01 SO.CL.BO.01  570 5.903599 0.9303400
-    ## SO.CL.BO.02 SO.CL.BO.02  530 5.798217 0.9243314
-    ## SO.CL.BO.03 SO.CL.BO.03  333 5.271409 0.9075895
-    ## SO.CL.BO.04 SO.CL.BO.04  262 4.866517 0.8739612
-    ## SO.CL.BO.05 SO.CL.BO.05  717 6.104065 0.9283641
-    ## SO.CL.YO.01 SO.CL.YO.01  572 5.874423 0.9252315
-    ## SO.CL.YO.02 SO.CL.YO.02  312 5.092870 0.8867956
-    ## SO.CL.YO.03 SO.CL.YO.03  375 5.415934 0.9137846
-    ## SO.CL.YO.04 SO.CL.YO.04  517 5.801164 0.9284769
-    ## SO.CL.YO.05 SO.CL.YO.05  596 5.919177 0.9262838
-    ## SO.CY.BU.01 SO.CY.BU.01  381 5.355506 0.9011756
-    ## SO.CY.BU.02 SO.CY.BU.02  425 5.508445 0.9101725
-    ## SO.CY.BU.03 SO.CY.BU.03  256 4.775168 0.8611390
-    ## SO.CY.BU.04 SO.CY.BU.04  573 5.821427 0.9166322
-    ## SO.CY.BU.05 SO.CY.BU.05  370 5.305947 0.8972595
-    ## SO.CY.YO.01 SO.CY.YO.01  423 5.567836 0.9207033
-    ## SO.CY.YO.02 SO.CY.YO.02  633 6.005063 0.9309496
-    ## SO.CY.YO.03 SO.CY.YO.03  288 4.972227 0.8780261
-    ## SO.CY.YO.04 SO.CY.YO.04  925 6.423273 0.9404783
-    ## SO.CY.YO.05 SO.CY.YO.05  627 6.009067 0.9329478
-    ## SO.SC.HE.01 SO.SC.HE.01  222 4.520995 0.8368064
-    ## SO.SC.HE.02 SO.SC.HE.02  453 5.485561 0.8969355
-    ## SO.SC.HE.03 SO.SC.HE.03  295 4.946406 0.8697781
-    ## SO.SC.HE.04 SO.SC.HE.04  462 5.463689 0.8904949
-    ## SO.SC.HE.05 SO.SC.HE.05  355 5.181393 0.8823721
-    ## SO.SC.SH.01 SO.SC.SH.01  285 5.021720 0.8884086
-    ## SO.SC.SH.02 SO.SC.SH.02  459 5.594972 0.9128612
-    ## SO.SC.SH.03 SO.SC.SH.03  479 5.680508 0.9204122
-    ## SO.SC.SH.04 SO.SC.SH.04  774 6.091752 0.9158364
-    ## SO.SC.SH.05 SO.SC.SH.05  424 5.554399 0.9181229
-    ## SO.SL.AN.01 SO.SL.AN.01  680 5.974136 0.9159845
-    ## SO.SL.AN.02 SO.SL.AN.02  517 5.731799 0.9173752
-    ## SO.SL.AN.03 SO.SL.AN.03  524 5.760121 0.9199280
-    ## SO.SL.AN.04 SO.SL.AN.04  568 5.833961 0.9198753
-    ## SO.SL.AN.05 SO.SL.AN.05  595 5.853912 0.9163115
-    ## SO.SL.BE.01 SO.SL.BE.01  428 5.573147 0.9197943
-    ## SO.SL.BE.02 SO.SL.BE.02  722 6.127366 0.9309241
-    ## SO.SL.BE.03 SO.SL.BE.03  553 5.830171 0.9231734
-    ## SO.SL.BE.04 SO.SL.BE.04  616 5.945128 0.9255643
-    ## SO.SL.BE.05 SO.SL.BE.05  658 5.846886 0.9010173
-    ## SO.SL.SH.01 SO.SL.SH.01  621 5.966311 0.9276945
-    ## SO.SL.SH.02 SO.SL.SH.02  853 6.252889 0.9265242
-    ## SO.SL.SH.03 SO.SL.SH.03  465 5.612398 0.9137682
-    ## SO.SL.SH.04 SO.SL.SH.04  696 6.070377 0.9274335
-    ## SO.SL.SH.05 SO.SL.SH.05  988 6.412279 0.9298976
-    ## SU.CL.BO.01 SU.CL.BO.01  686 6.069413 0.9293411
-    ## SU.CL.BO.02 SU.CL.BO.02  698 6.070862 0.9271012
-    ## SU.CL.BO.03 SU.CL.BO.03  662 6.008171 0.9250078
-    ## SU.CL.BO.04 SU.CL.BO.04  891 6.294808 0.9267505
-    ## SU.CL.BO.05 SU.CL.BO.05  844 6.229984 0.9245834
-    ## SU.CL.YO.01 SU.CL.YO.01  506 5.754857 0.9242468
-    ## SU.CL.YO.02 SU.CL.YO.02 1277 6.732531 0.9413140
-    ## SU.CL.YO.03 SU.CL.YO.03 1029 6.446361 0.9293602
-    ## SU.CL.YO.04 SU.CL.YO.04  962 6.449995 0.9389986
-    ## SU.CL.YO.05 SU.CL.YO.05  735 6.131344 0.9290098
-    ## SU.CY.BU.01 SU.CY.BU.01  843 6.166615 0.9153400
-    ## SU.CY.BU.02 SU.CY.BU.02  897 6.215152 0.9141199
-    ## SU.CY.BU.03 SU.CY.BU.03  584 5.683012 0.8921664
-    ## SU.CY.BU.04 SU.CY.BU.04  883 6.169676 0.9095357
-    ## SU.CY.BU.05 SU.CY.BU.05  558 5.709352 0.9027559
-    ## SU.CY.YO.01 SU.CY.YO.01  723 6.083097 0.9240041
-    ## SU.CY.YO.02 SU.CY.YO.02  766 6.082221 0.9158341
-    ## SU.CY.YO.03 SU.CY.YO.03  918 6.364314 0.9328833
-    ## SU.CY.YO.04 SU.CY.YO.04  842 6.254463 0.9285432
-    ## SU.CY.YO.05 SU.CY.YO.05  562 5.763346 0.9102652
-    ## SU.SC.HE.01 SU.SC.HE.01 1052 6.215411 0.8932180
-    ## SU.SC.HE.02 SU.SC.HE.02 1015 6.159965 0.8898284
-    ## SU.SC.HE.03 SU.SC.HE.03  946 6.084096 0.8878985
-    ## SU.SC.HE.04 SU.SC.HE.04  981 6.262072 0.9090522
-    ## SU.SC.HE.05 SU.SC.HE.05  885 6.033006 0.8890912
-    ## SU.SC.SH.01 SU.SC.SH.01  617 5.872502 0.9140267
-    ## SU.SC.SH.02 SU.SC.SH.02  429 5.446247 0.8985047
-    ## SU.SC.SH.03 SU.SC.SH.03  636 5.921311 0.9172934
-    ## SU.SC.SH.04 SU.SC.SH.04  728 6.011633 0.9121940
-    ## SU.SC.SH.05 SU.SC.SH.05  624 5.821956 0.9045711
-    ## SU.SL.AN.01 SU.SL.AN.01  788 6.097297 0.9142062
-    ## SU.SL.AN.02 SU.SL.AN.02  709 5.956328 0.9074434
-    ## SU.SL.AN.03 SU.SL.AN.03  825 6.202384 0.9236083
-    ## SU.SL.AN.04 SU.SL.AN.04  961 6.440855 0.9378101
-    ## SU.SL.AN.05 SU.SL.AN.05  970 6.414012 0.9326357
-    ## SU.SL.BE.01 SU.SL.BE.01  767 6.137715 0.9240086
-    ## SU.SL.BE.02 SU.SL.BE.02  595 5.937198 0.9293482
-    ## SU.SL.BE.03 SU.SL.BE.03  510 5.766411 0.9249329
-    ## SU.SL.BE.04 SU.SL.BE.04  540 5.730824 0.9108736
-    ## SU.SL.BE.05 SU.SL.BE.05  576 5.858005 0.9216340
-    ## SU.SL.SH.01 SU.SL.SH.01  780 6.118612 0.9188079
-    ## SU.SL.SH.02 SU.SL.SH.02  969 6.381999 0.9281201
-    ## SU.SL.SH.03 SU.SL.SH.03 1024 6.362461 0.9179092
-    ## SU.SL.SH.04 SU.SL.SH.04  995 6.390411 0.9257785
-    ## SU.SL.SH.05 SU.SL.SH.05  901 6.326369 0.9298691
-    ## SW.CL.BO.01 SW.CL.BO.01  974 6.451315 0.9374989
-    ## SW.CL.BO.02 SW.CL.BO.02  802 6.176022 0.9235714
-    ## SW.CL.BO.03 SW.CL.BO.03  819 6.238176 0.9299490
-    ## SW.CL.BO.04 SW.CL.BO.04  824 6.200767 0.9235344
-    ## SW.CL.BO.05 SW.CL.BO.05  807 6.218921 0.9291230
-    ## SW.CL.YO.01 SW.CL.YO.01  956 6.426632 0.9364504
-    ## SW.CL.YO.02 SW.CL.YO.02  929 6.390227 0.9350490
-    ## SW.CL.YO.03 SW.CL.YO.03  855 6.254398 0.9264262
-    ## SW.CL.YO.04 SW.CL.YO.04  858 6.292755 0.9316246
-    ## SW.CL.YO.05 SW.CL.YO.05  810 6.237511 0.9313841
-    ## SW.CY.BU.01 SW.CY.BU.01  707 6.040961 0.9207335
-    ## SW.CY.BU.02 SW.CY.BU.02  937 6.235538 0.9112708
-    ## SW.CY.BU.03 SW.CY.BU.03  990 6.355781 0.9214342
-    ## SW.CY.BU.04 SW.CY.BU.04  910 6.119194 0.8981057
-    ## SW.CY.BU.05 SW.CY.BU.05  968 6.330770 0.9208082
-    ## SW.CY.YO.01 SW.CY.YO.01  712 6.141844 0.9351053
-    ## SW.CY.YO.02 SW.CY.YO.02  759 6.187330 0.9329506
-    ## SW.CY.YO.03 SW.CY.YO.03  728 6.158487 0.9344774
-    ## SW.CY.YO.04 SW.CY.YO.04  817 6.230007 0.9290698
-    ## SW.CY.YO.05 SW.CY.YO.05  790 6.228949 0.9335909
-    ## SW.SC.HE.01 SW.SC.HE.01  876 6.116722 0.9027884
-    ## SW.SC.HE.02 SW.SC.HE.02  864 6.052406 0.8951181
-    ## SW.SC.HE.03 SW.SC.HE.03  757 5.951314 0.8977203
-    ## SW.SC.HE.04 SW.SC.HE.04  626 5.816345 0.9032503
-    ## SW.SC.HE.05 SW.SC.HE.05  592 5.685177 0.8906040
-    ## SW.SC.SH.01 SW.SC.SH.01  927 6.182445 0.9049307
-    ## SW.SC.SH.02 SW.SC.SH.02  778 6.066504 0.9113344
-    ## SW.SC.SH.03 SW.SC.SH.03 1058 6.422090 0.9221661
-    ## SW.SC.SH.04 SW.SC.SH.04  612 5.943683 0.9262788
-    ## SW.SC.SH.05 SW.SC.SH.05  841 6.191478 0.9193547
-    ## SW.SL.AN.01 SW.SL.AN.01  946 6.345051 0.9259817
-    ## SW.SL.AN.02 SW.SL.AN.02  930 6.327139 0.9256721
-    ## SW.SL.AN.03 SW.SL.AN.03  935 6.291709 0.9197670
-    ## SW.SL.AN.04 SW.SL.AN.04  695 5.966868 0.9118198
-    ## SW.SL.AN.05 SW.SL.AN.05  984 6.342081 0.9202591
-    ## SW.SL.BE.01 SW.SL.BE.01  859 6.314826 0.9347309
-    ## SW.SL.BE.02 SW.SL.BE.02  861 6.311738 0.9339523
-    ## SW.SL.BE.03 SW.SL.BE.03  882 6.359915 0.9377373
-    ## SW.SL.BE.04 SW.SL.BE.04  943 6.428285 0.9385637
-    ## SW.SL.SH.01 SW.SL.SH.01  846 6.198159 0.9195374
-    ## SW.SL.SH.02 SW.SL.SH.02  664 5.964613 0.9178753
-    ## SW.SL.SH.03 SW.SL.SH.03 1028 6.436963 0.9281355
-    ## SW.SL.SH.04 SW.SL.SH.04  896 6.286459 0.9247594
-    ## SW.SL.SH.05 SW.SL.SH.05 1060 6.518456 0.9357499
 
 Below we will plot and compare the diversity indexes by location, crop
 and soil type. first will test the normality of the data using
@@ -685,8 +372,15 @@ First we prepare the data.
 
 ``` r
 library(tibble)
+```
+
+    ## Warning: package 'tibble' was built under R version 4.4.3
+
+``` r
 library(dplyr)
 ```
+
+    ## Warning: package 'dplyr' was built under R version 4.4.3
 
     ## 
     ## Attaching package: 'dplyr'
@@ -1703,32 +1397,85 @@ results.
 ``` r
 # Here I deficne a fuction to get letters from pairwise test 
 # Define the function
-generate_significant_letters <- function(p_values_matrix) {
-  
-  # Load necessary library for generating letters
+
+### This version is commented out because it does not order the letters according to the means, which can lead to confusion when interpreting the results. The version below remaps the letters so that "a" corresponds to the group with the highest mean, "b" to the next highest, and so on, which is more intuitive for readers.
+
+# generate_significant_letters <- function(p_values_matrix) {
+#   
+#   # Load necessary library for generating letters
+#   library(multcompView)
+#   
+#   # Get the location names
+#   
+#   location_names <- rownames(p_values_matrix)
+#   
+#   # Add a first row with NAs and the name of the first column
+#   first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
+#   #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+#   p_values_matrix <- rbind(first_row, p_values_matrix)
+#   rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+#   # Add a last column with NAs and the name of the last row
+#   p_values_matrix <- cbind(p_values_matrix, NA)
+#   colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+#   
+#   # Fill the diagonal with 1s to avoid issues with self-comparisons
+#   #diag(p_values_matrix) <- 1
+#   
+#   # Generate letters for the significant differences
+#   significant_letters <- multcompLetters(p_values_matrix)$Letters
+#   
+#   # Return the significant letters
+#   return(significant_letters)
+# }
+
+## This version remaps the letters so that "a" corresponds to the group with the highest mean, "b" to the next highest, and so on, which is more intuitive for readers.
+
+generate_significant_letters <- function(p_values_matrix, group_means) {
   library(multcompView)
   
-  # Get the location names
+  # Convert lower-triangular matrix to a named vector ("GroupA-GroupB" = p-value)
+  p_vec <- c()
+  for (i in seq_len(nrow(p_values_matrix))) {
+    for (j in seq_len(ncol(p_values_matrix))) {
+      if (!is.na(p_values_matrix[i, j])) {
+        pair_name <- paste(rownames(p_values_matrix)[i],
+                           colnames(p_values_matrix)[j],
+                           sep = "-")
+        p_vec[pair_name] <- p_values_matrix[i, j]
+      }
+    }
+  }
   
-  location_names <- rownames(p_values_matrix)
+  # Generate letters
+  significant_letters <- multcompLetters(p_vec)$Letters
   
-  # Add a first row with NAs and the name of the first column
-  first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
-  #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
-  p_values_matrix <- rbind(first_row, p_values_matrix)
-  rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
-  # Add a last column with NAs and the name of the last row
-  p_values_matrix <- cbind(p_values_matrix, NA)
-  colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+  # --- Remap so "a" = highest mean ---
+  aligned_means <- group_means[names(significant_letters)]
+  sorted_groups <- names(sort(aligned_means, decreasing = TRUE))
   
-  # Fill the diagonal with 1s to avoid issues with self-comparisons
-  #diag(p_values_matrix) <- 1
+  # Build a letter remapping by scanning groups from highest to lowest mean
+  seen       <- c()
+  letter_map <- c()
+  new_idx    <- 1
   
-  # Generate letters for the significant differences
-  significant_letters <- multcompLetters(p_values_matrix)$Letters
+  for (grp in sorted_groups) {
+    for (ch in strsplit(significant_letters[grp], "")[[1]]) {
+      if (!ch %in% seen) {
+        letter_map[ch] <- letters[new_idx]
+        seen  <- c(seen, ch)
+        new_idx <- new_idx + 1
+      }
+    }
+  }
   
-  # Return the significant letters
-  return(significant_letters)
+  # Apply remapping to all groups
+  new_letters <- sapply(significant_letters, function(s) {
+    chars <- strsplit(s, "")[[1]]
+    paste(sort(letter_map[chars]), collapse = "")
+  })
+  
+  names(new_letters) <- names(significant_letters)
+  return(new_letters)
 }
 ```
 
@@ -1784,19 +1531,24 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Shannon, 
+                      merged_sample_data_unc$Soil.Location, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
 
 # Create a boxplot with letters
 library(ggplot2)
+```
+
+    ## Warning: package 'ggplot2' was built under R version 4.4.3
+
+``` r
 sha_loc_plot <- ggplot(merged_sample_data_unc, aes(x = Soil.Location, y = Shannon, fill = Soil.Location)) +
                         geom_boxplot() +
                         labs(x = "Location", y = "Shannon's H'") +
@@ -1868,14 +1620,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Shannon, 
+                      merged_sample_data_unc$Type, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
 
@@ -1950,14 +1702,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Shannon, 
+                      merged_sample_data_unc$Soil, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
 
@@ -2108,14 +1860,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Sobs, 
+                      merged_sample_data_unc$Soil.Location, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
 
@@ -2236,14 +1988,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Sobs, 
+                      merged_sample_data_unc$Type, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
 
@@ -2318,14 +2070,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Sobs, 
+                      merged_sample_data_unc$Soil, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
 
@@ -2407,14 +2159,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Pielou, 
+                      merged_sample_data_unc$Soil.Location, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
 
@@ -2490,14 +2242,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Pielou, 
+                      merged_sample_data_unc$Type, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
 
@@ -2572,14 +2324,14 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Pielou, 
+                      merged_sample_data_unc$Soil, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
 
@@ -2644,7 +2396,7 @@ plot_bar(phylGlommed, fill ="Phylum") +
     ## ℹ See also `vignette("ggplot2-in-packages")` for more information.
     ## ℹ The deprecated feature was likely used in the phyloseq package.
     ##   Please report the issue at <https://github.com/joey711/phyloseq/issues>.
-    ## This warning is displayed once every 8 hours.
+    ## This warning is displayed once per session.
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
 
@@ -2950,10 +2702,14 @@ taxa_plot_comb_uncult <- (tax_plot_crop + tax_plot_locat + tax_plot_soil) & them
 library(tidyverse)
 ```
 
+    ## Warning: package 'tidyr' was built under R version 4.4.3
+
+    ## Warning: package 'purrr' was built under R version 4.4.3
+
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ forcats   1.0.1     ✔ readr     2.1.5
-    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.2
-    ## ✔ purrr     1.1.0     ✔ tidyr     1.3.1
+    ## ✔ lubridate 1.9.4     ✔ stringr   1.6.0
+    ## ✔ purrr     1.2.1     ✔ tidyr     1.3.2
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::collapse() masks nlme::collapse()
     ## ✖ dplyr::filter()   masks stats::filter()
@@ -3276,11 +3032,14 @@ library(scales)
 ``` r
 # location
 
-NMDS_plot_loc <- plot_ordination(physeq = physeq.norm, 
+p <- plot_ordination(physeq = physeq.norm, 
                                    ordination = NMDS, 
                                    color = "Soil.Location" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_loc <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -3296,11 +3055,14 @@ NMDS_plot_loc
 ![](community_analysis_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ``` r
-NMDS_plot_crop <- plot_ordination(physeq = physeq.norm, 
+p <- plot_ordination(physeq = physeq.norm, 
                                    ordination = NMDS, 
                                    color = "Type" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_crop <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -3316,11 +3078,14 @@ NMDS_plot_crop
 ![](community_analysis_files/figure-gfm/unnamed-chunk-28-2.png)<!-- -->
 
 ``` r
-NMDS_plot_soil <- plot_ordination(physeq = physeq.norm, 
+p <- plot_ordination(physeq = physeq.norm, 
                                    ordination = NMDS, 
                                    color = "Soil" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_soil <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -3859,13 +3624,14 @@ pairwise_loc <- pairwise.wilcox.test(merged_pd_data_unc$FaithPD,
                                      p.adjust.method = "BH")
 
 p_values_matrix <- pairwise_loc$p.value
-sig_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_pd_data_unc$FaithPD,
+                      merged_pd_data_unc$Soil.Location,
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+sig_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
 letters_df <- data.frame(Soil.Location = names(sig_letters), Letters = sig_letters)
 
 library(ggplot2)
@@ -3935,13 +3701,14 @@ pairwise_soil <- pairwise.wilcox.test(merged_pd_data_unc$FaithPD,
                                       p.adjust.method = "BH")
 
 p_values_matrix <- pairwise_soil$p.value
-sig_letters <- generate_significant_letters(p_values_matrix)
-```
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+group_means <- tapply(merged_pd_data_unc$FaithPD,
+                      merged_pd_data_unc$Soil,
+                      mean)
 
-``` r
+# Pass both arguments
+sig_letters <- generate_significant_letters(p_values_matrix, group_means)
+
 letters_df <- data.frame(Soil = names(sig_letters), Letters = sig_letters)
 
 faith_soil_plot <- ggplot(merged_pd_data_unc, aes(x = Soil, y = FaithPD, fill = Soil)) +
@@ -4186,12 +3953,15 @@ library(scales)
 
 ## === Location =====================================================
 
-NMDS_plot_loc <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm, 
   ordination = NMDS, 
   color = "Soil.Location"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_loc <- p + geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -4211,12 +3981,15 @@ NMDS_plot_loc
 ``` r
 ## === Crop =========================================================
 
-NMDS_plot_crop <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm, 
   ordination = NMDS, 
   color = "Type"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_crop <- p + geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -4236,12 +4009,15 @@ NMDS_plot_crop
 ``` r
 ## === Soil =========================================================
 
-NMDS_plot_soil <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm, 
   ordination = NMDS, 
   color = "Soil"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_soil <- p + geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -4426,7 +4202,7 @@ var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
 
 PCA_plot_loc_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Soil.Location)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4448,7 +4224,7 @@ PCA_plot_loc_aitchison
 ``` r
 PCA_plot_crop_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4470,7 +4246,7 @@ PCA_plot_crop_aitchison
 ``` r
 PCA_plot_soil_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Soil)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec) +
@@ -4581,17 +4357,17 @@ umap_res <- umap(
 )
 ```
 
-    ## 11:29:51 UMAP embedding parameters a = 0.583 b = 1.334
+    ## 11:34:52 UMAP embedding parameters a = 0.583 b = 1.334
 
-    ## 11:29:51 Read 308 rows and found 50 numeric columns
+    ## 11:34:52 Read 308 rows and found 50 numeric columns
 
-    ## 11:29:51 Using FNN for neighbor search, n_neighbors = 100
+    ## 11:34:52 Using FNN for neighbor search, n_neighbors = 100
 
-    ## 11:29:51 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 100
-    ## 11:29:52 Initializing from normalized Laplacian + noise (using RSpectra)
-    ## 11:29:52 Commencing optimization for 500 epochs, with 35840 positive edges
-    ## 11:29:52 Using rng type: pcg
-    ## 11:29:52 Optimization finished
+    ## 11:34:52 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 100
+    ## 11:34:53 Initializing from normalized Laplacian + noise (using RSpectra)
+    ## 11:34:53 Commencing optimization for 500 epochs, with 35840 positive edges
+    ## 11:34:53 Using rng type: pcg
+    ## 11:34:53 Optimization finished
 
 ``` r
 # Build plotting DF with metadata
@@ -4604,7 +4380,7 @@ umap_df <- cbind(meta_df, umap_df)
 # --- 4) Plots (match your aesthetics) ----------------------------------------
 UMAP_plot_loc <- ggplot(umap_df, 
                         aes(x = UMAP1, y = UMAP2, color = Soil.Location)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4619,7 +4395,7 @@ UMAP_plot_loc <- ggplot(umap_df,
 
 UMAP_plot_crop <- ggplot(umap_df, 
                          aes(x = UMAP1, y = UMAP2, color = Type)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4634,7 +4410,7 @@ UMAP_plot_crop <- ggplot(umap_df,
 
 UMAP_plot_soil <- ggplot(umap_df, 
                          aes(x = UMAP1, y = UMAP2, color = Soil)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec) +
@@ -4773,28 +4549,453 @@ vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)
     ## Permutation: free
     ## Number of permutations: 999
 
+## Alpha diversity with DivNet
+
+Because of the biases associated with rarefaction and the compositional
+nature of the data, we will use the DivNet package to calculate alpha
+diversity metrics.
+
+``` r
+# run alpha diversity metrics using DivNet package on the physeq.norm object.
+
+library(DivNet)
+```
+
+    ## Loading required package: breakaway
+
+``` r
+set.seed(123)
+
+# This part of the code is commented because it takes a long time to run. We will load the results obtained previously instead. 
+
+# genus_phy <- tax_glom(physeq.norm, taxrank="Genus")
+# divnet_res <- divnet(genus_phy, ncores = 6)
+# 
+# loc_divnet <- tax_glom(physeq.norm, taxrank="Genus") %>%
+#     divnet(X = "Soil.Location", ncores = 8) 
+# 
+# soil_divnet <- tax_glom(physeq.norm, taxrank="Genus") %>%
+#     divnet(X = "Soil", ncores = 8) 
+# 
+# crop_divnet <- tax_glom(physeq.norm, taxrank="Genus") %>%
+#     divnet(X = "Type", ncores = 8) 
+
+#save(loc_divnet, soil_divnet, crop_divnet, genus_phy, divnet_res, file = "../Comparisons/uncult_divnet.RData")
+
+load("../Comparisons/uncult_divnet.RData")
+
+## DivNet diversity testing using betta and betta_posthoc functions. We will test for differences in Shannon diversity across locations, soil types and crops
+library(magrittr)
+```
+
+    ## 
+    ## Attaching package: 'magrittr'
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     set_names
+
+    ## The following object is masked from 'package:tidyr':
+    ## 
+    ##     extract
+
+``` r
+## Crop 
+estimates <- crop_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(crop_divnet$`shannon-variance`) 
+
+# Build the combined df
+betta_df <- data.frame(
+  estimates = estimates,
+  ses       = ses,
+  row.names = crop_divnet$shannon %>% summary %$% sample_names
+)
+
+# Convert sample_data to a plain data frame first
+meta <- as.data.frame(as(sample_data(physeq.norm), "data.frame"))
+
+# Import Type from meta, matching by rowname
+betta_df$Type <- meta[rownames(betta_df), "Type"]
+#betta_df$Type[is.na(betta_df$Type)] <- "OilseedRape"
+# Run betta - formula uses your sample metadata
+bt <- betta(data = betta_df, formula = estimates ~ Type, ses = ses)
+bt$table # get table of results
+```
+
+    ##                   Estimates Standard Errors p-values
+    ## (Intercept)      4.14992090     0.006888238        0
+    ## TypeBeans       -0.18325531     0.011309341        0
+    ## TypeBulksoil    -0.14905860     0.011361440        0
+    ## TypeOats        -0.36981642     0.009600412        0
+    ## TypeOilseedRape -0.09473170     0.012252192        0
+    ## TypeSugarbeet   -0.11078204     0.015516352        0
+    ## TypeWheat        0.04727196     0.011254559        0
+
+``` r
+bt$global[2] # get p-value for global test
+```
+
+    ## [1] 0
+
+``` r
+#bt
+betta_PH <- DivNet::betta_posthoc(bt, metadata = betta_df,
+                      p_adjust_method = "BH")
+
+crop_div_letters <- betta_PH$cld_df
+
+## we will check if letters are ordered based on average
+crop_div_letters$cld # It's not so I will manually reorder.
+```
+
+    ## [1] "A" "B" "C" "D" "E" "E" "F"
+
+``` r
+crop_div_letters$cld <- c("b", "e", "d", "f", "c", "c", "a")
+# View results
+bt$table
+```
+
+    ##                   Estimates Standard Errors p-values
+    ## (Intercept)      4.14992090     0.006888238        0
+    ## TypeBeans       -0.18325531     0.011309341        0
+    ## TypeBulksoil    -0.14905860     0.011361440        0
+    ## TypeOats        -0.36981642     0.009600412        0
+    ## TypeOilseedRape -0.09473170     0.012252192        0
+    ## TypeSugarbeet   -0.11078204     0.015516352        0
+    ## TypeWheat        0.04727196     0.011254559        0
+
+``` r
+crop_test <- testDiversity(crop_divnet)
+```
+
+    ## Hypothesis testing:
+    ##   p-value for global test: 0
+
+``` r
+crop_test
+```
+
+    ##                         Estimates Standard Errors p-values
+    ## (Intercept)            4.14992090     0.006888238        0
+    ## predictorsBeans       -0.18325531     0.011309341        0
+    ## predictorsBulksoil    -0.14905860     0.011361440        0
+    ## predictorsOats        -0.36981642     0.009600412        0
+    ## predictorsOilseedRape -0.09473170     0.012252192        0
+    ## predictorsSugarbeet   -0.11078204     0.015516352        0
+    ## predictorsWheat        0.04727196     0.011254559        0
+
+``` r
+summary(crop_test)
+```
+
+    ##    Estimates        Standard Errors       p-values
+    ##  Min.   :-0.36982   Min.   :0.006888   Min.   :0  
+    ##  1st Qu.:-0.16616   1st Qu.:0.010427   1st Qu.:0  
+    ##  Median :-0.11078   Median :0.011309   Median :0  
+    ##  Mean   : 0.46994   Mean   :0.011169   Mean   :0  
+    ##  3rd Qu.:-0.02373   3rd Qu.:0.011807   3rd Qu.:0  
+    ##  Max.   : 4.14992   Max.   :0.015516   Max.   :0
+
+``` r
+### Location 
+
+estimates <- loc_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(loc_divnet$`shannon-variance`) 
+
+# Build the combined df
+betta_df <- data.frame(
+  estimates = estimates,
+  ses       = ses,
+  row.names = loc_divnet$shannon %>% summary %$% sample_names
+)
+
+# Import Type from meta, matching by rowname
+betta_df$Soil.Location <- meta[rownames(betta_df), "Soil.Location"]
+#betta_df$Type[is.na(betta_df$Type)] <- "OilseedRape"
+# Run betta - formula uses your sample metadata
+bt <- betta(data = betta_df, formula = estimates ~ Soil.Location, ses = ses)
+bt$table # get table of results
+```
+
+    ##                      Estimates Standard Errors p-values
+    ## (Intercept)         4.25244828     0.002848627    0.000
+    ## Soil.LocationCL.YO  0.03075875     0.005313368    0.000
+    ## Soil.LocationCY.BU -0.31721882     0.006682308    0.000
+    ## Soil.LocationCY.YO  0.25594233     0.006051267    0.000
+    ## Soil.LocationSC.HE -0.64493633     0.006151014    0.000
+    ## Soil.LocationSC.SH -0.07497402     0.005252764    0.000
+    ## Soil.LocationSL.AN  0.02481132     0.008120648    0.002
+    ## Soil.LocationSL.BE -0.17988323     0.005156667    0.000
+    ## Soil.LocationSL.SH -0.09134608     0.004303744    0.000
+
+``` r
+bt$global[2] # get p-value for global test
+```
+
+    ## [1] 0
+
+``` r
+#bt
+betta_PH <- DivNet::betta_posthoc(bt, metadata = betta_df,
+                      p_adjust_method = "BH")
+
+loc_div_letters <- betta_PH$cld_df
+
+## we will check if letters are ordered based on average
+loc_div_letters$cld # It's not so I will manually reorder.
+```
+
+    ## [1] "A" "B" "C" "D" "E" "F" "B" "G" "H"
+
+``` r
+loc_div_letters$cld <- c("c" ,"b" ,"g" ,"a" ,"h" ,"d" ,"b" ,"f" ,"e")
+# View results
+bt$table
+```
+
+    ##                      Estimates Standard Errors p-values
+    ## (Intercept)         4.25244828     0.002848627    0.000
+    ## Soil.LocationCL.YO  0.03075875     0.005313368    0.000
+    ## Soil.LocationCY.BU -0.31721882     0.006682308    0.000
+    ## Soil.LocationCY.YO  0.25594233     0.006051267    0.000
+    ## Soil.LocationSC.HE -0.64493633     0.006151014    0.000
+    ## Soil.LocationSC.SH -0.07497402     0.005252764    0.000
+    ## Soil.LocationSL.AN  0.02481132     0.008120648    0.002
+    ## Soil.LocationSL.BE -0.17988323     0.005156667    0.000
+    ## Soil.LocationSL.SH -0.09134608     0.004303744    0.000
+
+``` r
+loc_test <- testDiversity(loc_divnet)
+```
+
+    ## Hypothesis testing:
+    ##   p-value for global test: 0
+
+``` r
+loc_test
+```
+
+    ##                   Estimates Standard Errors p-values
+    ## (Intercept)      4.25244828     0.002848627    0.000
+    ## predictorsCL.YO  0.03075875     0.005313368    0.000
+    ## predictorsCY.BU -0.31721882     0.006682308    0.000
+    ## predictorsCY.YO  0.25594233     0.006051267    0.000
+    ## predictorsSC.HE -0.64493633     0.006151014    0.000
+    ## predictorsSC.SH -0.07497402     0.005252764    0.000
+    ## predictorsSL.AN  0.02481132     0.008120648    0.002
+    ## predictorsSL.BE -0.17988323     0.005156667    0.000
+    ## predictorsSL.SH -0.09134608     0.004303744    0.000
+
+``` r
+summary(loc_test)
+```
+
+    ##    Estimates        Standard Errors       p-values        
+    ##  Min.   :-0.64494   Min.   :0.002849   Min.   :0.0000000  
+    ##  1st Qu.:-0.17988   1st Qu.:0.005157   1st Qu.:0.0000000  
+    ##  Median :-0.07497   Median :0.005313   Median :0.0000000  
+    ##  Mean   : 0.36173   Mean   :0.005542   Mean   :0.0002222  
+    ##  3rd Qu.: 0.03076   3rd Qu.:0.006151   3rd Qu.:0.0000000  
+    ##  Max.   : 4.25245   Max.   :0.008121   Max.   :0.0020000
+
+``` r
+### Soil type 
+
+estimates <- soil_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(soil_divnet$`shannon-variance`) 
+
+# Build the combined df
+betta_df <- data.frame(
+  estimates = estimates,
+  ses       = ses,
+  row.names = soil_divnet$shannon %>% summary %$% sample_names
+)
+
+# Import Type from meta, matching by rowname
+betta_df$Soil <- meta[rownames(betta_df), "Soil"]
+#betta_df$Type[is.na(betta_df$Type)] <- "OilseedRape"
+# Run betta - formula uses your sample metadata
+bt <- betta(data = betta_df, formula = estimates ~ Soil, ses = ses)
+bt$table # get table of results
+```
+
+    ##               Estimates Standard Errors p-values
+    ## (Intercept)  4.20383042     0.004107029        0
+    ## SoilCY      -0.03538993     0.005104207        0
+    ## SoilSC      -0.53767555     0.004835564        0
+    ## SoilSL      -0.11789106     0.005328224        0
+
+``` r
+bt$global[2] # get p-value for global test
+```
+
+    ## [1] 0
+
+``` r
+#bt
+betta_PH <- DivNet::betta_posthoc(bt, metadata = betta_df,
+                      p_adjust_method = "BH")
+
+soil_div_letters <- betta_PH$cld_df
+
+## we will check if letters are ordered based on average
+soil_div_letters$cld # It's not so I will manually reorder.
+```
+
+    ## [1] "A" "B" "C" "D"
+
+``` r
+soil_div_letters$cld <- c("a", "b", "d", "c")
+# View results
+bt$table
+```
+
+    ##               Estimates Standard Errors p-values
+    ## (Intercept)  4.20383042     0.004107029        0
+    ## SoilCY      -0.03538993     0.005104207        0
+    ## SoilSC      -0.53767555     0.004835564        0
+    ## SoilSL      -0.11789106     0.005328224        0
+
+``` r
+soils_test <- testDiversity(soil_divnet)
+```
+
+    ## Hypothesis testing:
+    ##   p-value for global test: 0
+
+``` r
+soils_test
+```
+
+    ##                Estimates Standard Errors p-values
+    ## (Intercept)   4.20383042     0.004107029        0
+    ## predictorsCY -0.03538993     0.005104207        0
+    ## predictorsSC -0.53767555     0.004835564        0
+    ## predictorsSL -0.11789106     0.005328224        0
+
+``` r
+summary(soils_test)
+```
+
+    ##    Estimates        Standard Errors       p-values
+    ##  Min.   :-0.53768   Min.   :0.004107   Min.   :0  
+    ##  1st Qu.:-0.22284   1st Qu.:0.004653   1st Qu.:0  
+    ##  Median :-0.07664   Median :0.004970   Median :0  
+    ##  Mean   : 0.87822   Mean   :0.004844   Mean   :0  
+    ##  3rd Qu.: 1.02442   3rd Qu.:0.005160   3rd Qu.:0  
+    ##  Max.   : 4.20383   Max.   :0.005328   Max.   :0
+
+``` r
+# Prep for plots
+
+shannon <- divnet_res$shannon %>% summary %$% estimate %>% as.data.frame
+# rename column . to Shannon
+colnames(shannon)[1] <- "Shannon"
+
+simpson <- divnet_res$simpson %>% summary %$% estimate %>% as.data.frame
+colnames(simpson)[1] <- "Simpson"
+
+divnet_alpha <- cbind(shannon, simpson) %>% rownames_to_column("SampleID")
+
+meta <- data.frame(sample_data(physeq.norm))
+divnet_alpha_meta <- merge(divnet_alpha, meta, by.x = "SampleID", by.y = "row.names")
+
+
+
+# Plot Shannon diversity by crop, soil and location
+
+DV_sha_crop_plot <- ggplot(divnet_alpha_meta, aes(x = Type, y = Shannon, fill = Type)) +
+                        geom_boxplot() +
+                        labs(x = "Crop", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = crop_div_letters,
+                                  aes(x = Type,
+                                      y = max(divnet_alpha_meta$Shannon) + 0.05 * max(divnet_alpha_meta$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = crop_order) +
+                        theme(legend.position = "none")
+DV_sha_crop_plot
+```
+
+![](community_analysis_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+
+``` r
+DV_sha_soil_plot <- ggplot(divnet_alpha_meta, aes(x = Soil, y = Shannon, fill = Soil)) +
+                        geom_boxplot() +
+                        labs(x = "Soil", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = soil_div_letters,
+                                  aes(x = Soil,
+                                      y = max(divnet_alpha_meta$Shannon) + 0.05 * max(divnet_alpha_meta$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec) +
+                        theme(legend.position = "none")
+DV_sha_soil_plot
+```
+
+![](community_analysis_files/figure-gfm/unnamed-chunk-34-2.png)<!-- -->
+
+``` r
+DV_sha_loc_plot <- ggplot(divnet_alpha_meta, aes(x = Soil.Location, y = Shannon, fill = Soil.Location)) +
+                        geom_boxplot() +
+                        labs(x = "Location", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = loc_div_letters,
+                                  aes(x = Soil.Location,
+                                      y = max(divnet_alpha_meta$Shannon) + 0.05 * max(divnet_alpha_meta$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = local_order) +
+                        theme(legend.position = "none")
+DV_sha_loc_plot
+```
+
+![](community_analysis_files/figure-gfm/unnamed-chunk-34-3.png)<!-- -->
+
+## Join plots
+
+``` r
+library(patchwork)
+combined_plot_unc <- (DV_sha_crop_plot + DV_sha_loc_plot +  DV_sha_soil_plot) + plot_annotation(tag_levels = 'A')
+combined_plot_unc
+```
+
+<img src="community_analysis_files/figure-gfm/unnamed-chunk-35-1.png" style="display: block; margin: auto;" />
+
 # Export objects
 
 We will export some object to be used in other scripts down the line
 such as comparisons.
 
 ``` r
-save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, PCA_plot_comb_aitchison_unc, UMAP_plot_comb_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
+save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, PCA_plot_comb_aitchison_unc, UMAP_plot_comb_unc, combined_plot_unc, divnet_alpha_meta, file = "../Comparisons/uncult_metabarcode_figs.RData")
 ```
 
 ``` r
 installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
-    ##           uwot         Matrix     microbiome        cowplot pairwiseAdonis 
-    ##        "0.2.4"        "1.7-4"       "1.28.0"        "1.2.0"        "0.4.1" 
-    ##        cluster         scales      lubridate        forcats        stringr 
-    ##      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1"        "1.5.2" 
-    ##          purrr          readr          tidyr      tidyverse   RColorBrewer 
-    ##        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0"        "1.1-3" 
-    ##      patchwork        ggplot2   multcompView          dplyr         tibble 
-    ##        "1.3.2"        "4.0.0"       "0.1-10"        "1.1.4"        "3.3.0" 
-    ##        picante           nlme          vegan        permute            ape 
-    ##        "1.8.2"      "3.1-168"        "2.7-2"        "0.9-8"        "5.8-1" 
-    ##       phyloseq 
-    ##       "1.50.0"
+    ##       magrittr         DivNet      breakaway           uwot         Matrix 
+    ##        "2.0.4"        "0.4.1"        "4.8.5"        "0.2.4"        "1.7-4" 
+    ##     microbiome        cowplot pairwiseAdonis        cluster         scales 
+    ##       "1.28.0"        "1.2.0"        "0.4.1"      "2.1.8.1"        "1.4.0" 
+    ##      lubridate        forcats        stringr          purrr          readr 
+    ##        "1.9.4"        "1.0.1"        "1.6.0"        "1.2.1"        "2.1.5" 
+    ##          tidyr      tidyverse   RColorBrewer      patchwork        ggplot2 
+    ##        "1.3.2"        "2.0.0"        "1.1-3"        "1.3.2"        "4.0.2" 
+    ##   multcompView          dplyr         tibble        picante           nlme 
+    ##       "0.1-10"        "1.2.0"        "3.3.1"        "1.8.2"      "3.1-168" 
+    ##          vegan        permute            ape       phyloseq 
+    ##        "2.7-2"        "0.9-8"        "5.8-1"       "1.50.0"

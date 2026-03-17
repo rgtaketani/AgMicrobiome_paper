@@ -1,7 +1,7 @@
 Isolates Metabarcoding
 ================
 Rodrigo Taketani
-2026-02-02
+2026-03-17
 
 # Importing data
 
@@ -115,6 +115,8 @@ sample_metadata_iso <- merge(sample_data_iso, AgMicrobiome_RR, by = "Sample name
 
 library(dplyr)
 ```
+
+    ## Warning: package 'dplyr' was built under R version 4.4.3
 
     ## 
     ## Attaching package: 'dplyr'
@@ -719,6 +721,11 @@ First we prepare the data.
 
 ``` r
 library(tibble)
+```
+
+    ## Warning: package 'tibble' was built under R version 4.4.3
+
+``` r
 library(dplyr)
 # Extract the sample data
 sample_data_df <- data.frame(sample_data(physeq.norm.raref))
@@ -1262,32 +1269,84 @@ Then let’s start looking at the Shannon results.
 ``` r
 # Here I deficne a fuction to get letters from pairwise test 
 # Define the function
-generate_significant_letters <- function(p_values_matrix) {
-  
-  # Load necessary library for generating letters
+### This version is commented out because it does not order the letters according to the means, which can lead to confusion when interpreting the results. The version below remaps the letters so that "a" corresponds to the group with the highest mean, "b" to the next highest, and so on, which is more intuitive for readers.
+
+# generate_significant_letters <- function(p_values_matrix) {
+#   
+#   # Load necessary library for generating letters
+#   library(multcompView)
+#   
+#   # Get the location names
+#   
+#   location_names <- rownames(p_values_matrix)
+#   
+#   # Add a first row with NAs and the name of the first column
+#   first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
+#   #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+#   p_values_matrix <- rbind(first_row, p_values_matrix)
+#   rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+#   # Add a last column with NAs and the name of the last row
+#   p_values_matrix <- cbind(p_values_matrix, NA)
+#   colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+#   
+#   # Fill the diagonal with 1s to avoid issues with self-comparisons
+#   #diag(p_values_matrix) <- 1
+#   
+#   # Generate letters for the significant differences
+#   significant_letters <- multcompLetters(p_values_matrix)$Letters
+#   
+#   # Return the significant letters
+#   return(significant_letters)
+# }
+
+## This version remaps the letters so that "a" corresponds to the group with the highest mean, "b" to the next highest, and so on, which is more intuitive for readers.
+
+generate_significant_letters <- function(p_values_matrix, group_means) {
   library(multcompView)
   
-  # Get the location names
+  # Convert lower-triangular matrix to a named vector ("GroupA-GroupB" = p-value)
+  p_vec <- c()
+  for (i in seq_len(nrow(p_values_matrix))) {
+    for (j in seq_len(ncol(p_values_matrix))) {
+      if (!is.na(p_values_matrix[i, j])) {
+        pair_name <- paste(rownames(p_values_matrix)[i],
+                           colnames(p_values_matrix)[j],
+                           sep = "-")
+        p_vec[pair_name] <- p_values_matrix[i, j]
+      }
+    }
+  }
   
-  location_names <- rownames(p_values_matrix)
+  # Generate letters
+  significant_letters <- multcompLetters(p_vec)$Letters
   
-  # Add a first row with NAs and the name of the first column
-  first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
-  #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
-  p_values_matrix <- rbind(first_row, p_values_matrix)
-  rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
-  # Add a last column with NAs and the name of the last row
-  p_values_matrix <- cbind(p_values_matrix, NA)
-  colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+  # --- Remap so "a" = highest mean ---
+  aligned_means <- group_means[names(significant_letters)]
+  sorted_groups <- names(sort(aligned_means, decreasing = TRUE))
   
-  # Fill the diagonal with 1s to avoid issues with self-comparisons
-  #diag(p_values_matrix) <- 1
+  # Build a letter remapping by scanning groups from highest to lowest mean
+  seen       <- c()
+  letter_map <- c()
+  new_idx    <- 1
   
-  # Generate letters for the significant differences
-  significant_letters <- multcompLetters(p_values_matrix)$Letters
+  for (grp in sorted_groups) {
+    for (ch in strsplit(significant_letters[grp], "")[[1]]) {
+      if (!ch %in% seen) {
+        letter_map[ch] <- letters[new_idx]
+        seen  <- c(seen, ch)
+        new_idx <- new_idx + 1
+      }
+    }
+  }
   
-  # Return the significant letters
-  return(significant_letters)
+  # Apply remapping to all groups
+  new_letters <- sapply(significant_letters, function(s) {
+    chars <- strsplit(s, "")[[1]]
+    paste(sort(letter_map[chars]), collapse = "")
+  })
+  
+  names(new_letters) <- names(significant_letters)
+  return(new_letters)
 }
 ```
 
@@ -1343,19 +1402,25 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Shannon, 
+                      merged_sample_data_iso$Soil.Id, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Id = names(significant_letters), Letters = significant_letters)
 
 # Create a boxplot with letters
 library(ggplot2)
+```
+
+    ## Warning: package 'ggplot2' was built under R version 4.4.3
+
+``` r
 sha_loc_plot <- ggplot(merged_sample_data_iso, aes(x = Soil.Id, y = Shannon, fill = Soil.Id)) +
                         geom_boxplot() +
                         labs(x = "Location", y = "Shannon's H'") +
@@ -1427,14 +1492,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Shannon, 
+                      merged_sample_data_iso$Crop, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Crop = names(significant_letters), Letters = significant_letters)
 
@@ -1509,14 +1575,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Shannon, 
+                      merged_sample_data_iso$Textural.class, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Textural.class = names(significant_letters), Letters = significant_letters)
 
@@ -1673,14 +1740,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Sobs, 
+                      merged_sample_data_iso$Soil.Id, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Id = names(significant_letters), Letters = significant_letters)
 
@@ -1829,14 +1897,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Sobs, 
+                      merged_sample_data_iso$Crop, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Crop = names(significant_letters), Letters = significant_letters)
 
@@ -1911,14 +1980,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Sobs, 
+                      merged_sample_data_iso$Textural.class, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Textural.class = names(significant_letters), Letters = significant_letters)
 
@@ -2000,14 +2070,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Pielou, 
+                      merged_sample_data_iso$Soil.Id, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Id = names(significant_letters), Letters = significant_letters)
 
@@ -2089,14 +2160,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Pielou, 
+                      merged_sample_data_iso$Crop, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Crop = names(significant_letters), Letters = significant_letters)
 
@@ -2177,14 +2249,15 @@ print(pairwise_comparisons)
 ``` r
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
-```
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_iso$Pielou, 
+                      merged_sample_data_iso$Textural.class, 
+                      mean)
 
-    ## Warning in rbind(first_row, p_values_matrix): number of columns of result is
-    ## not a multiple of vector length (arg 1)
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
-``` r
+
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Textural.class = names(significant_letters), Letters = significant_letters)
 
@@ -2281,7 +2354,7 @@ plot_bar(phylGlommed, fill ="Phylum") +
     ## ℹ See also `vignette("ggplot2-in-packages")` for more information.
     ## ℹ The deprecated feature was likely used in the phyloseq package.
     ##   Please report the issue at <https://github.com/joey711/phyloseq/issues>.
-    ## This warning is displayed once every 8 hours.
+    ## This warning is displayed once per session.
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
 
@@ -2549,10 +2622,14 @@ taxa_plot_comb_isol <- (tax_plot_crop  + tax_plot_locat +  tax_plot_soil)
 library(tidyverse)
 ```
 
+    ## Warning: package 'tidyr' was built under R version 4.4.3
+
+    ## Warning: package 'purrr' was built under R version 4.4.3
+
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ forcats   1.0.1     ✔ readr     2.1.5
-    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.2
-    ## ✔ purrr     1.1.0     ✔ tidyr     1.3.1
+    ## ✔ lubridate 1.9.4     ✔ stringr   1.6.0
+    ## ✔ purrr     1.2.1     ✔ tidyr     1.3.2
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ nlme::collapse() masks dplyr::collapse()
     ## ✖ dplyr::filter()  masks stats::filter()
@@ -2771,43 +2848,46 @@ NMDS <- ordinate(physeq = physeq.norm.raref,
     ## Square root transformation
     ## Wisconsin double standardization
     ## Run 0 stress 0.3118237 
-    ## Run 1 stress 0.3122753 
-    ## ... Procrustes: rmse 0.01062647  max resid 0.1258497 
-    ## Run 2 stress 0.3120501 
-    ## ... Procrustes: rmse 0.01498661  max resid 0.139682 
-    ## Run 3 stress 0.3135155 
-    ## Run 4 stress 0.3123262 
-    ## Run 5 stress 0.312401 
-    ## Run 6 stress 0.3120343 
-    ## ... Procrustes: rmse 0.009758387  max resid 0.09353057 
-    ## Run 7 stress 0.3115798 
+    ## Run 1 stress 0.3120908 
+    ## ... Procrustes: rmse 0.02011072  max resid 0.1939051 
+    ## Run 2 stress 0.311941 
+    ## ... Procrustes: rmse 0.01734091  max resid 0.1690991 
+    ## Run 3 stress 0.3126407 
+    ## Run 4 stress 0.3143527 
+    ## Run 5 stress 0.3180684 
+    ## Run 6 stress 0.3115988 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.01593682  max resid 0.1942868 
-    ## Run 8 stress 0.3134509 
-    ## Run 9 stress 0.3122204 
-    ## Run 10 stress 0.3125242 
-    ## Run 11 stress 0.3119913 
-    ## ... Procrustes: rmse 0.0120463  max resid 0.1136684 
-    ## Run 12 stress 0.3262805 
-    ## Run 13 stress 0.3127822 
-    ## Run 14 stress 0.3124953 
-    ## Run 15 stress 0.3127472 
-    ## Run 16 stress 0.312542 
-    ## Run 17 stress 0.312312 
-    ## Run 18 stress 0.3164448 
-    ## Run 19 stress 0.3324717 
-    ## Run 20 stress 0.3116253 
-    ## ... Procrustes: rmse 0.009183876  max resid 0.08946551 
+    ## ... Procrustes: rmse 0.0161951  max resid 0.1668177 
+    ## Run 7 stress 0.3121767 
+    ## Run 8 stress 0.3116456 
+    ## ... Procrustes: rmse 0.004537174  max resid 0.04025376 
+    ## Run 9 stress 0.3120885 
+    ## ... Procrustes: rmse 0.016342  max resid 0.189646 
+    ## Run 10 stress 0.3122122 
+    ## Run 11 stress 0.3160819 
+    ## Run 12 stress 0.3124485 
+    ## Run 13 stress 0.3116342 
+    ## ... Procrustes: rmse 0.01111536  max resid 0.090132 
+    ## Run 14 stress 0.3133241 
+    ## Run 15 stress 0.3120538 
+    ## ... Procrustes: rmse 0.0180282  max resid 0.1910274 
+    ## Run 16 stress 0.3153595 
+    ## Run 17 stress 0.3124639 
+    ## Run 18 stress 0.31191 
+    ## ... Procrustes: rmse 0.01562088  max resid 0.2068425 
+    ## Run 19 stress 0.3130881 
+    ## Run 20 stress 0.3115603 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.013582  max resid 0.1905343 
     ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##      9: no. of iterations >= maxit
-    ##     10: stress ratio > sratmax
-    ##      1: scale factor of the gradient < sfgrmin
+    ##      6: no. of iterations >= maxit
+    ##     14: stress ratio > sratmax
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.3115798
+    ## [1] 0.3115603
 
 ``` r
 iso_bac_phylo_norm <- bac_phylo_norm
@@ -2817,7 +2897,7 @@ NMDS_plot_all <- plot_ordination(physeq = physeq.norm.raref,
                                    ordination = NMDS, 
                                    color = "Soil.Id", 
                                    shape = "Crop")+
-            geom_point(size = 2.5) +
+            geom_point(size = 2.5, alpha = 0.6)  +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
             scale_shape_manual(values = shapesvec, name = NULL, labels = labelsvec, limits = crop_order) +
             cowplot::theme_cowplot()
@@ -2851,11 +2931,17 @@ library(scales)
 ``` r
 # location
 
-NMDS_plot_loc <- plot_ordination(physeq = physeq.norm.raref, 
+p <- plot_ordination(physeq = physeq.norm.raref, 
                                    ordination = NMDS, 
                                    color = "Soil.Id" 
-                                   )+
-            geom_point(size = 3) +
+                                   ) 
+
+# Drop the first layer (the default geom_point added by plot_ordination)
+
+p$layers <- p$layers[-1]
+
+
+NMDS_plot_loc <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -2874,11 +2960,13 @@ NMDS_plot_loc
 ![](isolate_metabarcoding_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
-NMDS_plot_crop <- plot_ordination(physeq = physeq.norm.raref, 
+p <- plot_ordination(physeq = physeq.norm.raref, 
                                    ordination = NMDS, 
                                    color = "Crop" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+p$layers <- p$layers[-1]
+
+NMDS_plot_crop <- p + geom_point(size = 2.5, alpha = 0.6)  +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -2897,11 +2985,13 @@ NMDS_plot_crop
 ![](isolate_metabarcoding_files/figure-gfm/unnamed-chunk-23-2.png)<!-- -->
 
 ``` r
-NMDS_plot_soil <- plot_ordination(physeq = physeq.norm.raref, 
+p <- plot_ordination(physeq = physeq.norm.raref, 
                                    ordination = NMDS, 
                                    color = "Textural.class" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+p$layers <- p$layers[-1]
+
+NMDS_plot_soil <- p + geom_point(size = 2.5, alpha = 0.6)  +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -3029,27 +3119,27 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Crop)
 ```
 
     ##                  pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
-    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.022      0.462    
-    ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.002      0.042   .
+    ## 1      Barley vs Beans  1 0.6856281 1.840606 0.02562069   0.013      0.273    
+    ## 2       Barley vs Bulk  1 0.9552074 2.728453 0.03751562   0.003      0.063    
     ## 3       Barley vs Oats  1 0.9597603 2.867802 0.03935623   0.001      0.021   .
-    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.029      0.609    
+    ## 4        Barley vs OSR  1 0.6455047 1.835018 0.02554489   0.014      0.294    
     ## 5  Barley vs Sugarbeet  1 1.0274182 2.836481 0.03894314   0.001      0.021   .
     ## 6      Barley vs Wheat  1 1.2123773 3.297626 0.04498953   0.001      0.021   .
     ## 7        Beans vs Bulk  1 0.7246194 1.874812 0.02608441   0.010      0.210    
     ## 8        Beans vs Oats  1 0.9669703 2.605836 0.03589017   0.003      0.063    
-    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.200      1.000    
-    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.011      0.231    
-    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.016      0.336    
-    ## 12        Bulk vs Oats  1 0.9958593 2.856177 0.03920295   0.002      0.042   .
-    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.063      1.000    
+    ## 9         Beans vs OSR  1 0.4586258 1.181472 0.01659803   0.195      1.000    
+    ## 10  Beans vs Sugarbeet  1 0.7119660 1.786046 0.02488012   0.007      0.147    
+    ## 11      Beans vs Wheat  1 0.7240159 1.791840 0.02495882   0.014      0.294    
+    ## 12        Bulk vs Oats  1 0.9958593 2.856177 0.03920295   0.001      0.021   .
+    ## 13         Bulk vs OSR  1 0.5688145 1.555109 0.02173303   0.050      1.000    
     ## 14   Bulk vs Sugarbeet  1 1.0417453 2.769002 0.03805195   0.001      0.021   .
-    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.139      1.000    
-    ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.025      0.525    
+    ## 15       Bulk vs Wheat  1 0.4951335 1.297341 0.01819620   0.137      1.000    
+    ## 16         Oats vs OSR  1 0.6637814 1.894636 0.02635295   0.026      0.546    
     ## 17   Oats vs Sugarbeet  1 1.1792089 3.268379 0.04460831   0.001      0.021   .
-    ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.002      0.042   .
-    ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.001      0.021   .
-    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.024      0.504    
-    ## 21  Sugarbeet vs Wheat  1 0.8971419 2.278298 0.03152119   0.001      0.021   .
+    ## 18       Oats vs Wheat  1 0.9822283 2.682006 0.03690055   0.001      0.021   .
+    ## 19    OSR vs Sugarbeet  1 0.8613194 2.279250 0.03153395   0.004      0.084    
+    ## 20        OSR vs Wheat  1 0.6733693 1.756623 0.02448029   0.021      0.441    
+    ## 21  Sugarbeet vs Wheat  1 0.8971419 2.278298 0.03152119   0.002      0.042   .
 
 ``` r
 pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
@@ -3057,35 +3147,35 @@ pairwise.adonis(ps_dist_matrix, phyloseq::sample_data(ps_tr)$Soil.Id)
 
     ##             pairs Df SumsOfSqs  F.Model         R2 p.value p.adjusted sig
     ## 1  CL.BO vs CY.YO  1 1.1667592 3.175788 0.05554427   0.001      0.036   .
-    ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.002      0.072    
+    ## 2  CL.BO vs CL.YO  1 1.0156197 2.779001 0.04894418   0.003      0.108    
     ## 3  CL.BO vs CY.BU  1 1.5347727 4.169977 0.07168607   0.001      0.036   .
-    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.020      0.720    
-    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.047      1.000    
-    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.394      1.000    
+    ## 4  CL.BO vs SL.AN  1 0.6499922 1.951851 0.03488448   0.014      0.504    
+    ## 5  CL.BO vs SC.SH  1 0.5749972 1.596796 0.02872101   0.037      1.000    
+    ## 6  CL.BO vs SL.SH  1 0.3634982 1.024129 0.01861236   0.366      1.000    
     ## 7  CL.BO vs SC.HE  1 1.7967801 5.118486 0.08658013   0.001      0.036   .
-    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.027      0.972    
+    ## 8  CL.BO vs SL.BE  1 0.5688874 1.858573 0.03327283   0.032      1.000    
     ## 9  CY.YO vs CL.YO  1 1.4085635 3.719082 0.06443419   0.001      0.036   .
-    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.001      0.036   .
+    ## 10 CY.YO vs CY.BU  1 0.7812836 2.048836 0.03655448   0.003      0.108    
     ## 11 CY.YO vs SL.AN  1 1.4106260 4.073532 0.07014438   0.001      0.036   .
-    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.014      0.504    
+    ## 12 CY.YO vs SC.SH  1 0.6755874 1.809423 0.03242146   0.010      0.360    
     ## 13 CY.YO vs SL.SH  1 1.0940152 2.971160 0.05215201   0.001      0.036   .
     ## 14 CY.YO vs SC.HE  1 2.3438077 6.433468 0.10645539   0.001      0.036   .
     ## 15 CY.YO vs SL.BE  1 1.9278954 6.036639 0.10054925   0.001      0.036   .
     ## 16 CL.YO vs CY.BU  1 1.4205168 3.744109 0.06483967   0.001      0.036   .
     ## 17 CL.YO vs SL.AN  1 1.8628885 5.409701 0.09105754   0.001      0.036   .
     ## 18 CL.YO vs SC.SH  1 1.1195847 3.014159 0.05286686   0.001      0.036   .
-    ## 19 CL.YO vs SL.SH  1 0.8168638 2.230153 0.03966116   0.004      0.144    
+    ## 19 CL.YO vs SL.SH  1 0.8168638 2.230153 0.03966116   0.002      0.072    
     ## 20 CL.YO vs SC.HE  1 2.1798480 6.015285 0.10022921   0.001      0.036   .
     ## 21 CL.YO vs SL.BE  1 1.8418358 5.802232 0.09702367   0.001      0.036   .
     ## 22 CY.BU vs SL.AN  1 2.2559378 6.502168 0.10747001   0.001      0.036   .
-    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.002      0.072    
+    ## 23 CY.BU vs SC.SH  1 0.9461571 2.529611 0.04474842   0.001      0.036   .
     ## 24 CY.BU vs SL.SH  1 1.3368964 3.624279 0.06289499   0.001      0.036   .
     ## 25 CY.BU vs SC.HE  1 2.5964509 7.114037 0.11640594   0.001      0.036   .
     ## 26 CY.BU vs SL.BE  1 2.6298133 8.217482 0.13207673   0.001      0.036   .
     ## 27 SL.AN vs SC.SH  1 1.2334569 3.638592 0.06312771   0.001      0.036   .
-    ## 28 SL.AN vs SL.SH  1 1.0502440 3.146020 0.05505230   0.002      0.072    
+    ## 28 SL.AN vs SL.SH  1 1.0502440 3.146020 0.05505230   0.001      0.036   .
     ## 29 SL.AN vs SC.HE  1 2.2220943 6.734926 0.11089050   0.001      0.036   .
-    ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.002      0.072    
+    ## 30 SL.AN vs SL.BE  1 0.7774573 2.728046 0.04808990   0.004      0.144    
     ## 31 SC.SH vs SL.SH  1 0.5810170 1.609850 0.02894902   0.034      1.000    
     ## 32 SC.SH vs SC.HE  1 2.2214194 6.222167 0.10332021   0.001      0.036   .
     ## 33 SC.SH vs SL.BE  1 1.2358263 3.960120 0.06832491   0.001      0.036   .
@@ -4065,42 +4155,39 @@ NMDS <- ordinate(
 ```
 
     ## Run 0 stress 0.2000125 
-    ## Run 1 stress 0.2005581 
-    ## Run 2 stress 0.1997875 
+    ## Run 1 stress 0.203057 
+    ## Run 2 stress 0.2023327 
+    ## Run 3 stress 0.2025048 
+    ## Run 4 stress 0.2158231 
+    ## Run 5 stress 0.2028518 
+    ## Run 6 stress 0.202528 
+    ## Run 7 stress 0.2076746 
+    ## Run 8 stress 0.2031792 
+    ## Run 9 stress 0.200021 
+    ## ... Procrustes: rmse 0.003236261  max resid 0.05043539 
+    ## Run 10 stress 0.1996421 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.009309628  max resid 0.126699 
-    ## Run 3 stress 0.2159637 
-    ## Run 4 stress 0.1996425 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.004643324  max resid 0.05213965 
-    ## Run 5 stress 0.2024229 
-    ## Run 6 stress 0.2016831 
-    ## Run 7 stress 0.2050204 
-    ## Run 8 stress 0.200594 
-    ## Run 9 stress 0.2054942 
-    ## Run 10 stress 0.2025108 
-    ## Run 11 stress 0.2031257 
-    ## Run 12 stress 0.202159 
-    ## Run 13 stress 0.1999185 
-    ## ... Procrustes: rmse 0.009351023  max resid 0.1275827 
-    ## Run 14 stress 0.2020578 
-    ## Run 15 stress 0.2025055 
-    ## Run 16 stress 0.2024229 
-    ## Run 17 stress 0.2143739 
-    ## Run 18 stress 0.1997743 
-    ## ... Procrustes: rmse 0.008804359  max resid 0.1270066 
-    ## Run 19 stress 0.1997743 
-    ## ... Procrustes: rmse 0.008797283  max resid 0.1270254 
-    ## Run 20 stress 0.233697 
-    ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##     19: stress ratio > sratmax
-    ##      1: scale factor of the gradient < sfgrmin
+    ## ... Procrustes: rmse 0.01042874  max resid 0.1267949 
+    ## Run 11 stress 0.2029072 
+    ## Run 12 stress 0.2025275 
+    ## Run 13 stress 0.2005606 
+    ## Run 14 stress 0.2005764 
+    ## Run 15 stress 0.2004231 
+    ## Run 16 stress 0.1997607 
+    ## ... Procrustes: rmse 0.003360693  max resid 0.05064036 
+    ## Run 17 stress 0.1996425 
+    ## ... Procrustes: rmse 0.0001666184  max resid 0.001788118 
+    ## ... Similar to previous best
+    ## Run 18 stress 0.2055337 
+    ## Run 19 stress 0.205071 
+    ## Run 20 stress 0.2054495 
+    ## *** Best solution repeated 1 times
 
 ``` r
 NMDS$stress
 ```
 
-    ## [1] 0.1996425
+    ## [1] 0.1996421
 
 ``` r
 NMDS_plot_all <- plot_ordination(
@@ -4108,31 +4195,40 @@ NMDS_plot_all <- plot_ordination(
   ordination = NMDS, 
   color = "Soil.Id", 
   shape = "Crop"
-) +
-  geom_point(size = 3) +
+) 
+p + geom_point(size = 3) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
   scale_shape_manual(values = shapesvec, name = NULL, labels = labelsvec, limits = crop_order) +
   cowplot::theme_cowplot()
+```
 
+![](isolate_metabarcoding_files/figure-gfm/wUNifrac%20NMDS-1.png)<!-- -->
+
+``` r
 NMDS_plot_all
 ```
 
-    ## Warning: Removed 72 rows containing missing values or values outside the scale range
-    ## (`geom_point()`).
+    ## Warning: The shape palette can deal with a maximum of 6 discrete values because more
+    ## than 6 becomes difficult to discriminate
+    ## ℹ you have requested 7 values. Consider specifying shapes manually if you need
+    ##   that many of them.
 
-![](isolate_metabarcoding_files/figure-gfm/wUNifrac%20NMDS-1.png)<!-- -->
+![](isolate_metabarcoding_files/figure-gfm/wUNifrac%20NMDS-2.png)<!-- -->
 
 ``` r
 library(scales)
 
 ## === Location =====================================================
 
-NMDS_plot_loc <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm.raref, 
   ordination = NMDS, 
   color = "Soil.Id"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_loc <- p + geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -4149,12 +4245,15 @@ NMDS_plot_loc <- plot_ordination(
 
 ## === Crop =========================================================
 
-NMDS_plot_crop <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm.raref, 
   ordination = NMDS, 
   color = "Crop"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_crop <- p + geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -4171,12 +4270,15 @@ NMDS_plot_crop <- plot_ordination(
 
 ## === Textural.class =========================================================
 
-NMDS_plot_soil <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm.raref, 
   ordination = NMDS, 
   color = "Textural.class"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_soil <- p + geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -4352,7 +4454,7 @@ var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
 
 PCA_plot_loc_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Soil.Id)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4374,7 +4476,7 @@ PCA_plot_loc_aitchison
 ``` r
 PCA_plot_crop_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Crop)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4396,7 +4498,7 @@ PCA_plot_crop_aitchison
 ``` r
 PCA_plot_soil_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Textural.class)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec) +
@@ -4503,17 +4605,17 @@ umap_res <- umap(
 )
 ```
 
-    ## 11:17:09 UMAP embedding parameters a = 1.577 b = 0.8951
+    ## 11:48:29 UMAP embedding parameters a = 1.577 b = 0.8951
 
-    ## 11:17:09 Read 252 rows and found 50 numeric columns
+    ## 11:48:29 Read 252 rows and found 50 numeric columns
 
-    ## 11:17:09 Using FNN for neighbor search, n_neighbors = 50
+    ## 11:48:29 Using FNN for neighbor search, n_neighbors = 50
 
-    ## 11:17:09 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 50
-    ## 11:17:09 Initializing from normalized Laplacian + noise (using RSpectra)
-    ## 11:17:09 Commencing optimization for 500 epochs, with 19780 positive edges
-    ## 11:17:09 Using rng type: pcg
-    ## 11:17:10 Optimization finished
+    ## 11:48:29 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 50
+    ## 11:48:30 Initializing from normalized Laplacian + noise (using RSpectra)
+    ## 11:48:30 Commencing optimization for 500 epochs, with 19780 positive edges
+    ## 11:48:30 Using rng type: pcg
+    ## 11:48:30 Optimization finished
 
 ``` r
 # Add metadata into UMAP data frame
@@ -4527,7 +4629,7 @@ umap_df <- cbind(meta_df, umap_df)
 
 UMAP_plot_loc <- ggplot(umap_df, 
                         aes(x = UMAP1, y = UMAP2, color = Soil.Id)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4542,7 +4644,7 @@ UMAP_plot_loc <- ggplot(umap_df,
 
 UMAP_plot_crop <- ggplot(umap_df, 
                          aes(x = UMAP1, y = UMAP2, color = Crop)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -4557,7 +4659,7 @@ UMAP_plot_crop <- ggplot(umap_df,
 
 UMAP_plot_soil <- ggplot(umap_df, 
                          aes(x = UMAP1, y = UMAP2, color = Textural.class)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec) +
@@ -4696,30 +4798,380 @@ vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(bac_phylo)$Crop, d
     ## Permutation: free
     ## Number of permutations: 999
 
+## Alpha diversity with DivNet
+
+Because of the biases associated with rarefaction and the compositional
+nature of the data, we will use the DivNet package to calculate alpha
+diversity metrics.
+
+``` r
+# run alpha diversity metrics using DivNet package on the physeq.norm object.
+
+library(DivNet)
+```
+
+    ## Loading required package: breakaway
+
+``` r
+set.seed(123)
+
+# genus_phy <- tax_glom(bac_phylo, taxrank="Class") # we are using "Class" level because it is the deepest level we can detect taxa that is present in all samples, which is a requirement for DivNet.
+# divnet_res <- divnet(genus_phy, ncores = 6)
+# 
+# 
+# loc_divnet <- tax_glom(bac_phylo, taxrank="Class") %>%
+#     divnet(X = "Soil.Id", ncores = 8)
+# 
+# soil_divnet <- tax_glom(bac_phylo, taxrank="Class") %>%
+#     divnet(X = "Textural.class", ncores = 8)
+# 
+# crop_divnet <- tax_glom(bac_phylo, taxrank="Class") %>%
+#     divnet(X = "Crop", ncores = 8)
+# 
+# save(loc_divnet, soil_divnet, crop_divnet, genus_phy, divnet_res, file = "../Comparisons/cult_divnet.RData")
+load("../Comparisons/cult_divnet.RData")
+
+# Test for significant differences in alpha diversity metrics using DivNet's testDiversity function
+## location
+
+loc_test <- testDiversity(loc_divnet)
+```
+
+    ## Hypothesis testing:
+    ##   p-value for global test: 0
+
+``` r
+loc_test
+```
+
+    ##                  Estimates Standard Errors p-values
+    ## (Intercept)      1.0098357      0.02292901    0.000
+    ## predictorsCL.YO  0.1012243      0.02992493    0.001
+    ## predictorsCY.BU -0.2790388      0.03632590    0.000
+    ## predictorsCY.YO -0.5636009      0.02452010    0.000
+    ## predictorsSC.HE -0.1055374      0.02714317    0.000
+    ## predictorsSC.SH -0.3729721      0.02745051    0.000
+    ## predictorsSL.AN -0.2140034      0.03255994    0.000
+    ## predictorsSL.BE -0.3308934      0.03662298    0.000
+    ## predictorsSL.SH -0.2169173      0.02793810    0.000
+
+``` r
+summary(loc_test)
+```
+
+    ##    Estimates       Standard Errors      p-values        
+    ##  Min.   :-0.5636   Min.   :0.02293   Min.   :0.0000000  
+    ##  1st Qu.:-0.3309   1st Qu.:0.02714   1st Qu.:0.0000000  
+    ##  Median :-0.2169   Median :0.02794   Median :0.0000000  
+    ##  Mean   :-0.1080   Mean   :0.02949   Mean   :0.0001111  
+    ##  3rd Qu.:-0.1055   3rd Qu.:0.03256   3rd Qu.:0.0000000  
+    ##  Max.   : 1.0098   Max.   :0.03662   Max.   :0.0010000
+
+``` r
+library(magrittr)
+```
+
+    ## 
+    ## Attaching package: 'magrittr'
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     set_names
+
+    ## The following object is masked from 'package:tidyr':
+    ## 
+    ##     extract
+
+``` r
+estimates <- loc_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(loc_divnet$`shannon-variance`)
+X <- as.data.frame(sample_data(genus_phy)$"Soil.Id")
+colnames(X)[1] <- "X"
+# make df with estimates, ses and X
+df <- data.frame(estimates, ses, X)
+
+loc_betta <- betta(formula = estimates ~ X, ses = ses, data = df)
+loc_betta$table
+```
+
+    ##              Estimates Standard Errors p-values
+    ## (Intercept)  1.0098357      0.02292901    0.000
+    ## XCL.YO       0.1012243      0.02992493    0.001
+    ## XCY.BU      -0.2790388      0.03632590    0.000
+    ## XCY.YO      -0.5636009      0.02452010    0.000
+    ## XSC.HE      -0.1055374      0.02714317    0.000
+    ## XSC.SH      -0.3729721      0.02745051    0.000
+    ## XSL.AN      -0.2140034      0.03255994    0.000
+    ## XSL.BE      -0.3308934      0.03662298    0.000
+    ## XSL.SH      -0.2169173      0.02793810    0.000
+
+``` r
+loc_betta$global[2]
+```
+
+    ## [1] 0
+
+``` r
+loc_div_ph <- betta_posthoc(loc_betta, df, p_adjust_method = "BH")
+loc_div_letters <- loc_div_ph$cld
+loc_div_letters$cld # needs to be reordered by average estimates
+```
+
+    ## [1] "A"  "B"  "CD" "E"  "F"  "G"  "C"  "DG" "C"
+
+``` r
+loc_div_letters$cld <- c("b", "a", "de", "g", "c", "f", "d", "ef", "d")
+loc_div_letters <- loc_div_letters %>% dplyr::rename(Soil.Id = X)
+
+
+## Soil type
+
+estimates <- soil_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(soil_divnet$`shannon-variance`)
+X <- as.data.frame(sample_data(genus_phy)$"Textural.class")
+colnames(X)[1] <- "X"
+# make df with estimates, ses and X
+df <- data.frame(estimates, ses, X)
+
+soil_betta <- betta(formula = estimates ~ X, ses = ses, data = df)
+soil_betta$table
+```
+
+    ##                  Estimates Standard Errors p-values
+    ## (Intercept)      0.5751724      0.01392033        0
+    ## XClay loam       0.5390897      0.01907802        0
+    ## XSandy loam      0.1634843      0.01604401        0
+    ## XSilty clay loam 0.1614671      0.01652444        0
+
+``` r
+soil_betta$global[2]
+```
+
+    ## [1] 0
+
+``` r
+soil_div_ph <- betta_posthoc(soil_betta, df, p_adjust_method = "BH")
+soil_div_letters <- soil_div_ph$cld
+soil_div_letters$cld # needs to be reordered by average estimates
+```
+
+    ## [1] "A" "B" "C" "C"
+
+``` r
+soil_div_letters$cld <- c("d", "a", "c", "b")
+soil_div_letters <- soil_div_letters %>% dplyr::rename(Textural.class = X)
+
+soils_test <- testDiversity(soil_divnet)
+```
+
+    ## Hypothesis testing:
+    ##   p-value for global test: 0
+
+``` r
+soils_test
+```
+
+    ##                           Estimates Standard Errors p-values
+    ## (Intercept)               0.5751724      0.01392033        0
+    ## predictorsClay loam       0.5390897      0.01907802        0
+    ## predictorsSandy loam      0.1634843      0.01604401        0
+    ## predictorsSilty clay loam 0.1614671      0.01652444        0
+
+``` r
+summary(soils_test)
+```
+
+    ##    Estimates      Standard Errors      p-values
+    ##  Min.   :0.1615   Min.   :0.01392   Min.   :0  
+    ##  1st Qu.:0.1630   1st Qu.:0.01551   1st Qu.:0  
+    ##  Median :0.3513   Median :0.01628   Median :0  
+    ##  Mean   :0.3598   Mean   :0.01639   Mean   :0  
+    ##  3rd Qu.:0.5481   3rd Qu.:0.01716   3rd Qu.:0  
+    ##  Max.   :0.5752   Max.   :0.01908   Max.   :0
+
+``` r
+## Crop 
+
+
+estimates <- crop_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(crop_divnet$`shannon-variance`)
+X <- as.data.frame(sample_data(genus_phy)$"Crop")
+colnames(X)[1] <- "X"
+# make df with estimates, ses and X
+df <- data.frame(estimates, ses, X)
+
+crop_betta <- betta(formula = estimates ~ X, ses = ses, data = df)
+crop_betta$table
+```
+
+    ##             Estimates Standard Errors p-values
+    ## (Intercept) 0.5878072      0.02027163        0
+    ## XBeans      0.2302204      0.03198378        0
+    ## XBulk       0.3714355      0.02632325        0
+    ## XOats       0.1211758      0.02398806        0
+    ## XOSR        0.3653583      0.02355874        0
+    ## XSugarbeet  0.4394606      0.02663747        0
+    ## XWheat      0.2892615      0.03005571        0
+
+``` r
+crop_betta$global[2]
+```
+
+    ## [1] 0
+
+``` r
+crop_div_ph <- betta_posthoc(crop_betta, df, p_adjust_method = "BH")
+crop_div_letters <- crop_div_ph$cld
+crop_div_letters$cld # needs to be reordered by average estimates
+```
+
+    ## [1] "A" "B" "C" "C" "D" "E" "B"
+
+``` r
+crop_div_letters$cld <- c("f", "d", "b", "b", "e", "a", "c")
+crop_div_letters <- crop_div_letters %>% dplyr::rename(Crop = X)
+
+crop_test <- testDiversity(crop_divnet)
+```
+
+    ## Hypothesis testing:
+    ##   p-value for global test: 0
+
+``` r
+crop_test
+```
+
+    ##                     Estimates Standard Errors p-values
+    ## (Intercept)         0.5878072      0.02027163        0
+    ## predictorsBeans     0.2302204      0.03198378        0
+    ## predictorsBulk      0.3714355      0.02632325        0
+    ## predictorsOats      0.1211758      0.02398806        0
+    ## predictorsOSR       0.3653583      0.02355874        0
+    ## predictorsSugarbeet 0.4394606      0.02663747        0
+    ## predictorsWheat     0.2892615      0.03005571        0
+
+``` r
+summary(crop_test)
+```
+
+    ##    Estimates      Standard Errors      p-values
+    ##  Min.   :0.1212   Min.   :0.02027   Min.   :0  
+    ##  1st Qu.:0.2597   1st Qu.:0.02377   1st Qu.:0  
+    ##  Median :0.3654   Median :0.02632   Median :0  
+    ##  Mean   :0.3435   Mean   :0.02612   Mean   :0  
+    ##  3rd Qu.:0.4054   3rd Qu.:0.02835   3rd Qu.:0  
+    ##  Max.   :0.5878   Max.   :0.03198   Max.   :0
+
+``` r
+# Prep for plots
+
+shannon <- divnet_res$shannon %>% summary %$% estimate %>% as.data.frame
+# rename column . to Shannon
+colnames(shannon)[1] <- "Shannon"
+
+simpson <- divnet_res$simpson %>% summary %$% estimate %>% as.data.frame
+colnames(simpson)[1] <- "Simpson"
+
+divnet_alpha <- cbind(shannon, simpson) %>% rownames_to_column("SampleID")
+
+meta <- data.frame(sample_data(bac_phylo))
+divnet_alpha_iso <- merge(divnet_alpha, meta, by.x = "SampleID", by.y = "row.names")
+
+# Plot Shannon diversity by crop, soil and location
+
+DV_sha_crop_plot <- ggplot(divnet_alpha_iso, aes(x = Crop, y = Shannon, fill = Crop)) +
+                        geom_boxplot() +
+                        labs(x = "Crop", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = crop_div_letters,
+                                  aes(x = Crop,
+                                      y = max(divnet_alpha_iso$Shannon) + 0.05 * max(divnet_alpha_iso$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = crop_order) +
+                        theme(legend.position = "none")
+DV_sha_crop_plot
+```
+
+![](isolate_metabarcoding_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+
+``` r
+DV_sha_soil_plot <- ggplot(divnet_alpha_iso, aes(x = Textural.class, y = Shannon, fill = Textural.class)) +
+                        geom_boxplot() +
+                        labs(x = "Soil", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = soil_div_letters,
+                                  aes(x = Textural.class,
+                                      y = max(divnet_alpha_iso$Shannon) + 0.05 * max(divnet_alpha_iso$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec) +
+                        theme(legend.position = "none")
+DV_sha_soil_plot
+```
+
+![](isolate_metabarcoding_files/figure-gfm/unnamed-chunk-35-2.png)<!-- -->
+
+``` r
+DV_sha_loc_plot <- ggplot(divnet_alpha_iso, aes(x = Soil.Id, y = Shannon, fill = Soil.Id)) +
+                        geom_boxplot() +
+                        labs(x = "Location", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = loc_div_letters,
+                                  aes(x = Soil.Id,
+                                      y = max(divnet_alpha_iso$Shannon) + 0.05 * max(divnet_alpha_iso$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = local_order) +
+                        theme(legend.position = "none")
+DV_sha_loc_plot
+```
+
+![](isolate_metabarcoding_files/figure-gfm/unnamed-chunk-35-3.png)<!-- -->
+
+## Join plots
+
+``` r
+library(patchwork)
+combined_plot_iso <- (DV_sha_crop_plot + DV_sha_loc_plot +  DV_sha_soil_plot) + plot_annotation(tag_levels = 'A')
+combined_plot_iso
+```
+
+<img src="isolate_metabarcoding_files/figure-gfm/unnamed-chunk-36-1.png" style="display: block; margin: auto;" />
+
 # Export objects
 
 We will export some object to be used in other scripts down the line
 such as comparisons.
 
 ``` r
-save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, faith_combined_plot, faith_combined_plot2, nmds_plot_comb_wUniF, merged_pd_data,PCA_plot_comb_aitchison_cult, UMAP_plot_comb_cult, file = "../Comparisons/isolate_metabarcode_figs.RData")
+save(alpha_shannon_isolates, nmds_plot_comb_isolates, taxa_plot_comb_isol, merged_sample_data_iso, faith_combined_plot, faith_combined_plot2, nmds_plot_comb_wUniF, merged_pd_data,PCA_plot_comb_aitchison_cult, UMAP_plot_comb_cult, combined_plot_iso, divnet_alpha_iso, file = "../Comparisons/isolate_metabarcode_figs.RData")
 ```
 
 ``` r
 installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
-    ##           uwot         Matrix     microbiome        cowplot pairwiseAdonis 
-    ##        "0.2.4"        "1.7-4"       "1.28.0"        "1.2.0"        "0.4.1" 
-    ##        cluster         scales      lubridate        forcats        stringr 
-    ##      "2.1.8.1"        "1.4.0"        "1.9.4"        "1.0.1"        "1.5.2" 
-    ##          purrr          readr          tidyr      tidyverse   RColorBrewer 
-    ##        "1.1.0"        "2.1.5"        "1.3.1"        "2.0.0"        "1.1-3" 
-    ##      patchwork       multcomp        TH.data           MASS       survival 
-    ##        "1.3.2"       "1.4-29"        "1.1-4"       "7.3-65"        "3.8-3" 
-    ##        mvtnorm        ggplot2   multcompView         tibble        picante 
-    ##        "1.3-3"        "4.0.0"       "0.1-10"        "3.3.0"        "1.8.2" 
-    ##           nlme          vegan        permute            ape          dplyr 
-    ##      "3.1-168"        "2.7-2"        "0.9-8"        "5.8-1"        "1.1.4" 
-    ##       phyloseq 
-    ##       "1.50.0"
+    ##       magrittr         DivNet      breakaway           uwot         Matrix 
+    ##        "2.0.4"        "0.4.1"        "4.8.5"        "0.2.4"        "1.7-4" 
+    ##     microbiome        cowplot pairwiseAdonis        cluster         scales 
+    ##       "1.28.0"        "1.2.0"        "0.4.1"      "2.1.8.1"        "1.4.0" 
+    ##      lubridate        forcats        stringr          purrr          readr 
+    ##        "1.9.4"        "1.0.1"        "1.6.0"        "1.2.1"        "2.1.5" 
+    ##          tidyr      tidyverse   RColorBrewer      patchwork       multcomp 
+    ##        "1.3.2"        "2.0.0"        "1.1-3"        "1.3.2"       "1.4-29" 
+    ##        TH.data           MASS       survival        mvtnorm        ggplot2 
+    ##        "1.1-4"       "7.3-65"        "3.8-3"        "1.3-3"        "4.0.2" 
+    ##   multcompView         tibble        picante           nlme          vegan 
+    ##       "0.1-10"        "3.3.1"        "1.8.2"      "3.1-168"        "2.7-2" 
+    ##        permute            ape          dplyr       phyloseq 
+    ##        "0.9-8"        "5.8-1"        "1.2.0"       "1.50.0"

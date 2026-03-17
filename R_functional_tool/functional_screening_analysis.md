@@ -1,7 +1,7 @@
 PGPR screening analysis
 ================
 Rodrigo Taketani
-2025-09-16
+2026-02-02
 
 # Analysis of the Functional screening datadata
 
@@ -342,9 +342,9 @@ library(tidyverse)
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ forcats   1.0.0     ✔ readr     2.1.5
-    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.1
-    ## ✔ purrr     1.0.4     ✔ tibble    3.2.1
+    ## ✔ forcats   1.0.1     ✔ readr     2.1.5
+    ## ✔ lubridate 1.9.4     ✔ stringr   1.5.2
+    ## ✔ purrr     1.1.0     ✔ tibble    3.3.0
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -590,10 +590,6 @@ library(vegan)
 
     ## Loading required package: permute
 
-    ## Loading required package: lattice
-
-    ## This is vegan 2.6-8
-
 ``` r
 your_data <- posit_counts_table[,2:9]
 row.names(your_data) <- posit_counts_table$Plate
@@ -627,57 +623,40 @@ nmds_result <- metaMDS(bray_curtis_matrix, k = 2, trymax = 100)
 ```
 
     ## Run 0 stress 0.1764414 
-    ## Run 1 stress 0.1780764 
-    ## Run 2 stress 0.1764404 
+    ## Run 1 stress 0.1764337 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.0002371512  max resid 0.003085724 
+    ## ... Procrustes: rmse 0.0007279767  max resid 0.008368701 
     ## ... Similar to previous best
-    ## Run 3 stress 0.1762892 
+    ## Run 2 stress 0.178342 
+    ## Run 3 stress 0.177373 
+    ## Run 4 stress 0.1782123 
+    ## Run 5 stress 0.176608 
+    ## ... Procrustes: rmse 0.01339308  max resid 0.1353304 
+    ## Run 6 stress 0.1909119 
+    ## Run 7 stress 0.1784347 
+    ## Run 8 stress 0.1762928 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.009432103  max resid 0.1278895 
-    ## Run 4 stress 0.1785435 
-    ## Run 5 stress 0.1792306 
-    ## Run 6 stress 0.1764418 
-    ## ... Procrustes: rmse 0.009588752  max resid 0.1286317 
-    ## Run 7 stress 0.1835386 
-    ## Run 8 stress 0.1821611 
-    ## Run 9 stress 0.1764433 
-    ## ... Procrustes: rmse 0.009560978  max resid 0.1286402 
-    ## Run 10 stress 0.1813301 
-    ## Run 11 stress 0.1774453 
-    ## Run 12 stress 0.1881173 
-    ## Run 13 stress 0.1764409 
-    ## ... Procrustes: rmse 0.009465132  max resid 0.1277741 
-    ## Run 14 stress 0.1928684 
-    ## Run 15 stress 0.1764336 
-    ## ... Procrustes: rmse 0.009545955  max resid 0.128426 
-    ## Run 16 stress 0.1764008 
-    ## ... Procrustes: rmse 0.004378569  max resid 0.0441121 
-    ## Run 17 stress 0.1899149 
-    ## Run 18 stress 0.17649 
-    ## ... Procrustes: rmse 0.01003729  max resid 0.1290934 
-    ## Run 19 stress 0.1855325 
-    ## Run 20 stress 0.1766897 
-    ## ... Procrustes: rmse 0.006148425  max resid 0.0735826 
-    ## Run 21 stress 0.186798 
-    ## Run 22 stress 0.1763456 
-    ## ... Procrustes: rmse 0.002227561  max resid 0.03046127 
-    ## Run 23 stress 0.176402 
-    ## ... Procrustes: rmse 0.00450099  max resid 0.04417916 
-    ## Run 24 stress 0.1764423 
-    ## ... Procrustes: rmse 0.009633832  max resid 0.1289088 
-    ## Run 25 stress 0.2148677 
-    ## Run 26 stress 0.1931186 
-    ## Run 27 stress 0.182225 
-    ## Run 28 stress 0.1782332 
-    ## Run 29 stress 0.1859731 
-    ## Run 30 stress 0.1762746 
+    ## ... Procrustes: rmse 0.003556364  max resid 0.05394397 
+    ## Run 9 stress 0.1883914 
+    ## Run 10 stress 0.1787402 
+    ## Run 11 stress 0.19364 
+    ## Run 12 stress 0.1814681 
+    ## Run 13 stress 0.1876797 
+    ## Run 14 stress 0.177401 
+    ## Run 15 stress 0.1762659 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.00800633  max resid 0.1238179 
-    ## Run 31 stress 0.1824071 
-    ## Run 32 stress 0.1762746 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.0001935903  max resid 0.001615151 
+    ## ... Procrustes: rmse 0.009161606  max resid 0.1296872 
+    ## Run 16 stress 0.1802765 
+    ## Run 17 stress 0.2180846 
+    ## Run 18 stress 0.1773853 
+    ## Run 19 stress 0.1764039 
+    ## ... Procrustes: rmse 0.00321208  max resid 0.03957633 
+    ## Run 20 stress 0.188212 
+    ## Run 21 stress 0.4177084 
+    ## Run 22 stress 0.1811922 
+    ## Run 23 stress 0.1887449 
+    ## Run 24 stress 0.1762872 
+    ## ... Procrustes: rmse 0.0008205878  max resid 0.009383649 
     ## ... Similar to previous best
     ## *** Best solution repeated 1 times
 
@@ -685,7 +664,7 @@ nmds_result <- metaMDS(bray_curtis_matrix, k = 2, trymax = 100)
 nmds_result$stress
 ```
 
-    ## [1] 0.1762746
+    ## [1] 0.1762659
 
 ``` r
 # Extract NMDS coordinates
@@ -699,7 +678,7 @@ nmds_df$Cluster <- posit_counts_table$soil
 
 # Plot NMDS results
 p <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site, shape = Crop)) +
-  geom_point(size = 3) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_shape_manual(values = shapesvec) +
   labs(x = "NMDS1", y = "NMDS2") +
   ggtitle("NMDS Plot of Bray-Curtis Dissimilarity") +
@@ -722,7 +701,7 @@ print(p)
 
 ``` r
 q <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Cluster)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   labs(x = "NMDS1", y = "NMDS2") +
   #ggtitle("NMDS colored by soil type") +
   cowplot::theme_cowplot()+
@@ -742,7 +721,7 @@ print(q)
 
 ``` r
 r <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Crop)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   labs(x = "NMDS1", y = "NMDS2") +
   #ggtitle("NMDS colored by Crop") +
   cowplot::theme_cowplot()+
@@ -762,7 +741,7 @@ print(r)
 
 ``` r
 s <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   labs(x = "NMDS1", y = "NMDS2") +
   #ggtitle("NMDS colored by location") +
   cowplot::theme_cowplot()+
@@ -828,7 +807,7 @@ knitr::kable(as.data.frame(permanova_soil), digits = 4, caption = "PERMANOVA soi
 
 |          |  Df | SumOfSqs |     R2 |      F | Pr(\>F) |
 |:---------|----:|---------:|-------:|-------:|--------:|
-| Model    |   3 |   0.3987 | 0.0202 | 1.7532 |   0.036 |
+| Model    |   3 |   0.3987 | 0.0202 | 1.7532 |    0.05 |
 | Residual | 255 |  19.3281 | 0.9798 |     NA |      NA |
 | Total    | 258 |  19.7268 | 1.0000 |     NA |      NA |
 
@@ -867,17 +846,17 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Cluster)
 ```
 
     ##                           pairs Df  SumsOfSqs   F.Model          R2 p.value
-    ## 1             Clay loam vs Clay  1 0.16403167 2.2135582 0.019212654   0.049
-    ## 2       Clay loam vs Sandy loam  1 0.18988488 2.9537468 0.020518722   0.019
-    ## 3  Clay loam vs Silty clay loam  1 0.05402700 0.7933580 0.006971919   0.591
-    ## 4            Clay vs Sandy loam  1 0.22758732 2.7780939 0.019188634   0.017
-    ## 5       Clay vs Silty clay loam  1 0.02978465 0.3308179 0.002893515   0.885
-    ## 6 Sandy loam vs Silty clay loam  1 0.10274054 1.3317974 0.009291710   0.253
+    ## 1             Clay loam vs Clay  1 0.16403167 2.2135582 0.019212654   0.050
+    ## 2       Clay loam vs Sandy loam  1 0.18988488 2.9537468 0.020518722   0.020
+    ## 3  Clay loam vs Silty clay loam  1 0.05402700 0.7933580 0.006971919   0.576
+    ## 4            Clay vs Sandy loam  1 0.22758732 2.7780939 0.019188634   0.021
+    ## 5       Clay vs Silty clay loam  1 0.02978465 0.3308179 0.002893515   0.901
+    ## 6 Sandy loam vs Silty clay loam  1 0.10274054 1.3317974 0.009291710   0.243
     ##   p.adjusted sig
-    ## 1      0.294    
-    ## 2      0.114    
+    ## 1      0.300    
+    ## 2      0.120    
     ## 3      1.000    
-    ## 4      0.102    
+    ## 4      0.126    
     ## 5      1.000    
     ## 6      1.000
 
@@ -888,10 +867,10 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Crop)
     ##                  pairs Df SumsOfSqs   F.Model         R2 p.value p.adjusted sig
     ## 1      Barley vs Beans  1 0.7427921 12.400957 0.14869083   0.001      0.021   .
     ## 2       Barley vs Bulk  1 0.4096443  4.816374 0.06189409   0.001      0.021   .
-    ## 3       Barley vs Oats  1 0.2030935  5.349014 0.07098984   0.003      0.063    
+    ## 3       Barley vs Oats  1 0.2030935  5.349014 0.07098984   0.002      0.042   .
     ## 4        Barley vs OSR  1 0.7410985 17.417214 0.19924238   0.001      0.021   .
     ## 5  Barley vs Sugarbeet  1 1.2672775 31.243053 0.30859454   0.001      0.021   .
-    ## 6      Barley vs Wheat  1 0.2761753  3.798543 0.04946113   0.003      0.063    
+    ## 6      Barley vs Wheat  1 0.2761753  3.798543 0.04946113   0.001      0.021   .
     ## 7        Beans vs Bulk  1 0.8855519  9.490727 0.11367402   0.001      0.021   .
     ## 8        Beans vs Oats  1 0.7225195 15.296282 0.17725308   0.001      0.021   .
     ## 9         Beans vs OSR  1 0.4015103  7.758380 0.09850863   0.001      0.021   .
@@ -900,7 +879,7 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Crop)
     ## 12        Bulk vs Oats  1 0.5420221  7.451871 0.09262521   0.001      0.021   .
     ## 13         Bulk vs OSR  1 1.1374762 14.747620 0.16806861   0.001      0.021   .
     ## 14   Bulk vs Sugarbeet  1 1.4250620 18.944425 0.20604213   0.001      0.021   .
-    ## 15       Bulk vs Wheat  1 0.1614466  1.541552 0.01988033   0.172      1.000    
+    ## 15       Bulk vs Wheat  1 0.1614466  1.541552 0.01988033   0.193      1.000    
     ## 16         Oats vs OSR  1 0.5063738 17.046245 0.19582976   0.001      0.021   .
     ## 17   Oats vs Sugarbeet  1 1.0309253 37.193338 0.34697434   0.001      0.021   .
     ## 18       Oats vs Wheat  1 0.5659850  9.372237 0.11377908   0.001      0.021   .
@@ -913,42 +892,42 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Site)
 ```
 
     ##             pairs Df  SumsOfSqs   F.Model         R2 p.value p.adjusted sig
-    ## 1  CL.BO vs CY.YO  1 0.19197537 2.2018852 0.03719282   0.053      1.000    
-    ## 2  CL.BO vs CL.YO  1 0.08029842 1.5648661 0.02766498   0.186      1.000    
-    ## 3  CL.BO vs CY.BU  1 0.09261627 1.5267771 0.02700980   0.210      1.000    
-    ## 4  CL.BO vs SL.AN  1 0.28610824 3.7126141 0.06115062   0.008      0.288    
-    ## 5  CL.BO vs SC.SH  1 0.04889540 0.8917382 0.01595474   0.465      1.000    
-    ## 6  CL.BO vs SL.SH  1 0.08336418 1.6899257 0.02980998   0.158      1.000    
-    ## 7  CL.BO vs SC.HE  1 0.18628558 2.3560079 0.03969283   0.041      1.000    
-    ## 8  CL.BO vs SL.BE  1 0.04498811 0.7356358 0.01319866   0.591      1.000    
-    ## 9  CY.YO vs CL.YO  1 0.30292427 3.5850885 0.06016755   0.003      0.108    
-    ## 10 CY.YO vs CY.BU  1 0.22523375 2.4043734 0.04116770   0.028      1.000    
-    ## 11 CY.YO vs SL.AN  1 0.29015986 2.6703967 0.04401482   0.027      0.972    
-    ## 12 CY.YO vs SC.SH  1 0.28112851 3.1964196 0.05399684   0.007      0.252    
+    ## 1  CL.BO vs CY.YO  1 0.19197537 2.2018852 0.03719282   0.046      1.000    
+    ## 2  CL.BO vs CL.YO  1 0.08029842 1.5648661 0.02766498   0.175      1.000    
+    ## 3  CL.BO vs CY.BU  1 0.09261627 1.5267771 0.02700980   0.194      1.000    
+    ## 4  CL.BO vs SL.AN  1 0.28610824 3.7126141 0.06115062   0.015      0.540    
+    ## 5  CL.BO vs SC.SH  1 0.04889540 0.8917382 0.01595474   0.491      1.000    
+    ## 6  CL.BO vs SL.SH  1 0.08336418 1.6899257 0.02980998   0.160      1.000    
+    ## 7  CL.BO vs SC.HE  1 0.18628558 2.3560079 0.03969283   0.046      1.000    
+    ## 8  CL.BO vs SL.BE  1 0.04498811 0.7356358 0.01319866   0.595      1.000    
+    ## 9  CY.YO vs CL.YO  1 0.30292427 3.5850885 0.06016755   0.004      0.144    
+    ## 10 CY.YO vs CY.BU  1 0.22523375 2.4043734 0.04116770   0.034      1.000    
+    ## 11 CY.YO vs SL.AN  1 0.29015986 2.6703967 0.04401482   0.021      0.756    
+    ## 12 CY.YO vs SC.SH  1 0.28112851 3.1964196 0.05399684   0.010      0.360    
     ## 13 CY.YO vs SL.SH  1 0.30248955 3.6644155 0.06141710   0.004      0.144    
-    ## 14 CY.YO vs SC.HE  1 0.15032416 1.3588268 0.02289174   0.239      1.000    
-    ## 15 CY.YO vs SL.BE  1 0.26939563 2.8609807 0.04860573   0.006      0.216    
-    ## 16 CL.YO vs CY.BU  1 0.03899987 0.6796866 0.01243033   0.576      1.000    
-    ## 17 CL.YO vs SL.AN  1 0.21656808 2.9190278 0.04954304   0.034      1.000    
-    ## 18 CL.YO vs SC.SH  1 0.13390799 2.6031115 0.04598884   0.033      1.000    
-    ## 19 CL.YO vs SL.SH  1 0.15756897 3.4375069 0.05984777   0.010      0.360    
-    ## 20 CL.YO vs SC.HE  1 0.14505730 1.9028364 0.03286258   0.076      1.000    
+    ## 14 CY.YO vs SC.HE  1 0.15032416 1.3588268 0.02289174   0.238      1.000    
+    ## 15 CY.YO vs SL.BE  1 0.26939563 2.8609807 0.04860573   0.007      0.252    
+    ## 16 CL.YO vs CY.BU  1 0.03899987 0.6796866 0.01243033   0.596      1.000    
+    ## 17 CL.YO vs SL.AN  1 0.21656808 2.9190278 0.04954304   0.022      0.792    
+    ## 18 CL.YO vs SC.SH  1 0.13390799 2.6031115 0.04598884   0.042      1.000    
+    ## 19 CL.YO vs SL.SH  1 0.15756897 3.4375069 0.05984777   0.009      0.324    
+    ## 20 CL.YO vs SC.HE  1 0.14505730 1.9028364 0.03286258   0.092      1.000    
     ## 21 CL.YO vs SL.BE  1 0.08195529 1.4158914 0.02555028   0.229      1.000    
-    ## 22 CY.BU vs SL.AN  1 0.13138230 1.5758389 0.02736979   0.167      1.000    
-    ## 23 CY.BU vs SC.SH  1 0.07971616 1.3076235 0.02364274   0.279      1.000    
-    ## 24 CY.BU vs SL.SH  1 0.12920718 2.3339756 0.04143105   0.079      1.000    
-    ## 25 CY.BU vs SC.HE  1 0.10136866 1.1868030 0.02075309   0.329      1.000    
-    ## 26 CY.BU vs SL.BE  1 0.05539642 0.8218616 0.01499149   0.533      1.000    
-    ## 27 SL.AN vs SC.SH  1 0.23019788 2.9646605 0.05027860   0.028      1.000    
-    ## 28 SL.AN vs SL.SH  1 0.17853636 2.4712945 0.04226509   0.057      1.000    
-    ## 29 SL.AN vs SC.HE  1 0.22283156 2.2132779 0.03675731   0.073      1.000    
-    ## 30 SL.AN vs SL.BE  1 0.20339043 2.4254083 0.04151290   0.059      1.000    
-    ## 31 SC.SH vs SL.SH  1 0.06970236 1.4103629 0.02545305   0.197      1.000    
+    ## 22 CY.BU vs SL.AN  1 0.13138230 1.5758389 0.02736979   0.207      1.000    
+    ## 23 CY.BU vs SC.SH  1 0.07971616 1.3076235 0.02364274   0.251      1.000    
+    ## 24 CY.BU vs SL.SH  1 0.12920718 2.3339756 0.04143105   0.091      1.000    
+    ## 25 CY.BU vs SC.HE  1 0.10136866 1.1868030 0.02075309   0.318      1.000    
+    ## 26 CY.BU vs SL.BE  1 0.05539642 0.8218616 0.01499149   0.527      1.000    
+    ## 27 SL.AN vs SC.SH  1 0.23019788 2.9646605 0.05027860   0.031      1.000    
+    ## 28 SL.AN vs SL.SH  1 0.17853636 2.4712945 0.04226509   0.048      1.000    
+    ## 29 SL.AN vs SC.HE  1 0.22283156 2.2132779 0.03675731   0.066      1.000    
+    ## 30 SL.AN vs SL.BE  1 0.20339043 2.4254083 0.04151290   0.073      1.000    
+    ## 31 SC.SH vs SL.SH  1 0.06970236 1.4103629 0.02545305   0.240      1.000    
     ## 32 SC.SH vs SC.HE  1 0.33016919 4.1432950 0.06889039   0.002      0.072    
-    ## 33 SC.SH vs SL.BE  1 0.03556159 0.5785582 0.01060047   0.701      1.000    
-    ## 34 SL.SH vs SC.HE  1 0.27941272 3.7613940 0.06294020   0.003      0.108    
-    ## 35 SL.SH vs SL.BE  1 0.03851665 0.6894897 0.01260735   0.611      1.000    
-    ## 36 SC.HE vs SL.BE  1 0.18554013 2.1599923 0.03713880   0.064      1.000
+    ## 33 SC.SH vs SL.BE  1 0.03556159 0.5785582 0.01060047   0.715      1.000    
+    ## 34 SL.SH vs SC.HE  1 0.27941272 3.7613940 0.06294020   0.002      0.072    
+    ## 35 SL.SH vs SL.BE  1 0.03851665 0.6894897 0.01260735   0.607      1.000    
+    ## 36 SC.HE vs SL.BE  1 0.18554013 2.1599923 0.03713880   0.049      1.000
 
 # PERMDIST
 
@@ -1003,17 +982,17 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Cluster)
 ```
 
     ##                           pairs Df  SumsOfSqs   F.Model          R2 p.value
-    ## 1             Clay loam vs Clay  1 0.16403167 2.2135582 0.019212654   0.042
-    ## 2       Clay loam vs Sandy loam  1 0.18988488 2.9537468 0.020518722   0.017
-    ## 3  Clay loam vs Silty clay loam  1 0.05402700 0.7933580 0.006971919   0.557
-    ## 4            Clay vs Sandy loam  1 0.22758732 2.7780939 0.019188634   0.023
-    ## 5       Clay vs Silty clay loam  1 0.02978465 0.3308179 0.002893515   0.889
-    ## 6 Sandy loam vs Silty clay loam  1 0.10274054 1.3317974 0.009291710   0.251
+    ## 1             Clay loam vs Clay  1 0.16403167 2.2135582 0.019212654   0.052
+    ## 2       Clay loam vs Sandy loam  1 0.18988488 2.9537468 0.020518722   0.029
+    ## 3  Clay loam vs Silty clay loam  1 0.05402700 0.7933580 0.006971919   0.577
+    ## 4            Clay vs Sandy loam  1 0.22758732 2.7780939 0.019188634   0.019
+    ## 5       Clay vs Silty clay loam  1 0.02978465 0.3308179 0.002893515   0.918
+    ## 6 Sandy loam vs Silty clay loam  1 0.10274054 1.3317974 0.009291710   0.272
     ##   p.adjusted sig
-    ## 1      0.252    
-    ## 2      0.102    
+    ## 1      0.312    
+    ## 2      0.174    
     ## 3      1.000    
-    ## 4      0.138    
+    ## 4      0.114    
     ## 5      1.000    
     ## 6      1.000
 
@@ -1023,11 +1002,11 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Crop)
 
     ##                  pairs Df SumsOfSqs   F.Model         R2 p.value p.adjusted sig
     ## 1      Barley vs Beans  1 0.7427921 12.400957 0.14869083   0.001      0.021   .
-    ## 2       Barley vs Bulk  1 0.4096443  4.816374 0.06189409   0.001      0.021   .
-    ## 3       Barley vs Oats  1 0.2030935  5.349014 0.07098984   0.001      0.021   .
+    ## 2       Barley vs Bulk  1 0.4096443  4.816374 0.06189409   0.002      0.042   .
+    ## 3       Barley vs Oats  1 0.2030935  5.349014 0.07098984   0.002      0.042   .
     ## 4        Barley vs OSR  1 0.7410985 17.417214 0.19924238   0.001      0.021   .
     ## 5  Barley vs Sugarbeet  1 1.2672775 31.243053 0.30859454   0.001      0.021   .
-    ## 6      Barley vs Wheat  1 0.2761753  3.798543 0.04946113   0.004      0.084    
+    ## 6      Barley vs Wheat  1 0.2761753  3.798543 0.04946113   0.002      0.042   .
     ## 7        Beans vs Bulk  1 0.8855519  9.490727 0.11367402   0.001      0.021   .
     ## 8        Beans vs Oats  1 0.7225195 15.296282 0.17725308   0.001      0.021   .
     ## 9         Beans vs OSR  1 0.4015103  7.758380 0.09850863   0.001      0.021   .
@@ -1036,11 +1015,11 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Crop)
     ## 12        Bulk vs Oats  1 0.5420221  7.451871 0.09262521   0.001      0.021   .
     ## 13         Bulk vs OSR  1 1.1374762 14.747620 0.16806861   0.001      0.021   .
     ## 14   Bulk vs Sugarbeet  1 1.4250620 18.944425 0.20604213   0.001      0.021   .
-    ## 15       Bulk vs Wheat  1 0.1614466  1.541552 0.01988033   0.168      1.000    
+    ## 15       Bulk vs Wheat  1 0.1614466  1.541552 0.01988033   0.176      1.000    
     ## 16         Oats vs OSR  1 0.5063738 17.046245 0.19582976   0.001      0.021   .
     ## 17   Oats vs Sugarbeet  1 1.0309253 37.193338 0.34697434   0.001      0.021   .
     ## 18       Oats vs Wheat  1 0.5659850  9.372237 0.11377908   0.001      0.021   .
-    ## 19    OSR vs Sugarbeet  1 0.1921824  5.950032 0.07834141   0.003      0.063    
+    ## 19    OSR vs Sugarbeet  1 0.1921824  5.950032 0.07834141   0.001      0.021   .
     ## 20        OSR vs Wheat  1 1.2118015 18.705655 0.20397493   0.001      0.021   .
     ## 21  Sugarbeet vs Wheat  1 1.5561109 24.748709 0.25318707   0.001      0.021   .
 
@@ -1049,42 +1028,42 @@ pairwise.adonis(bray_curtis_matrix, pcoa_df$Site)
 ```
 
     ##             pairs Df  SumsOfSqs   F.Model         R2 p.value p.adjusted sig
-    ## 1  CL.BO vs CY.YO  1 0.19197537 2.2018852 0.03719282   0.056      1.000    
-    ## 2  CL.BO vs CL.YO  1 0.08029842 1.5648661 0.02766498   0.177      1.000    
-    ## 3  CL.BO vs CY.BU  1 0.09261627 1.5267771 0.02700980   0.210      1.000    
-    ## 4  CL.BO vs SL.AN  1 0.28610824 3.7126141 0.06115062   0.010      0.360    
-    ## 5  CL.BO vs SC.SH  1 0.04889540 0.8917382 0.01595474   0.483      1.000    
-    ## 6  CL.BO vs SL.SH  1 0.08336418 1.6899257 0.02980998   0.162      1.000    
-    ## 7  CL.BO vs SC.HE  1 0.18628558 2.3560079 0.03969283   0.052      1.000    
-    ## 8  CL.BO vs SL.BE  1 0.04498811 0.7356358 0.01319866   0.574      1.000    
+    ## 1  CL.BO vs CY.YO  1 0.19197537 2.2018852 0.03719282   0.047      1.000    
+    ## 2  CL.BO vs CL.YO  1 0.08029842 1.5648661 0.02766498   0.183      1.000    
+    ## 3  CL.BO vs CY.BU  1 0.09261627 1.5267771 0.02700980   0.179      1.000    
+    ## 4  CL.BO vs SL.AN  1 0.28610824 3.7126141 0.06115062   0.012      0.432    
+    ## 5  CL.BO vs SC.SH  1 0.04889540 0.8917382 0.01595474   0.457      1.000    
+    ## 6  CL.BO vs SL.SH  1 0.08336418 1.6899257 0.02980998   0.150      1.000    
+    ## 7  CL.BO vs SC.HE  1 0.18628558 2.3560079 0.03969283   0.044      1.000    
+    ## 8  CL.BO vs SL.BE  1 0.04498811 0.7356358 0.01319866   0.609      1.000    
     ## 9  CY.YO vs CL.YO  1 0.30292427 3.5850885 0.06016755   0.002      0.072    
-    ## 10 CY.YO vs CY.BU  1 0.22523375 2.4043734 0.04116770   0.028      1.000    
-    ## 11 CY.YO vs SL.AN  1 0.29015986 2.6703967 0.04401482   0.031      1.000    
-    ## 12 CY.YO vs SC.SH  1 0.28112851 3.1964196 0.05399684   0.006      0.216    
-    ## 13 CY.YO vs SL.SH  1 0.30248955 3.6644155 0.06141710   0.001      0.036   .
-    ## 14 CY.YO vs SC.HE  1 0.15032416 1.3588268 0.02289174   0.219      1.000    
-    ## 15 CY.YO vs SL.BE  1 0.26939563 2.8609807 0.04860573   0.009      0.324    
-    ## 16 CL.YO vs CY.BU  1 0.03899987 0.6796866 0.01243033   0.575      1.000    
-    ## 17 CL.YO vs SL.AN  1 0.21656808 2.9190278 0.04954304   0.023      0.828    
-    ## 18 CL.YO vs SC.SH  1 0.13390799 2.6031115 0.04598884   0.028      1.000    
-    ## 19 CL.YO vs SL.SH  1 0.15756897 3.4375069 0.05984777   0.010      0.360    
-    ## 20 CL.YO vs SC.HE  1 0.14505730 1.9028364 0.03286258   0.081      1.000    
-    ## 21 CL.YO vs SL.BE  1 0.08195529 1.4158914 0.02555028   0.233      1.000    
-    ## 22 CY.BU vs SL.AN  1 0.13138230 1.5758389 0.02736979   0.195      1.000    
-    ## 23 CY.BU vs SC.SH  1 0.07971616 1.3076235 0.02364274   0.248      1.000    
-    ## 24 CY.BU vs SL.SH  1 0.12920718 2.3339756 0.04143105   0.091      1.000    
-    ## 25 CY.BU vs SC.HE  1 0.10136866 1.1868030 0.02075309   0.327      1.000    
-    ## 26 CY.BU vs SL.BE  1 0.05539642 0.8218616 0.01499149   0.512      1.000    
-    ## 27 SL.AN vs SC.SH  1 0.23019788 2.9646605 0.05027860   0.028      1.000    
-    ## 28 SL.AN vs SL.SH  1 0.17853636 2.4712945 0.04226509   0.076      1.000    
-    ## 29 SL.AN vs SC.HE  1 0.22283156 2.2132779 0.03675731   0.070      1.000    
-    ## 30 SL.AN vs SL.BE  1 0.20339043 2.4254083 0.04151290   0.061      1.000    
-    ## 31 SC.SH vs SL.SH  1 0.06970236 1.4103629 0.02545305   0.217      1.000    
+    ## 10 CY.YO vs CY.BU  1 0.22523375 2.4043734 0.04116770   0.029      1.000    
+    ## 11 CY.YO vs SL.AN  1 0.29015986 2.6703967 0.04401482   0.025      0.900    
+    ## 12 CY.YO vs SC.SH  1 0.28112851 3.1964196 0.05399684   0.011      0.396    
+    ## 13 CY.YO vs SL.SH  1 0.30248955 3.6644155 0.06141710   0.002      0.072    
+    ## 14 CY.YO vs SC.HE  1 0.15032416 1.3588268 0.02289174   0.226      1.000    
+    ## 15 CY.YO vs SL.BE  1 0.26939563 2.8609807 0.04860573   0.010      0.360    
+    ## 16 CL.YO vs CY.BU  1 0.03899987 0.6796866 0.01243033   0.561      1.000    
+    ## 17 CL.YO vs SL.AN  1 0.21656808 2.9190278 0.04954304   0.030      1.000    
+    ## 18 CL.YO vs SC.SH  1 0.13390799 2.6031115 0.04598884   0.032      1.000    
+    ## 19 CL.YO vs SL.SH  1 0.15756897 3.4375069 0.05984777   0.017      0.612    
+    ## 20 CL.YO vs SC.HE  1 0.14505730 1.9028364 0.03286258   0.078      1.000    
+    ## 21 CL.YO vs SL.BE  1 0.08195529 1.4158914 0.02555028   0.229      1.000    
+    ## 22 CY.BU vs SL.AN  1 0.13138230 1.5758389 0.02736979   0.201      1.000    
+    ## 23 CY.BU vs SC.SH  1 0.07971616 1.3076235 0.02364274   0.271      1.000    
+    ## 24 CY.BU vs SL.SH  1 0.12920718 2.3339756 0.04143105   0.082      1.000    
+    ## 25 CY.BU vs SC.HE  1 0.10136866 1.1868030 0.02075309   0.322      1.000    
+    ## 26 CY.BU vs SL.BE  1 0.05539642 0.8218616 0.01499149   0.541      1.000    
+    ## 27 SL.AN vs SC.SH  1 0.23019788 2.9646605 0.05027860   0.027      0.972    
+    ## 28 SL.AN vs SL.SH  1 0.17853636 2.4712945 0.04226509   0.060      1.000    
+    ## 29 SL.AN vs SC.HE  1 0.22283156 2.2132779 0.03675731   0.074      1.000    
+    ## 30 SL.AN vs SL.BE  1 0.20339043 2.4254083 0.04151290   0.065      1.000    
+    ## 31 SC.SH vs SL.SH  1 0.06970236 1.4103629 0.02545305   0.231      1.000    
     ## 32 SC.SH vs SC.HE  1 0.33016919 4.1432950 0.06889039   0.003      0.108    
-    ## 33 SC.SH vs SL.BE  1 0.03556159 0.5785582 0.01060047   0.714      1.000    
-    ## 34 SL.SH vs SC.HE  1 0.27941272 3.7613940 0.06294020   0.004      0.144    
+    ## 33 SC.SH vs SL.BE  1 0.03556159 0.5785582 0.01060047   0.692      1.000    
+    ## 34 SL.SH vs SC.HE  1 0.27941272 3.7613940 0.06294020   0.003      0.108    
     ## 35 SL.SH vs SL.BE  1 0.03851665 0.6894897 0.01260735   0.608      1.000    
-    ## 36 SC.HE vs SL.BE  1 0.18554013 2.1599923 0.03713880   0.064      1.000
+    ## 36 SC.HE vs SL.BE  1 0.18554013 2.1599923 0.03713880   0.047      1.000
 
 Because the PERMDIST test indicated that the dispersal of the samples is
 significant as were the PERMANOVA tests we cannot affirm that the are
@@ -1107,7 +1086,7 @@ vegan::anosim(bray_curtis_matrix, pcoa_df$Cluster, distance = "bray", permutatio
     ## Dissimilarity: bray 
     ## 
     ## ANOSIM statistic R: 0.008761 
-    ##       Significance: 0.209 
+    ##       Significance: 0.218 
     ## 
     ## Permutation: free
     ## Number of permutations: 999
@@ -1153,10 +1132,10 @@ installed.packages()[names(sessionInfo()$otherPkgs), "Version"]
 ```
 
     ## pairwiseAdonis        cluster      patchwork         scales          vegan 
-    ##        "0.4.1"        "2.1.7"        "1.3.2"        "1.4.0"        "2.6-8" 
-    ##        lattice        permute         ggpubr   multcompView      lubridate 
-    ##       "0.22-6"        "0.9-7"        "0.6.0"       "0.1-10"        "1.9.4" 
-    ##        forcats        stringr          purrr          readr         tibble 
-    ##        "1.0.0"        "1.5.1"        "1.0.4"        "2.1.5"        "3.2.1" 
-    ##      tidyverse   RColorBrewer          tidyr        ggplot2          dplyr 
-    ##        "2.0.0"        "1.1-3"        "1.3.1"        "4.0.0"        "1.1.4"
+    ##        "0.4.1"      "2.1.8.1"        "1.3.2"        "1.4.0"        "2.7-2" 
+    ##        permute         ggpubr   multcompView      lubridate        forcats 
+    ##        "0.9-8"        "0.6.2"       "0.1-10"        "1.9.4"        "1.0.1" 
+    ##        stringr          purrr          readr         tibble      tidyverse 
+    ##        "1.5.2"        "1.1.0"        "2.1.5"        "3.3.0"        "2.0.0" 
+    ##   RColorBrewer          tidyr        ggplot2          dplyr 
+    ##        "1.1-3"        "1.3.1"        "4.0.0"        "1.1.4"

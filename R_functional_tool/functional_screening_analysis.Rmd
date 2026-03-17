@@ -529,7 +529,7 @@ nmds_df$Cluster <- posit_counts_table$soil
 
 # Plot NMDS results
 p <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site, shape = Crop)) +
-  geom_point(size = 3) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   scale_shape_manual(values = shapesvec) +
   labs(x = "NMDS1", y = "NMDS2") +
   ggtitle("NMDS Plot of Bray-Curtis Dissimilarity") +
@@ -545,7 +545,7 @@ p <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site, shape = Crop)) +
 print(p)
 
 q <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Cluster)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   labs(x = "NMDS1", y = "NMDS2") +
   #ggtitle("NMDS colored by soil type") +
   cowplot::theme_cowplot()+
@@ -561,7 +561,7 @@ q <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Cluster)) +
 print(q)
 
 r <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Crop)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   labs(x = "NMDS1", y = "NMDS2") +
   #ggtitle("NMDS colored by Crop") +
   cowplot::theme_cowplot()+
@@ -578,7 +578,7 @@ print(r)
 
 
 s <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = Site)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6)  +
   labs(x = "NMDS1", y = "NMDS2") +
   #ggtitle("NMDS colored by location") +
   cowplot::theme_cowplot()+

@@ -295,8 +295,6 @@ diversity_table <- data.frame(
   Pielou = pielou_evenness
 )
 
-# Print the diversity table
-print(diversity_table)
 
 ```
 
@@ -372,32 +370,85 @@ Then let's start looking at the Shannon results.
 
 # Here I deficne a fuction to get letters from pairwise test 
 # Define the function
-generate_significant_letters <- function(p_values_matrix) {
-  
-  # Load necessary library for generating letters
+
+### This version is commented out because it does not order the letters according to the means, which can lead to confusion when interpreting the results. The version below remaps the letters so that "a" corresponds to the group with the highest mean, "b" to the next highest, and so on, which is more intuitive for readers.
+
+# generate_significant_letters <- function(p_values_matrix) {
+#   
+#   # Load necessary library for generating letters
+#   library(multcompView)
+#   
+#   # Get the location names
+#   
+#   location_names <- rownames(p_values_matrix)
+#   
+#   # Add a first row with NAs and the name of the first column
+#   first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
+#   #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+#   p_values_matrix <- rbind(first_row, p_values_matrix)
+#   rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
+#   # Add a last column with NAs and the name of the last row
+#   p_values_matrix <- cbind(p_values_matrix, NA)
+#   colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+#   
+#   # Fill the diagonal with 1s to avoid issues with self-comparisons
+#   #diag(p_values_matrix) <- 1
+#   
+#   # Generate letters for the significant differences
+#   significant_letters <- multcompLetters(p_values_matrix)$Letters
+#   
+#   # Return the significant letters
+#   return(significant_letters)
+# }
+
+## This version remaps the letters so that "a" corresponds to the group with the highest mean, "b" to the next highest, and so on, which is more intuitive for readers.
+
+generate_significant_letters <- function(p_values_matrix, group_means) {
   library(multcompView)
   
-  # Get the location names
+  # Convert lower-triangular matrix to a named vector ("GroupA-GroupB" = p-value)
+  p_vec <- c()
+  for (i in seq_len(nrow(p_values_matrix))) {
+    for (j in seq_len(ncol(p_values_matrix))) {
+      if (!is.na(p_values_matrix[i, j])) {
+        pair_name <- paste(rownames(p_values_matrix)[i],
+                           colnames(p_values_matrix)[j],
+                           sep = "-")
+        p_vec[pair_name] <- p_values_matrix[i, j]
+      }
+    }
+  }
   
-  location_names <- rownames(p_values_matrix)
+  # Generate letters
+  significant_letters <- multcompLetters(p_vec)$Letters
   
-  # Add a first row with NAs and the name of the first column
-  first_row <- c(NA, rep(NA, ncol(p_values_matrix)))
-  #rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
-  p_values_matrix <- rbind(first_row, p_values_matrix)
-  rownames(p_values_matrix)[1] <- colnames(p_values_matrix)[1]
-  # Add a last column with NAs and the name of the last row
-  p_values_matrix <- cbind(p_values_matrix, NA)
-  colnames(p_values_matrix)[ncol(p_values_matrix)] <- rownames(p_values_matrix)[nrow(p_values_matrix)]
+  # --- Remap so "a" = highest mean ---
+  aligned_means <- group_means[names(significant_letters)]
+  sorted_groups <- names(sort(aligned_means, decreasing = TRUE))
   
-  # Fill the diagonal with 1s to avoid issues with self-comparisons
-  #diag(p_values_matrix) <- 1
+  # Build a letter remapping by scanning groups from highest to lowest mean
+  seen       <- c()
+  letter_map <- c()
+  new_idx    <- 1
   
-  # Generate letters for the significant differences
-  significant_letters <- multcompLetters(p_values_matrix)$Letters
+  for (grp in sorted_groups) {
+    for (ch in strsplit(significant_letters[grp], "")[[1]]) {
+      if (!ch %in% seen) {
+        letter_map[ch] <- letters[new_idx]
+        seen  <- c(seen, ch)
+        new_idx <- new_idx + 1
+      }
+    }
+  }
   
-  # Return the significant letters
-  return(significant_letters)
+  # Apply remapping to all groups
+  new_letters <- sapply(significant_letters, function(s) {
+    chars <- strsplit(s, "")[[1]]
+    paste(sort(letter_map[chars]), collapse = "")
+  })
+  
+  names(new_letters) <- names(significant_letters)
+  return(new_letters)
 }
 ```
 
@@ -427,9 +478,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Shannon, 
+                      merged_sample_data_unc$Soil.Location, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
@@ -481,9 +536,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Shannon, 
+                      merged_sample_data_unc$Type, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
@@ -536,9 +595,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Shannon, 
+                      merged_sample_data_unc$Soil, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
@@ -593,9 +656,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Sobs, 
+                      merged_sample_data_unc$Soil.Location, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
@@ -646,9 +713,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Sobs, 
+                      merged_sample_data_unc$Type, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
@@ -701,9 +772,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Sobs, 
+                      merged_sample_data_unc$Soil, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
@@ -758,9 +833,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Pielou, 
+                      merged_sample_data_unc$Soil.Location, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil.Location = names(significant_letters), Letters = significant_letters)
@@ -811,9 +890,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Pielou, 
+                      merged_sample_data_unc$Type, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Type = names(significant_letters), Letters = significant_letters)
@@ -866,9 +949,13 @@ print(pairwise_comparisons)
 
 p_values_matrix <- pairwise_comparisons$p.value
 
-# Generate letters for significant differences using the custom function
-significant_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_sample_data_unc$Pielou, 
+                      merged_sample_data_unc$Soil, 
+                      mean)
 
+# Pass both arguments
+significant_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 # Create a data frame for the letters to use in plotting
 letters_df <- data.frame(Soil = names(significant_letters), Letters = significant_letters)
@@ -1288,11 +1375,14 @@ Now we will repeat the plots highlighting the differences between crops, locatio
 library(scales)
 # location
 
-NMDS_plot_loc <- plot_ordination(physeq = physeq.norm, 
+p <- plot_ordination(physeq = physeq.norm, 
                                    ordination = NMDS, 
                                    color = "Soil.Location" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_loc <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -1304,11 +1394,14 @@ NMDS_plot_loc <- plot_ordination(physeq = physeq.norm,
             
 NMDS_plot_loc
 
-NMDS_plot_crop <- plot_ordination(physeq = physeq.norm, 
+p <- plot_ordination(physeq = physeq.norm, 
                                    ordination = NMDS, 
                                    color = "Type" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_crop <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -1320,11 +1413,14 @@ NMDS_plot_crop <- plot_ordination(physeq = physeq.norm,
             
 NMDS_plot_crop
 
-NMDS_plot_soil <- plot_ordination(physeq = physeq.norm, 
+p <- plot_ordination(physeq = physeq.norm, 
                                    ordination = NMDS, 
                                    color = "Soil" 
-                                   )+
-            geom_point(size = 2.5) +
+                                   )
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_soil <- p + geom_point(size = 2.5, alpha = 0.6) +
             scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
             #scale_shape_manual(values = shapesvec, ) +
             cowplot::theme_cowplot()+
@@ -1489,7 +1585,13 @@ pairwise_loc <- pairwise.wilcox.test(merged_pd_data_unc$FaithPD,
                                      p.adjust.method = "BH")
 
 p_values_matrix <- pairwise_loc$p.value
-sig_letters <- generate_significant_letters(p_values_matrix)
+# Compute group means to correctly order the letters
+group_means <- tapply(merged_pd_data_unc$FaithPD,
+                      merged_pd_data_unc$Soil.Location,
+                      mean)
+
+# Pass both arguments
+sig_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 letters_df <- data.frame(Soil.Location = names(sig_letters), Letters = sig_letters)
 
@@ -1548,7 +1650,13 @@ pairwise_soil <- pairwise.wilcox.test(merged_pd_data_unc$FaithPD,
                                       p.adjust.method = "BH")
 
 p_values_matrix <- pairwise_soil$p.value
-sig_letters <- generate_significant_letters(p_values_matrix)
+
+group_means <- tapply(merged_pd_data_unc$FaithPD,
+                      merged_pd_data_unc$Soil,
+                      mean)
+
+# Pass both arguments
+sig_letters <- generate_significant_letters(p_values_matrix, group_means)
 
 letters_df <- data.frame(Soil = names(sig_letters), Letters = sig_letters)
 
@@ -1704,12 +1812,15 @@ library(scales)
 
 ## === Location =====================================================
 
-NMDS_plot_loc <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm, 
   ordination = NMDS, 
   color = "Soil.Location"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_loc <- p + geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = local_order) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -1726,12 +1837,15 @@ NMDS_plot_loc
 
 ## === Crop =========================================================
 
-NMDS_plot_crop <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm, 
   ordination = NMDS, 
   color = "Type"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_crop <- p + geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec, limits = crop_order) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -1748,12 +1862,15 @@ NMDS_plot_crop
 
 ## === Soil =========================================================
 
-NMDS_plot_soil <- plot_ordination(
+p <- plot_ordination(
   physeq = physeq.norm, 
   ordination = NMDS, 
   color = "Soil"
-) +
-  geom_point(size = 2.5) +
+) 
+
+p$layers <- p$layers[-1]
+
+NMDS_plot_soil <- p + geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec, name = NULL, labels = labelsvec) +
   cowplot::theme_cowplot() +
   scale_x_continuous(labels = label_number(accuracy = 0.1)) +
@@ -1847,7 +1964,7 @@ var_exp <- pca_res$sdev^2 / sum(pca_res$sdev^2)
 
 PCA_plot_loc_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Soil.Location)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -1865,7 +1982,7 @@ PCA_plot_loc_aitchison
 
 PCA_plot_crop_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Type)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -1884,7 +2001,7 @@ PCA_plot_crop_aitchison
 
 PCA_plot_soil_aitchison <- ggplot(pca_df, 
                                  aes(x = PC1, y = PC2, color = Soil)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec) +
@@ -1959,7 +2076,7 @@ umap_df <- cbind(meta_df, umap_df)
 # --- 4) Plots (match your aesthetics) ----------------------------------------
 UMAP_plot_loc <- ggplot(umap_df, 
                         aes(x = UMAP1, y = UMAP2, color = Soil.Location)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -1974,7 +2091,7 @@ UMAP_plot_loc <- ggplot(umap_df,
 
 UMAP_plot_crop <- ggplot(umap_df, 
                          aes(x = UMAP1, y = UMAP2, color = Type)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec,
@@ -1989,7 +2106,7 @@ UMAP_plot_crop <- ggplot(umap_df,
 
 UMAP_plot_soil <- ggplot(umap_df, 
                          aes(x = UMAP1, y = UMAP2, color = Soil)) +
-  geom_point(size = 2.5) +
+  geom_point(size = 2.5, alpha = 0.6) +
   scale_color_manual(values = colorvec,
                      name = NULL,
                      labels = labelsvec) +
@@ -2048,6 +2165,229 @@ vegan::anosim(ps_dist_matrix_aitchison, phyloseq::sample_data(physeq.norm.raref)
 
 ```
 
+## Alpha diversity with DivNet
+
+Because of the biases associated with rarefaction and the compositional nature of the data, we will use the DivNet package to calculate alpha diversity metrics. 
+
+```{r}
+# run alpha diversity metrics using DivNet package on the physeq.norm object.
+
+library(DivNet)
+set.seed(123)
+
+# This part of the code is commented because it takes a long time to run. We will load the results obtained previously instead. 
+
+# genus_phy <- tax_glom(physeq.norm, taxrank="Genus")
+# divnet_res <- divnet(genus_phy, ncores = 6)
+# 
+# loc_divnet <- tax_glom(physeq.norm, taxrank="Genus") %>%
+#     divnet(X = "Soil.Location", ncores = 8) 
+# 
+# soil_divnet <- tax_glom(physeq.norm, taxrank="Genus") %>%
+#     divnet(X = "Soil", ncores = 8) 
+# 
+# crop_divnet <- tax_glom(physeq.norm, taxrank="Genus") %>%
+#     divnet(X = "Type", ncores = 8) 
+
+#save(loc_divnet, soil_divnet, crop_divnet, genus_phy, divnet_res, file = "../Comparisons/uncult_divnet.RData")
+
+load("../Comparisons/uncult_divnet.RData")
+
+## DivNet diversity testing using betta and betta_posthoc functions. We will test for differences in Shannon diversity across locations, soil types and crops
+library(magrittr)
+
+
+## Crop 
+estimates <- crop_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(crop_divnet$`shannon-variance`) 
+
+# Build the combined df
+betta_df <- data.frame(
+  estimates = estimates,
+  ses       = ses,
+  row.names = crop_divnet$shannon %>% summary %$% sample_names
+)
+
+# Convert sample_data to a plain data frame first
+meta <- as.data.frame(as(sample_data(physeq.norm), "data.frame"))
+
+# Import Type from meta, matching by rowname
+betta_df$Type <- meta[rownames(betta_df), "Type"]
+#betta_df$Type[is.na(betta_df$Type)] <- "OilseedRape"
+# Run betta - formula uses your sample metadata
+bt <- betta(data = betta_df, formula = estimates ~ Type, ses = ses)
+bt$table # get table of results
+bt$global[2] # get p-value for global test
+#bt
+betta_PH <- DivNet::betta_posthoc(bt, metadata = betta_df,
+                      p_adjust_method = "BH")
+
+crop_div_letters <- betta_PH$cld_df
+
+## we will check if letters are ordered based on average
+crop_div_letters$cld # It's not so I will manually reorder.
+crop_div_letters$cld <- c("b", "e", "d", "f", "c", "c", "a")
+# View results
+bt$table
+
+
+crop_test <- testDiversity(crop_divnet)
+crop_test
+summary(crop_test)
+
+### Location 
+
+estimates <- loc_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(loc_divnet$`shannon-variance`) 
+
+# Build the combined df
+betta_df <- data.frame(
+  estimates = estimates,
+  ses       = ses,
+  row.names = loc_divnet$shannon %>% summary %$% sample_names
+)
+
+# Import Type from meta, matching by rowname
+betta_df$Soil.Location <- meta[rownames(betta_df), "Soil.Location"]
+#betta_df$Type[is.na(betta_df$Type)] <- "OilseedRape"
+# Run betta - formula uses your sample metadata
+bt <- betta(data = betta_df, formula = estimates ~ Soil.Location, ses = ses)
+bt$table # get table of results
+bt$global[2] # get p-value for global test
+#bt
+betta_PH <- DivNet::betta_posthoc(bt, metadata = betta_df,
+                      p_adjust_method = "BH")
+
+loc_div_letters <- betta_PH$cld_df
+
+## we will check if letters are ordered based on average
+loc_div_letters$cld # It's not so I will manually reorder.
+loc_div_letters$cld <- c("c" ,"b" ,"g" ,"a" ,"h" ,"d" ,"b" ,"f" ,"e")
+# View results
+bt$table
+
+
+loc_test <- testDiversity(loc_divnet)
+loc_test
+summary(loc_test)
+
+### Soil type 
+
+estimates <- soil_divnet$shannon %>% summary %$% estimate
+ses <- sqrt(soil_divnet$`shannon-variance`) 
+
+# Build the combined df
+betta_df <- data.frame(
+  estimates = estimates,
+  ses       = ses,
+  row.names = soil_divnet$shannon %>% summary %$% sample_names
+)
+
+# Import Type from meta, matching by rowname
+betta_df$Soil <- meta[rownames(betta_df), "Soil"]
+#betta_df$Type[is.na(betta_df$Type)] <- "OilseedRape"
+# Run betta - formula uses your sample metadata
+bt <- betta(data = betta_df, formula = estimates ~ Soil, ses = ses)
+bt$table # get table of results
+bt$global[2] # get p-value for global test
+#bt
+betta_PH <- DivNet::betta_posthoc(bt, metadata = betta_df,
+                      p_adjust_method = "BH")
+
+soil_div_letters <- betta_PH$cld_df
+
+## we will check if letters are ordered based on average
+soil_div_letters$cld # It's not so I will manually reorder.
+soil_div_letters$cld <- c("a", "b", "d", "c")
+# View results
+bt$table
+
+soils_test <- testDiversity(soil_divnet)
+soils_test
+summary(soils_test)
+
+
+
+
+
+# Prep for plots
+
+shannon <- divnet_res$shannon %>% summary %$% estimate %>% as.data.frame
+# rename column . to Shannon
+colnames(shannon)[1] <- "Shannon"
+
+simpson <- divnet_res$simpson %>% summary %$% estimate %>% as.data.frame
+colnames(simpson)[1] <- "Simpson"
+
+divnet_alpha <- cbind(shannon, simpson) %>% rownames_to_column("SampleID")
+
+meta <- data.frame(sample_data(physeq.norm))
+divnet_alpha_meta <- merge(divnet_alpha, meta, by.x = "SampleID", by.y = "row.names")
+
+
+
+# Plot Shannon diversity by crop, soil and location
+
+DV_sha_crop_plot <- ggplot(divnet_alpha_meta, aes(x = Type, y = Shannon, fill = Type)) +
+                        geom_boxplot() +
+                        labs(x = "Crop", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = crop_div_letters,
+                                  aes(x = Type,
+                                      y = max(divnet_alpha_meta$Shannon) + 0.05 * max(divnet_alpha_meta$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = crop_order) +
+                        theme(legend.position = "none")
+DV_sha_crop_plot
+
+    
+DV_sha_soil_plot <- ggplot(divnet_alpha_meta, aes(x = Soil, y = Shannon, fill = Soil)) +
+                        geom_boxplot() +
+                        labs(x = "Soil", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = soil_div_letters,
+                                  aes(x = Soil,
+                                      y = max(divnet_alpha_meta$Shannon) + 0.05 * max(divnet_alpha_meta$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec) +
+                        theme(legend.position = "none")
+DV_sha_soil_plot
+
+DV_sha_loc_plot <- ggplot(divnet_alpha_meta, aes(x = Soil.Location, y = Shannon, fill = Soil.Location)) +
+                        geom_boxplot() +
+                        labs(x = "Location", y = "DivNet Shannon's H'") +
+                        geom_jitter(show.legend = FALSE, width = 0.2, alpha = 0.3) + 
+                        theme_classic() +
+                        geom_text(data = loc_div_letters,
+                                  aes(x = Soil.Location,
+                                      y = max(divnet_alpha_meta$Shannon) + 0.05 * max(divnet_alpha_meta$Shannon),
+                                      label = cld),
+                                  size = 4) +
+                        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                        scale_fill_manual(values = colorvec, name = NULL) +
+                        scale_x_discrete(labels = labelsvec, limits = local_order) +
+                        theme(legend.position = "none")
+DV_sha_loc_plot
+
+
+```
+
+## Join plots
+
+```{r, fig.height = 4, fig.width = 9, fig.align = "center"}
+library(patchwork)
+combined_plot_unc <- (DV_sha_crop_plot + DV_sha_loc_plot +  DV_sha_soil_plot) + plot_annotation(tag_levels = 'A')
+combined_plot_unc
+```
+
 # Export objects 
 
 We will export some object to be used in other scripts down the line such as comparisons.
@@ -2055,7 +2395,7 @@ We will export some object to be used in other scripts down the line such as com
 
 ```{r}
 
-save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, PCA_plot_comb_aitchison_unc, UMAP_plot_comb_unc, file = "../Comparisons/uncult_metabarcode_figs.RData")
+save(alpha_combined_plot_uncult, nmds_plot_comb_uncult, taxa_plot_comb_uncult, merged_sample_data_unc, faith_combined_plot_unc, faith_combined_plot2_unc, nmds_plot_comb_wUniF_uncult, merged_pd_data_unc, PCA_plot_comb_aitchison_unc, UMAP_plot_comb_unc, combined_plot_unc, divnet_alpha_meta, file = "../Comparisons/uncult_metabarcode_figs.RData")
 
 ```
 
