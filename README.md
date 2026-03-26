@@ -1,6 +1,6 @@
 # AgMicrobiome Cryobank Microbiome diversity and functions
 
-This is the repository of codes and files used in Taketani et al. "Host plants drive root microbiome functions whereas microbial community phylogeny is determined by the soil environment" currently under review.
+This is the repository of codes and files used in Taketani et al. "Host plants drive root microbiome functions whereas microbial community phylogeny is determined by the soil environment" ISME Communications in press.
 
 Please follow the order below to make sense of the story 
 
@@ -11,6 +11,10 @@ Cultured microorganisms identification using 16S rRNA metabarcoding [here](./Iso
 Characterization of plant-growth promoting characteristics of the cultures [here](./R_functional_tool/functional_screening_analysis.md).
 
 Code for the main figures found in the paper. [here](./Comparisons/concat_figs.md).
+
+## Funding
+
+This work was funded by the Biotechnology and Biological Sciences Research Council of the United Kingdom (BBSRC) awards: BB/T019492/1, BB/T019484/1, BB/T019700/1, BB/T019808/1. Rothamsted Research receives strategic funding from the BBSRC. We acknowledge support from the Institute Strategic Programme Growing Health (BB/X010953/1).
 
 
 ## License
